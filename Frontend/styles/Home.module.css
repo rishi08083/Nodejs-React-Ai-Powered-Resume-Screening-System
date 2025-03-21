@@ -1,0 +1,188 @@
+/* styles/Dashboard.module.css */
+
+.container {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.sidebar {
+  width: 250px;
+  background-color: #000000;
+  color: white;
+  padding-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.logo {
+  margin-bottom: 20px;
+}
+
+.sidebarItem {
+  width: 100%;
+  padding: 15px;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.sidebarItem:hover {
+  background-color: #1e3a3a;
+}
+
+.sidebarItem.active {
+  background-color: #eeea1f;
+  color: black;
+}
+.dragUpload {
+  color: yellow;
+  border: 1px solid yellow;
+}
+
+.mainContainer {
+  flex: 1;
+  padding: 20px;
+  background-color: #f9f9f9;
+  overflow: scroll;
+}
+
+.header {
+  background-color: #ffffff;
+  padding: 15px;
+  border-bottom: 2px solid #ddd;
+  margin-bottom: 20px;
+}
+
+.content {
+  background-color: white;
+  padding: 20px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+/* UploadForm.module.css */
+.dragUpload {
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  font-size: 16px;
+  color: #333;
+}
+
+.fileInputLabel {
+  margin-top: 10px;
+  font-size: 14px;
+  display: inline-block;
+  cursor: pointer;
+  color: #007bff;
+}
+
+.errorMessage {
+  color: red;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+.fileDetails {
+  margin-top: 20px;
+  font-size: 16px;
+}
+.hiddenInput {
+  display: none;
+}
+.fileInputButton {
+  background-color: rgb(248, 233, 24);
+  border: none;
+  padding: 10px;
+}
+/* Jobs.module.css */
+.container2 {
+  width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+  background-color: white; /* White background for the table */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add box shadow to the table */
+  border-radius: 8px; /* Rounded corners for the table */
+  overflow: hidden;
+}
+
+.table th,
+.table td {
+  padding: 12px 15px; /* Add padding and adjust spacing */
+  text-align: left;
+  font-size: 14px; /* Slightly smaller font size */
+}
+
+.table th {
+  background-color: #f4f4f4;
+  font-weight: bold;
+  color: #555; /* Darker color for table header */
+}
+
+.table tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.table tbody tr:hover {
+  background-color: #f1f1f1; /* Light gray background on hover */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Add box shadow on hover */
+  cursor: pointer; /* Change cursor to pointer on hover */
+}
+
+.viewButton {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.viewButton:hover {
+  background-color: #b39200;
+}
+
+/* Tag-like styling for status */
+.status {
+  display: inline-block;
+  border-radius: 12px;
+  padding: 4px 10px;
+  color: white; /* White text for better contrast */
+  /* Smaller font size for status tags */
+}
+
+.status.open {
+  background-color: #28a745; /* Green for "Open" */
+}
+
+.status.pending {
+  background-color: #ffc107; /* Yellow for "Pending" */
+  color: #212529; /* Dark text for contrast */
+}
+
+.status.closed {
+  background-color: #dc3545; /* Red for "Closed" */
+}
+
+.viewButton {
+  background-color: yellow;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  color: black;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.viewButton:hover {
+  background-color: #f5e61b;
+}
