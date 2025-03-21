@@ -5,14 +5,14 @@ import Image from "next/image";
 import ListJobs from "../components/JobList";
 import UploadForm from "../components/UploadForm";
 import RecruiterRequests from "../components/admin/RecruiterRequests"; // Admin-specific component
+import { useAuth } from "../lib/auth";
 
 // Define action types
 const actionTypes = {
   SET_ACTIVE_SECTION: "SET_ACTIVE_SECTION",
 } as const;
 
-type Action =
-  | { type: typeof actionTypes.SET_ACTIVE_SECTION; payload: string };
+type Action = { type: typeof actionTypes.SET_ACTIVE_SECTION; payload: string };
 
 type State = {
   activeSection: string;
@@ -31,25 +31,33 @@ const reducer = (state: State, action: Action): State => {
 };
 
 const initialState: State = {
-  activeSection: "dashboard", // Default section
+  activeSection: "jobs", // Default section
 };
 
 const Home = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [role, setRole] = useState<"admin" | "recruiter">("recruiter"); // State to track user role
+  const { user, logout, checkAuth, loading } = useAuth();
+  console.log(user);
 
   useEffect(() => {
     // Simulate fetching the role from an API or authentication context
     const fetchUserRole = async () => {
       // Replace this with actual API call or authentication logic
       // const userRole = "admin"; // Change to "recruiter" or "admin" as needed
-      const userRole = "recruiter"; // Change to "recruiter" or "admin" as needed
-      
-      setRole(userRole as "admin" | "recruiter");
+      // check if user is authenticated
+      console.log(user);
+      if (!loading) {
+        if (user) {
+          setRole(user.role as "admin" | "recruiter");
+        } else {
+          console.log("No user found");
+        }
+      }
     };
 
     fetchUserRole();
-  }, []);
+  }, [user, loading]);
 
   const setActiveSection = (section: string) => {
     dispatch({
@@ -152,6 +160,7 @@ const Home = () => {
             {state.activeSection.charAt(0).toUpperCase() +
               state.activeSection.slice(1)}
           </h2>
+          <h1>{user && user.name}</h1>
         </div>
         <div className="bg-white p-5 shadow-lg rounded-lg">
           {role === "recruiter" && state.activeSection === "jobs" && (

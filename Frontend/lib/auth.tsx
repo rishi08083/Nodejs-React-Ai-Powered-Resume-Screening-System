@@ -1,0 +1,87 @@
+"use client";
+import {
+  createContext,
+  useState,
+  useEffect,
+  ReactNode,
+  useContext,
+} from "react";
+
+// // api response user: {
+//         id: user.id,
+//         name: user.name,
+//         email: user.email,
+//         role: user.role,
+//       }
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+}
+interface AuthContextType {
+  user: User | null;
+  login: (credentials: { email: string; password: string }) => Promise<void>;
+  logout: () => Promise<void>;
+  loading: boolean;
+
+  checkAuth: () => Promise<void>;
+}
+const AuthContext = createContext<AuthContextType | null>(null);
+
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+  async function checkAuth() {
+    try {
+      const response = await fetch(BASE_URL + "/api/user/getuserdetails", {
+        method: "POST",
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data.user);
+        setUser(data.user);
+        setLoading(false);
+        console.log(user);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  useEffect(() => {
+    checkAuth();
+  }, []);
+  const login = async (credentials: { email: string; password: string }) => {
+    const res = await fetch(`${BASE_URL}/api/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(credentials),
+      credentials: "include",
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      await checkAuth();
+      return data;
+    }
+    throw new Error("Login failed");
+  };
+  const logout = async () => {};
+  return (
+    <AuthContext.Provider value={{ user, login, logout, loading, checkAuth }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+
+  return context;
+};
