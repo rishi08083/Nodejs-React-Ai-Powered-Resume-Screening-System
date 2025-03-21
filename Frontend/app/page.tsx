@@ -2,9 +2,9 @@
 "use client";
 import { useReducer, useState, useEffect } from "react";
 import Image from "next/image";
-import ListJobs from "../src/components/JobList";
-import UploadForm from "../src/components/UploadForm";
-import RecruiterRequests from "../src/components/admin/RecruiterRequests"; // Admin-specific component
+import ListJobs from "../components/JobList";
+import UploadForm from "../components/UploadForm";
+import RecruiterRequests from "../components/admin/RecruiterRequests"; // Admin-specific component
 
 // Define action types
 const actionTypes = {

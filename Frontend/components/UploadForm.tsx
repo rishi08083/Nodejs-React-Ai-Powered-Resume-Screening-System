@@ -1,7 +1,7 @@
 // src/components/UploadForm.tsx
 import { useState, useEffect, useRef, ChangeEvent } from "react";
 import React from "react";
-import styles from '../../styles/Home.module.css'
+import styles from "../styles/Home.module.css";
 
 type Job = {
   title: string;
@@ -86,7 +86,9 @@ const UploadForm = () => {
         </label>
       </div>
 
-      {errorMessage && <div className={styles.errorMessage}>{errorMessage}</div>}
+      {errorMessage && (
+        <div className={styles.errorMessage}>{errorMessage}</div>
+      )}
 
       {file && (
         <div className={styles.fileDetails}>

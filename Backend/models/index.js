@@ -12,7 +12,6 @@ const env = process.env.NODE_ENV || "development"; // Dynamically select environ
 const config = require("../config/config")[env];
 
 console.log(`Running in ${env} mode`);
-console.log("Database Config:", config);
 
 const db = {};
 let sequelize;

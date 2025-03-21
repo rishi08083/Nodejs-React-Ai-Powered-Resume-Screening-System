@@ -46,6 +46,8 @@ module.exports = (sequelize, DataTypes) => {
       password_hash: { type: DataTypes.TEXT, allowNull: false },
       role: { type: DataTypes.ENUM("admin", "recruiter"), allowNull: false },
       is_deleted: { type: DataTypes.BOOLEAN, defaultValue: false },
+      resetToken: { type: DataTypes.STRING, allowNull: true },
+      resetTokenExpires: { type: DataTypes.DATE, allowNull: true },
     },
     {
       sequelize,
