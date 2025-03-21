@@ -1,0 +1,32 @@
+"use strict";
+const { Model } = require("sequelize");
+
+module.exports = (sequelize, DataTypes) => {
+  class Skills extends Model {
+    static associate(models) {
+      // Many-to-One: Skills → Candidates
+      Skills.belongsTo(models.Candidates, {
+        foreignKey: "candidate_id",
+        as: "candidate",
+      });
+    }
+  }
+
+  Skills.init(
+    {
+      candidate_id: DataTypes.INTEGER,
+      skill_name: DataTypes.STRING,
+      proficiency: DataTypes.STRING,
+      is_deleted: DataTypes.BOOLEAN,
+    },
+    {
+      sequelize,
+      modelName: "Skills",
+      tableName: "skills",
+      timestamps: true,
+      underscored: true,
+    }
+  );
+
+  return Skills;
+};
