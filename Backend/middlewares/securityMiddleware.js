@@ -17,7 +17,7 @@ module.exports = (app) => {
           upgradeInsecureRequests: [],
         },
       },
-      crossOriginResourcePolicy: { policy: "same-origin" }, // Restrict CORS within the same origin
+      crossOriginResourcePolicy: { policy: "cross-origin" }, // Restrict CORS within the same origin
     })
   );
 
@@ -46,7 +46,7 @@ module.exports = (app) => {
   // Enable CORS with Restriction (Only allow frontend domain)
   app.use(
     cors({
-      origin: ["https://your-frontend-domain.com"],
+      origin: ["https://your-frontend-domain.com", "http://localhost:3000"],
       methods: ["GET", "POST", "PUT", "DELETE"],
       credentials: true,
     })
