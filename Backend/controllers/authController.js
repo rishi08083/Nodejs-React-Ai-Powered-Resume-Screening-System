@@ -3,7 +3,9 @@ const jwt = require("jsonwebtoken");
 const db = require("../models");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
+
 const { Op, where } = require("sequelize");
+
 
 const register = async (req, res) => {
   try {

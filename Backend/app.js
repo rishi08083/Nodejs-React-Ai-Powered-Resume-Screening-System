@@ -2,11 +2,14 @@ const express = require("express");
 const morgan = require("morgan");
 const app = express();
 const dotenv = require("dotenv").config();
+const cors = require("cors");
+const cookieParser = require("cookie-parser");
 const PORT = process.env.SERVER_PORT;
 const cors = require("cors");
 
 app.use(express.json());
 app.use(morgan("dev"));
+
 //cors
 app.use(cors({
   origin: "http://localhost:3000", // Allow requests from Next.js frontend

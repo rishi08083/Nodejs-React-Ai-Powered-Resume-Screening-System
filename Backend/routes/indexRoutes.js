@@ -3,6 +3,7 @@ const router = express.Router();
 const authRoutes = require("../routes/authRoutes");
 const uploadRoutes = require("../routes/uploadRoutes");
 const homeRoutes = require("../routes/homeRoutes");
+const userRoutes = require("../routes/userRoutes");
 const createJobRoutes = require("./createJobRoutes.js");
 
 router.get("/", homeRoutes);

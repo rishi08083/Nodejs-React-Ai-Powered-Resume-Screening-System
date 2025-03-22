@@ -17,7 +17,7 @@ module.exports = (app) => {
           upgradeInsecureRequests: [],
         },
       },
-      crossOriginResourcePolicy: { policy: "same-origin" }, // Restrict CORS within the same origin
+      crossOriginResourcePolicy: { policy: "cross-origin" }, // Restrict CORS within the same origin
     })
   );
 

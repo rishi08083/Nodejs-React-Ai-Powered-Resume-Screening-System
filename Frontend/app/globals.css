@@ -8,3 +8,21 @@ body {
   margin: 0;
   padding: 0;
 }
+
+/* Remove scrollbars from all elements */
+*,
+*::before,
+*::after {
+  scrollbar-width: none; /* For Firefox */
+  -ms-overflow-style: none; /* For Internet Explorer and Edge */
+}
+
+html,
+body {
+  overflow: hidden; /* Remove default scrollbar on the body */
+}
+
+/* Hide scrollbars for Webkit browsers (Chrome, Safari, etc.) */
+::-webkit-scrollbar {
+  display: none;
+}
