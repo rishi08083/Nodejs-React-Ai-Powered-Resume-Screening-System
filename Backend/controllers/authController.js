@@ -6,7 +6,6 @@ const nodemailer = require("nodemailer");
 
 const { Op, where } = require("sequelize");
 
-
 const register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -95,10 +94,6 @@ const login = async (req, res) => {
         process.env.JWT_SECRET,
         { expiresIn: "1h" }
       );
-      // save jwt token in cookie jwtToken
-      res.cookie("jwtToken", token, {
-        httpOnly: true,
-      });
       res.status(200).json({
         message: `logged in successfully`,
         token,
