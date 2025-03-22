@@ -45,6 +45,7 @@ const Home = () => {
   useEffect(() => {
     // Simulate fetching the role from an API or authentication context
     const fetchUserRole = async () => {
+
       if (!user) {
         console.log("No user found, redirecting to login.");
         router.push("/login");
@@ -53,6 +54,7 @@ const Home = () => {
   
       // If there is a user, fetch the role
       setRole(user.role as "admin" | "recruiter");
+
     };
 
     fetchUserRole();

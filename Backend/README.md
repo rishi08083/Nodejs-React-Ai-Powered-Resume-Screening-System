@@ -15,7 +15,6 @@ cd ATS_Recruitment_Screening_System
 
 ```
 npm install
-npm install
 
 ```
 
@@ -48,11 +47,13 @@ PROD_DB_SSL=true
 
 ```
 
-### Set Up the Database
+### Set Up the Database & Undo migration commands
 
 ```
+npx sequelize-cli db:migrate:undo:all
 npx sequelize-cli db:migrate
 ```
+ 
 
 ### Run the Server
 

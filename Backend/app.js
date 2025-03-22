@@ -5,21 +5,17 @@ const dotenv = require("dotenv").config();
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const PORT = process.env.SERVER_PORT;
+const cors = require("cors");
 
 app.use(express.json());
 app.use(morgan("dev"));
-app.use(cookieParser());
-app.use(
-  cors({
-    origin: [
-      "https://your-frontend-domain.com",
-      "http://localhost:3000",
-      "http://localhost:3001",
-    ],
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true,
-  })
-);
+
+//cors
+app.use(cors({
+  origin: "http://localhost:3000", // Allow requests from Next.js frontend
+  methods: "GET,POST,PUT,DELETE",
+  credentials: true, // If using cookies/authentication
+}));
 
 // Routes
 const indexRouter = require("./routes/indexRoutes");
@@ -29,6 +25,7 @@ const errorRouter = require("./routes/errorRoutes");
 app.use("/api", indexRouter);
 
 app.use(errorRouter);
+
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
