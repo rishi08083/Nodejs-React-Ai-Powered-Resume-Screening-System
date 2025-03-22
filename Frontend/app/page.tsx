@@ -1,14 +1,15 @@
 "use client";
+
 import { useReducer, useState, useEffect } from "react";
 import Image from "next/image";
 import ListJobs from "../components/JobList";
 import { useRouter } from "next/navigation";
 import UploadForm from "../components/UploadForm";
-import RecruiterRequests from "../components/admin/RecruiterRequests"; // Admin-specific component
+import RecruiterRequests from "../components/admin/RecruiterRequests";
 import { useAuth } from "../lib/auth";
-import { HiMenu } from "react-icons/hi"; // For the hamburger icon
+import { HiMenu, HiX } from "react-icons/hi";
+import styles from "../styles/NavBar.module.css";
 
-// Define action types
 const actionTypes = {
   SET_ACTIVE_SECTION: "SET_ACTIVE_SECTION",
 } as const;
@@ -22,189 +23,190 @@ type State = {
 const reducer = (state: State, action: Action): State => {
   switch (action.type) {
     case actionTypes.SET_ACTIVE_SECTION:
-      return {
-        ...state,
-        activeSection: action.payload,
-      };
+      return { ...state, activeSection: action.payload };
     default:
       return state;
   }
 };
 
-const initialState: State = {
-  activeSection: "jobs", // Default section
-};
+const initialState: State = { activeSection: "jobs" };
 
 const Home = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const [role, setRole] = useState<"admin" | "recruiter">("recruiter"); // State to track user role
+  const [role, setRole] = useState<"admin" | "recruiter">("recruiter");
   const { user, logout, checkAuth, loading } = useAuth();
-  console.log(user)
   const router = useRouter();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // State to manage sidebar toggle
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
-    // Simulate fetching the role from an API or authentication context
-    const fetchUserRole = async () => {
-      if (loading) return;
-      if (!user) {
-        console.log("No user found, redirecting to login.");
-        router.push("/login");
-        return;
-      }
-  
-      // If there is a user, fetch the role
-      setRole(user.role as "admin" | "recruiter");
+    if (user == null) {
+      router.push("/login");
+      return;
+    }
+    if (user != null && user.role === "admin") {
+      setRole("recruiter");
+    }
+    if (user != null && user.role === "recruiter") {
+      setRole("recruiter");
+    }
+  }, [user, loading, router]);
 
+  // Close sidebar when clicking outside
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (
+        isSidebarOpen &&
+        !target.closest(`.${styles.sidebar}`) &&
+        !target.closest(`.${styles.menuButton}`)
+      ) {
+        setIsSidebarOpen(false);
+      }
     };
 
-    fetchUserRole();
-  }, [user, loading]);
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+    };
+  }, [isSidebarOpen]);
 
   const setActiveSection = (section: string) => {
-    dispatch({
-      type: actionTypes.SET_ACTIVE_SECTION,
-      payload: section,
-    });
-    setIsSidebarOpen(!isSidebarOpen)
+    dispatch({ type: actionTypes.SET_ACTIVE_SECTION, payload: section });
+    setIsSidebarOpen(false);
   };
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="flex justify-center items-center h-64">
+          <div className="w-12 h-12 rounded-full border-4 border-yellow-400 border-t-transparent animate-spin"></div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex h-screen overflow-hidden bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500">
-      {/* Sidebar */}
+    <div className={styles.container}>
+      {/* Header - now visible on all screen sizes */}
+      <header className={styles.header}>
+        <button
+          className={styles.menuButton}
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          aria-label="Toggle menu"
+        >
+          <HiMenu />
+        </button>
+        <h1>{user?.name || "Dashboard"}</h1>
+        <button onClick={logout} className="ml-auto text-sm">
+          Logout
+        </button>
+      </header>
+
+      {/* Overlay to close sidebar when clicking outside on mobile */}
       <div
-        className={`${
-          isSidebarOpen ? "w-64" : "w-0"
-        } md:w-64 bg-black text-white pt-5 flex flex-col items-center rounded-lg transition-all duration-300 ease-in-out`}
-      >
-        <div className="mb-5">
-          <Image src="/logo.jpg" alt="Logo" width={280} height={80} />
+        className={`${styles.overlay} ${isSidebarOpen ? styles.active : ""}`}
+        onClick={() => setIsSidebarOpen(false)}
+      />
+
+      {/* Sidebar */}
+      <div className={`${styles.sidebar} ${isSidebarOpen ? styles.open : ""}`}>
+        <div className={styles.logoContainer}>
+          <Image src="/logo.jpg" alt="Logo" width={200} height={60} priority />
         </div>
 
-        {/* Hamburger Icon (visible only on small screens) */}
-        
-        {role === "recruiter" && (
-          <>
-            <div
-              className={`w-full py-4 text-center cursor-pointer transition-all duration-300 ${
-                state.activeSection === "jobs"
-                  ? "bg-yellow-400 text-black"
-                  : "hover:bg-yellow-400 hover:text-black"
-              }`}
-              onClick={() => setActiveSection("jobs")}
-            >
-              Jobs
-            </div>
-            <div
-              className={`w-full py-4 text-center cursor-pointer transition-all duration-300 ${
-                state.activeSection === "upload"
-                  ? "bg-yellow-400 text-black"
-                  : "hover:bg-yellow-400 hover:text-black"
-              }`}
-              onClick={() => setActiveSection("upload")}
-            >
-              Upload Resume
-            </div>
-            <div
-              className={`w-full py-4 text-center cursor-pointer transition-all duration-300 ${
-                state.activeSection === "post"
-                  ? "bg-yellow-400 text-black"
-                  : "hover:bg-yellow-400 hover:text-black"
-              }`}
-              onClick={() => setActiveSection("post")}
-            >
-              Post Jobs
-            </div>
-            <div
-              className={`w-full py-4 text-center cursor-pointer transition-all duration-300 ${
-                state.activeSection === "profile"
-                  ? "bg-yellow-400 text-black"
-                  : "hover:bg-yellow-400 hover:text-black"
-              }`}
-              onClick={() => setActiveSection("profile")}
-            >
-              Profile
-            </div>
-          </>
-        )}
-        {role === "admin" && (
-          <>
-            <div
-              className={`w-full py-4 text-center cursor-pointer transition-all duration-300 ${
-                state.activeSection === "dashboard"
-                  ? "bg-yellow-400 text-black"
-                  : "hover:bg-yellow-400 hover:text-black"
-              }`}
-              onClick={() => setActiveSection("dashboard")}
-            >
-              Dashboard
-            </div>
-            <div
-              className={`w-full py-4 text-center cursor-pointer transition-all duration-300 ${
-                state.activeSection === "recruiterRequests"
-                  ? "bg-yellow-400 text-black"
-                  : "hover:bg-yellow-400 hover:text-black"
-              }`}
-              onClick={() => setActiveSection("recruiterRequests")}
-            >
-              Recruiter Requests
-            </div>
-            <div
-              className={`w-full py-4 text-center cursor-pointer transition-all duration-300 ${
-                state.activeSection === "settings"
-                  ? "bg-yellow-400 text-black"
-                  : "hover:bg-yellow-400 hover:text-black"
-              }`}
-              onClick={() => setActiveSection("settings")}
-            >
-              Settings
-            </div>
-          </>
-        )}
+        {/* Close button for mobile sidebar */}
+        <button
+          className="absolute top-4 right-4 text-gray-500 md:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        >
+          <HiX />
+        </button>
+
+        <nav>
+          {role === "recruiter" && (
+            <>
+              <button
+                onClick={() => setActiveSection("jobs")}
+                className={state.activeSection === "jobs" ? "font-bold" : ""}
+              >
+                Jobs
+              </button>
+              <button
+                onClick={() => setActiveSection("upload")}
+                className={state.activeSection === "upload" ? "font-bold" : ""}
+              >
+                Upload Resume
+              </button>
+              <button
+                onClick={() => setActiveSection("post")}
+                className={state.activeSection === "post" ? "font-bold" : ""}
+              >
+                Post Jobs
+              </button>
+              <button
+                onClick={() => setActiveSection("profile")}
+                className={state.activeSection === "profile" ? "font-bold" : ""}
+              >
+                Profile
+              </button>
+            </>
+          )}
+          {role === "admin" && (
+            <>
+              <button
+                onClick={() => setActiveSection("dashboard")}
+                className={
+                  state.activeSection === "dashboard" ? "font-bold" : ""
+                }
+              >
+                Dashboard
+              </button>
+              <button
+                onClick={() => setActiveSection("recruiterRequests")}
+                className={
+                  state.activeSection === "recruiterRequests" ? "font-bold" : ""
+                }
+              >
+                Recruiter Requests
+              </button>
+              <button
+                onClick={() => setActiveSection("settings")}
+                className={
+                  state.activeSection === "settings" ? "font-bold" : ""
+                }
+              >
+                Settings
+              </button>
+            </>
+          )}
+          <button onClick={logout} className="mt-4">
+            Logout
+          </button>
+        </nav>
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 p-5 bg-gray-100 overflow-scroll">
-        <div className="bg-white p-4 border-b-2 border-gray-300 mb-5 rounded-lg flex justify-between">
-          {/* <h2>
-            {state.activeSection.charAt(0).toUpperCase() +
-              state.activeSection.slice(1)}
-          </h2> */}
-          <h1>{user && user.name}</h1>
-          <button
-          className=" md:hidden text-white text-3xl"
-          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-        >
-          <HiMenu 
-          color="black"
-          />
-        </button> 
- 
-        </div>
-        <div className="bg-white p-5 shadow-lg rounded-lg overflow-scroll ">
-          {role === "recruiter" && state.activeSection === "jobs" && (
-            <ListJobs />
-          )}
-          {role === "recruiter" && state.activeSection === "upload" && (
-            <UploadForm />
-          )}
-          {role === "recruiter" && state.activeSection === "post" && (
-            <div>Post Jobs Content</div>
-          )}
-          {role === "recruiter" && state.activeSection === "profile" && (
-            <div>Profile Content</div>
-          )}
-          {role === "admin" && state.activeSection === "dashboard" && (
-            <div>Admin Dashboard Content</div>
-          )}
-          {role === "admin" && state.activeSection === "recruiterRequests" && (
-            <RecruiterRequests />
-          )}
-          {role === "admin" && state.activeSection === "settings" && (
-            <div>Settings Content</div>
-          )}
-        </div>
-      </div>
+      <main className={styles.main}>
+        {role === "recruiter" && state.activeSection === "jobs" && <ListJobs />}
+        {role === "recruiter" && state.activeSection === "upload" && (
+          <UploadForm />
+        )}
+        {role === "recruiter" && state.activeSection === "post" && (
+          <div>Post Jobs Content</div>
+        )}
+        {role === "recruiter" && state.activeSection === "profile" && (
+          <div>Profile Content</div>
+        )}
+        {role === "admin" && state.activeSection === "dashboard" && (
+          <div>Admin Dashboard Content</div>
+        )}
+        {role === "admin" && state.activeSection === "recruiterRequests" && (
+          <RecruiterRequests />
+        )}
+        {role === "admin" && state.activeSection === "settings" && (
+          <div>Settings Content</div>
+        )}
+      </main>
     </div>
   );
 };
