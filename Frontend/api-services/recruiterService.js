@@ -9,7 +9,7 @@ console.log(BASE_URL);
  */
 export const fetchRecruiterRequests = async () => {
   try {
-    const response = await fetch(`${BASE_URL}/api/recruiter/requests`, {
+    const response = await fetch(`${BASE_URL}/auth/view-recruiter-req`, {
       method: "GET",
     });
 
@@ -31,7 +31,7 @@ export const fetchRecruiterRequests = async () => {
  */
 export const acceptRecruiterRequest = async (email) => {
   try {
-    const response = await fetch(`${BASE_URL}/api/recruiter/accept`, {
+    const response = await fetch(`${BASE_URL}/auth/approve-recruiter-req`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -53,8 +53,8 @@ export const acceptRecruiterRequest = async (email) => {
  */
 export const rejectRecruiterRequest = async (email) => {
   try {
-    const response = await fetch(`${BASE_URL}/api/recruiter/reject`, {
-      method: "POST",
+    const response = await fetch(`${BASE_URL}/auth/reject-recruiter-req`, {
+      method: "DELETE",
       headers: {
         "Content-Type": "application/json",
       },

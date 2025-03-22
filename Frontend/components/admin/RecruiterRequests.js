@@ -15,12 +15,15 @@ export default function RecruiterRequests() {
     // Fetch recruiter requests when the component loads
     const getRequests = async () => {
       try {
-        // const data = await fetchRecruiterRequests(); // Fetch data from API
-        const data = [
-          { id: "1", name: "John Doe", email: "john.doe@example.com", company: "TechCorp" },
-          { id: "2", name: "Jane Smith", email: "jane.smith@example.com", company: "Innovate Inc." },
-        ];
-        setRequests(data); // Set the fetched data to state
+        const data = await fetchRecruiterRequests(); // Fetch data from API
+        console.log(data);
+        
+        // const data = [
+
+        //   { id: "1", name: "John Doe", email: "john.doe@example.com", company: "TechCorp" },
+        //   { id: "2", name: "Jane Smith", email: "jane.smith@example.com", company: "Innovate Inc." },
+        // ];
+        setRequests(data.users); // Set the fetched data to state
       } catch (error) {
         console.error("Error fetching recruiter requests:", error);
         setMessage("Failed to fetch recruiter requests.");
