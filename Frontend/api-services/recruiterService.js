@@ -1,6 +1,7 @@
-const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_BASE_URL; // Get the backend base URL from the environment variable
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL; // Get the backend base URL from the environment variable
 
 console.log(BASE_URL);
+
 
 /**
  * Fetches all recruiter requests.
@@ -8,7 +9,7 @@ console.log(BASE_URL);
  */
 export const fetchRecruiterRequests = async () => {
   try {
-    const response = await fetch(`${BASE_URL}/api/recruiter/requests`, {
+    const response = await fetch(`${BASE_URL}/auth/view-recruiter-req`, {
       method: "GET",
     });
 
@@ -25,18 +26,18 @@ export const fetchRecruiterRequests = async () => {
 
 /**
  * Accepts a recruiter request.
- * @param {string} requestId - The ID of the recruiter request to accept.
+ * @param {string} email - The email of the recruiter to accept.
  * @returns {Promise<Response>} - The API response.
  */
-export const acceptRecruiterRequest = async (requestId) => {
+export const acceptRecruiterRequest = async (email) => {
   try {
-    const response = await fetch(`${BASE_URL}/api/recruiter/accept/${requestId}`, {
+    const response = await fetch(`${BASE_URL}/auth/approve-recruiter-req`, {
       method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email }),
     });
-
-    if (!response.ok) {
-      throw new Error("Failed to accept recruiter request.");
-    }
 
     return response;
   } catch (error) {
@@ -47,22 +48,48 @@ export const acceptRecruiterRequest = async (requestId) => {
 
 /**
  * Rejects a recruiter request.
- * @param {string} requestId - The ID of the recruiter request to reject.
+ * @param {string} email - The email of the recruiter to reject.
  * @returns {Promise<Response>} - The API response.
  */
-export const rejectRecruiterRequest = async (requestId) => {
+export const rejectRecruiterRequest = async (email) => {
   try {
-    const response = await fetch(`${BASE_URL}/api/recruiter/reject/${requestId}`, {
-      method: "POST",
+    const response = await fetch(`${BASE_URL}/auth/reject-recruiter-req`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email }),
     });
-
-    if (!response.ok) {
-      throw new Error("Failed to reject recruiter request.");
-    }
 
     return response;
   } catch (error) {
     console.error("Error rejecting recruiter request:", error);
+    throw error;
+  }
+};
+/**
+ * Registers a new recruiter.
+ * @param {Object} formData - The registration data (name, email, password, etc.).
+ * @returns {Promise<Object>} - The API response.
+ */
+export const fetchRecruiterRegister = async (formData) => {
+  try {
+    const response = await fetch(`${BASE_URL}/auth/register`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    });
+    console.log(response);
+    
+    if (!response.ok) {
+      throw new Error("Failed to register recruiter.");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error registering recruiter:", error);
     throw error;
   }
 };

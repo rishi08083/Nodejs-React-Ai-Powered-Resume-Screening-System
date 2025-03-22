@@ -31,7 +31,7 @@ const reducer = (state: State, action: Action): State => {
 };
 
 const initialState: State = {
-  activeSection: "dashboard", // Default section
+  activeSection: "jobs", // Default section
 };
 
 const Home = () => {
@@ -42,8 +42,8 @@ const Home = () => {
     // Simulate fetching the role from an API or authentication context
     const fetchUserRole = async () => {
       // Replace this with actual API call or authentication logic
-      // const userRole = "admin"; // Change to "recruiter" or "admin" as needed
-      const userRole = "recruiter"; // Change to "recruiter" or "admin" as needed
+      const userRole = "admin"; // Change to "recruiter" or "admin" as needed
+      // const userRole = "recruiter"; // Change to "recruiter" or "admin" as needed
       
       setRole(userRole as "admin" | "recruiter");
     };
