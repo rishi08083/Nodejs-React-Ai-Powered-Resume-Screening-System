@@ -11,7 +11,12 @@ module.exports = (app) => {
       contentSecurityPolicy: {
         directives: {
           defaultSrc: ["'self'"],
-          scriptSrc: ["'self'", "https://trusted.cdn.com"],
+          scriptSrc: [
+            "'self'",
+            "https://trusted.cdn.com",
+            "http://localhost:3000",
+            "http://localhost:3001",
+          ],
           objectSrc: ["'none'"],
           imgSrc: ["'self'", "data:"],
           upgradeInsecureRequests: [],
@@ -46,7 +51,11 @@ module.exports = (app) => {
   // Enable CORS with Restriction (Only allow frontend domain)
   app.use(
     cors({
-      origin: ["https://your-frontend-domain.com", "http://localhost:3000"],
+      origin: [
+        "https://your-frontend-domain.com",
+        "http://localhost:3000",
+        "http://localhost:3001",
+      ],
       methods: ["GET", "POST", "PUT", "DELETE"],
       credentials: true,
     })
