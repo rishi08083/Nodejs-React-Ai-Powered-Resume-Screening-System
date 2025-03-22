@@ -39,13 +39,14 @@ const Home = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [role, setRole] = useState<"admin" | "recruiter">("recruiter"); // State to track user role
   const { user, logout, checkAuth, loading } = useAuth();
+  console.log(user)
   const router = useRouter();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false); // State to manage sidebar toggle
 
   useEffect(() => {
     // Simulate fetching the role from an API or authentication context
     const fetchUserRole = async () => {
-
+      if (loading) return;
       if (!user) {
         console.log("No user found, redirecting to login.");
         router.push("/login");

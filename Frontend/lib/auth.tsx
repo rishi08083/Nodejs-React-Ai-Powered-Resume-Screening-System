@@ -33,11 +33,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+  console.log('da',BASE_URL)
   async function checkAuth() {
     try {
       const response = await fetch(BASE_URL + "/api/user/getuserdetails", {
         method: "POST",
         credentials: "include",
+        headers: {
+          Authorization : "Bearer " + localStorage.getItem("token"),
+        }
       });
 
       if (response.ok) {
@@ -69,11 +73,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   
     const data = await res.json();
+
+  localStorage.setItem('token',data.token)
+
     await checkAuth();
     return data;
   };
   const logout = async () => {
-  document.cookie = `jwtToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
+
   };
   return (
     <AuthContext.Provider value={{ user, login, logout, loading, checkAuth }}>
