@@ -46,7 +46,7 @@ module.exports = (app) => {
   // Enable CORS with Restriction (Only allow frontend domain)
   app.use(
     cors({
-      origin: ["https://your-frontend-domain.com"],
+      origin: ["https://your-frontend-domain.com", "http://localhost:3000"],
       methods: ["GET", "POST", "PUT", "DELETE"],
       credentials: true,
     })

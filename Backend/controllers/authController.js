@@ -1,11 +1,9 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const db = require("../models");
-const crypto = require('crypto');
-const nodemailer = require('nodemailer');
-const { Op } = require('sequelize');
-
-
+const crypto = require("crypto");
+const nodemailer = require("nodemailer");
+const { Op, where } = require("sequelize");
 
 const register = async (req, res) => {
   try {
@@ -25,32 +23,87 @@ const register = async (req, res) => {
   }
 };
 
+const viewRecruiterReq = async (req, res) => {
+  try {
+    const users = await db.Users.findAll({
+      where: { isActive: false },
+      attributes: ["id", "name", "email", "role"],
+    });
+    res.status(200).json({
+      message: `Recruiter Requests Displayed`,
+      users,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const approveRecruiterReq = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const [updatedRows] = await db.Users.update(
+      { isActive: true }, // Set isActive to true
+      { where: { email } } // Update only inactive users
+    );
+
+    if (updatedRows === 0) {
+      return res
+        .status(404)
+        .json({ message: "Recruiter not found or already approved" });
+    }
+
+    res.status(200).json({ message: "Recruiter approved successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const rejectRecruiterReq = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const deletedRows = await db.Users.destroy({ where: { email } });
+    if (deletedRows === 0) {
+      return res.status(404).json({ message: "Recruiter not found " });
+    }
+
+    res.status(200).json({ message: "Recruiter Rejected successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await db.Users.findOne({ where: { email } });
-  
+
     if (!user) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password_hash);
-    console.log(isMatch);
-    if (!isMatch) {
-      return res.status(401).json({ message: "Invalid credentials" });
+    if (user.isActive === true) {
+      const isMatch = await bcrypt.compare(password, user.password_hash);
+      if (!isMatch) {
+        return res.status(401).json({ message: "Invalid credentials" });
+      }
+
+      // Generate JWT Token
+      const token = jwt.sign(
+        { id: user.id, user: user },
+        process.env.JWT_SECRET,
+        { expiresIn: "1h" }
+      );
+      // save jwt token in cookie jwtToken
+      res.cookie("jwtToken", token, {
+        httpOnly: true,
+      });
+      res.status(200).json({
+        message: `logged in successfully`,
+        token,
+      });
+    } else {
+      res.status(401).json({ message: `Unauthorized Access` });
     }
-
-    // Generate JWT Token
-    const token = jwt.sign(
-      { id: user.id, user: user },
-      process.env.JWT_SECRET,
-      { expiresIn: "1h" }
-    );
-
-    res.status(200).json({
-      message: `logged in successfully`,
-      token,
-    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -68,6 +121,7 @@ const adminRegister = async (req, res) => {
         email,
         password_hash: hashedPassword,
         role: "admin",
+        isActive: true,
       });
 
       res.status(201).json({ message: "Admin registered successfully", user });
@@ -146,4 +200,13 @@ const resetPassword = async (req, res) => {
   }
 };
 
-module.exports = { register, login, adminRegister, resetPassword, forgetPassword };
+module.exports = {
+  register,
+  login,
+  adminRegister,
+  resetPassword,
+  forgetPassword,
+  viewRecruiterReq,
+  approveRecruiterReq,
+  rejectRecruiterReq,
+};

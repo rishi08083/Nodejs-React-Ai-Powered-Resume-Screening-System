@@ -48,6 +48,7 @@ module.exports = (sequelize, DataTypes) => {
       is_deleted: { type: DataTypes.BOOLEAN, defaultValue: false },
       resetToken: { type: DataTypes.STRING, allowNull: true },
       resetTokenExpires: { type: DataTypes.DATE, allowNull: true },
+      isActive: { type: DataTypes.BOOLEAN, defaultValue: false },
     },
     {
       sequelize,
