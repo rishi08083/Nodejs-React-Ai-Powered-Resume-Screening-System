@@ -2,7 +2,8 @@
 
 import { useState, ChangeEvent, FormEvent } from "react";
 import { useRouter } from "next/navigation";
-
+import {fetchRecruiterRegister} from "../../../api-services/recruiterService"
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 // Define types for form data
 interface FormData {
   name: string;
@@ -18,7 +19,7 @@ export default function RecruiterRegister() {
     password: "",
     confirmPassword: "",
   });
-
+  //  "apikey":"Niket"
   // Message state with type string
   const [message, setMessage] = useState<string>("");// State to store the message
   const router = useRouter();
@@ -39,30 +40,46 @@ export default function RecruiterRegister() {
       return;
     }
 
+    try {
+      const response = await fetchRecruiterRegister(formData); // Call the API service
+      setMessage(
+        "Your request has been sent successfully! Please wait for approval."
+      );
+      setTimeout(() => {
+        router.push("/login"); // Redirect to login page after a delay
+      }, 3000); // 3-second delay before redirecting
+    } catch (error) {
+      setMessage("Failed to send your request. Please try again.");
+      console.error("Error:", error);
+    }
     // Uncomment and configure the API request when ready
+    // await fetch(`${BASE_URL}recruiter/register`
     // try {
-    //   const response = await fetch("/api/recruiter/register", {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify(formData),
-    //   });
+    //   const response = await fetchRecruiterRegister(formData); 
+  //     const response = await fetch(`${BASE_URL}/auth/register`, {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify(formData),
+  //     });
 
-    //   if (response.ok) {
-    setMessage(
-      "Your request has been sent successfully! Please wait for approval."
-    );
-    setTimeout(() => {
-      router.push("/login"); // Redirect to login page after a delay
-    }, 3000); // 3-second delay before redirecting
-    //   } else {
-    //     setMessage("Failed to send your request. Please try again.");
-    //   }
-    // } catch (error) {
-    //   console.error("Error submitting form:", error);
-    //   setMessage("An error occurred. Please try again later.");
-    // }
+  //     const data = await response.json(); // Read response
+  //   console.log("Response Data:", data);
+  //     if (response.ok) {
+  //   setMessage(
+  //     "Your request has been sent successfully! Please wait for approval."
+  //   );
+  //   setTimeout(() => {
+  //     router.push("/login"); // Redirect to login page after a delay
+  //   }, 3000); // 3-second delay before redirecting
+  //     } else {
+  //       setMessage("Failed to send your request. Please try again.");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error submitting form:", error);
+  //     setMessage("An error occurred. Please try again later.");
+  //   }
   };
 
   return (
@@ -141,6 +158,13 @@ export default function RecruiterRegister() {
         >
           Send Request
         </button>
+        {/* <a
+          href="/login"
+          className="block text-center w-full  text-black font-medium py-2 px-1 rounded-lg "
+        >
+          Go to Login
+        </a>
+         */}
       </form>
     </div>
   );
