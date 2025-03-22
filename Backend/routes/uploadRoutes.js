@@ -11,13 +11,16 @@ const upload = multer({ storage });
 
 // upload job api
 
-
+const auth = require("../middlewares/authMiddleware");
 
 // File Upload API
-Router.post("/upload-resume", upload.array("resume-files",10), (req, res, next) => {
+Router.post(
+  "/upload-resume",
+  auth.authMiddleware,
+  upload.array("resume-files", 10),
+  (req, res, next) => {
     s3fileUpload.uploadResumes(req, res).catch(next); // Pass errors to the error-handling middleware
-});
-
-
+  }
+);
 
 module.exports = Router;

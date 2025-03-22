@@ -46,15 +46,13 @@ exports.uploadResumes = async (req, res) => {
         Bucket: process.env.AWS_BUCKET_NAME,
         Key: fileName,
         Body: file.buffer, // Ensure this is the file buffer
-        ContentType: file.mimetype
+        ContentType: file.mimetype,
       };
 
       await s3.send(new PutObjectCommand(params));
 
       const fileUrl = `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
       uploadedFiles.push({ fileName, fileUrl });
-
-
     }
     const unparsedResumes = uploadedFiles.map((file) => ({
       user_id: req.user.id,
@@ -65,9 +63,11 @@ exports.uploadResumes = async (req, res) => {
 
     await db.UnparsedResume.bulkCreate(unparsedResumes);
 
-    res
-      .status(200)
-      .json({ message: "Files uploaded successfully", files: uploadedFiles });
+    res.status(200).json({
+      success: "success",
+      message: "Files uploaded successfully",
+      files: uploadedFiles
+    });
   } catch (error) {
     console.error("Error uploading files:", error);
     res
