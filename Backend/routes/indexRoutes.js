@@ -9,5 +9,6 @@ router.get("/", homeRoutes);
 router.use("/auth", authRoutes);
 router.use("/upload", uploadRoutes);
 router.use("/create-job", createJobRoutes);
+router.use("/user", userRoutes);
 
 module.exports = router;

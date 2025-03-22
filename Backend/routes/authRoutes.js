@@ -1,3 +1,5 @@
+authRoutes.js;
+
 const express = require("express");
 const router = express.Router();
 
@@ -7,6 +9,9 @@ const {
   adminRegister,
   forgetPassword,
   resetPassword,
+  viewRecruiterReq,
+  approveRecruiterReq,
+  rejectRecruiterReq,
 } = require("../controllers/authController");
 const {
   validateRegister,
@@ -18,5 +23,8 @@ router.post("/login", validateLogin, login);
 router.post("/adminregister", adminRegister);
 router.post("/forget-password", forgetPassword);
 router.post("/reset-password", resetPassword);
+router.get("/view-recruiter-req", viewRecruiterReq);
+router.post("/approve-recruiter-req", approveRecruiterReq);
+router.delete("/reject-recruiter-req", rejectRecruiterReq);
 
 module.exports = router;
