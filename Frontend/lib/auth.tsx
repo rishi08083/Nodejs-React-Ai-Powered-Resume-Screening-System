@@ -62,14 +62,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       credentials: "include",
     });
 
-    if (res.ok) {
-      const data = await res.json();
-      await checkAuth();
-      return data;
+    if (!res.ok) {
+      const errorData = await res.json();
+      const errorMessages = errorData.errors?.map((error: { msg: string }) => error.msg).join(", ");
+      throw new Error(errorMessages || "Invalid Credentials"); 
     }
-    throw new Error("Login failed");
+  
+    const data = await res.json();
+    await checkAuth();
+    return data;
   };
-  const logout = async () => {};
+  const logout = async () => {
+  document.cookie = `jwtToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
+  };
   return (
     <AuthContext.Provider value={{ user, login, logout, loading, checkAuth }}>
       {children}

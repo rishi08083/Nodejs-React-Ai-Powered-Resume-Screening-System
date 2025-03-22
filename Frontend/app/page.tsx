@@ -1,11 +1,12 @@
-// src/app/Home.tsx
 "use client";
 import { useReducer, useState, useEffect } from "react";
 import Image from "next/image";
 import ListJobs from "../components/JobList";
+import { useRouter } from "next/navigation";
 import UploadForm from "../components/UploadForm";
 import RecruiterRequests from "../components/admin/RecruiterRequests"; // Admin-specific component
 import { useAuth } from "../lib/auth";
+import { HiMenu } from "react-icons/hi"; // For the hamburger icon
 
 // Define action types
 const actionTypes = {
@@ -38,22 +39,20 @@ const Home = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [role, setRole] = useState<"admin" | "recruiter">("recruiter"); // State to track user role
   const { user, logout, checkAuth, loading } = useAuth();
-  console.log(user);
+  const router = useRouter();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // State to manage sidebar toggle
 
   useEffect(() => {
     // Simulate fetching the role from an API or authentication context
     const fetchUserRole = async () => {
-      // Replace this with actual API call or authentication logic
-      // const userRole = "admin"; // Change to "recruiter" or "admin" as needed
-      // check if user is authenticated
-      console.log(user);
-      if (!loading) {
-        if (user) {
-          setRole(user.role as "admin" | "recruiter");
-        } else {
-          console.log("No user found");
-        }
+      if (!user) {
+        console.log("No user found, redirecting to login.");
+        router.push("/login");
+        return;
       }
+  
+      // If there is a user, fetch the role
+      setRole(user.role as "admin" | "recruiter");
     };
 
     fetchUserRole();
@@ -64,15 +63,23 @@ const Home = () => {
       type: actionTypes.SET_ACTIVE_SECTION,
       payload: section,
     });
+    setIsSidebarOpen(!isSidebarOpen)
   };
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex h-screen overflow-hidden bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500">
       {/* Sidebar */}
-      <div className="w-64 bg-black text-white pt-5 flex flex-col items-center rounded-lg">
+      <div
+        className={`${
+          isSidebarOpen ? "w-64" : "w-0"
+        } md:w-64 bg-black text-white pt-5 flex flex-col items-center rounded-lg transition-all duration-300 ease-in-out`}
+      >
         <div className="mb-5">
           <Image src="/logo.jpg" alt="Logo" width={280} height={80} />
         </div>
+
+        {/* Hamburger Icon (visible only on small screens) */}
+        
         {role === "recruiter" && (
           <>
             <div
@@ -154,15 +161,24 @@ const Home = () => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 p-5 bg-gray-100 overflow-auto">
-        <div className="bg-white p-4 border-b-2 border-gray-300 mb-5">
-          <h2>
+      <div className="flex-1 p-5 bg-gray-100 overflow-scroll">
+        <div className="bg-white p-4 border-b-2 border-gray-300 mb-5 rounded-lg flex justify-between">
+          {/* <h2>
             {state.activeSection.charAt(0).toUpperCase() +
               state.activeSection.slice(1)}
-          </h2>
+          </h2> */}
           <h1>{user && user.name}</h1>
+          <button
+          className=" md:hidden text-white text-3xl"
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+        >
+          <HiMenu 
+          color="black"
+          />
+        </button> 
+ 
         </div>
-        <div className="bg-white p-5 shadow-lg rounded-lg">
+        <div className="bg-white p-5 shadow-lg rounded-lg overflow-scroll ">
           {role === "recruiter" && state.activeSection === "jobs" && (
             <ListJobs />
           )}

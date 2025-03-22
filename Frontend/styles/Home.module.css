@@ -94,8 +94,10 @@
   display: none;
 }
 .fileInputButton {
-  background-color: rgb(248, 233, 24);
+  background-color: rgb(248, 207, 24);
   border: none;
+  color: black;
+  border-radius: 20px;
   padding: 10px;
 }
 /* Jobs.module.css */
