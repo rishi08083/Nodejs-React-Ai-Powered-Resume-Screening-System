@@ -17,9 +17,15 @@ exports.getUserDetails = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
     // return the user details
-    return res
-      .status(200)
-      .json({ message: "User details fetched successfully", user });
+    return res.status(200).json({
+      message: "User details fetched successfully",
+      user: {
+        id: user.id,
+        name: user.name,
+        role: user.role,
+        email: user.email,
+      },
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
