@@ -1,0 +1,138 @@
+/* NavBar.module.css */
+.container {
+  min-height: 100vh;
+  position: relative;
+}
+
+.header {
+  background-color: #f8f9fa;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(184, 165, 165, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.menuButton {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  margin-right: 1rem;
+  color: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar {
+  background-color: #fff;
+  width: 250px;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: -250px;
+  transition: left 0.3s ease;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  z-index: 20;
+  padding-top: 1rem;
+  overflow-y: auto;
+}
+
+.sidebar.open {
+  left: 0;
+}
+
+.logoContainer {
+  padding: 1rem;
+  display: flex;
+  justify-content: center;
+  border-bottom: 1px solid #eee;
+  margin-bottom: 1rem;
+}
+
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+  padding: 0 1rem;
+}
+
+.sidebar button {
+  background-color: #fff; /* White background by default */
+  color: #333;
+  border: none;
+  border-radius: 4px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.75rem;
+  cursor: pointer;
+  text-align: left;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.sidebar button:hover {
+  background-color: #ffd700; /* Yellow on hover */
+  transform: translateY(-2px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar button:active {
+  transform: translateY(0);
+}
+
+.main {
+  flex: 1;
+  overflow-y: scroll;
+  margin-top: 20px;
+}
+
+/* Overlay to close sidebar when clicking outside */
+.overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 15;
+}
+
+.overlay.active {
+  display: block;
+}
+
+/* Media query for desktop view */
+@media (min-width: 768px) {
+  .container {
+    flex-direction: row;
+  }
+
+  .header {
+    width: calc(100% - 250px);
+    margin-left: 250px;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    box-shadow: none;
+    border-right: 1px solid #eee;
+  }
+
+  .main {
+    margin-left: 250px;
+    padding: 2rem;
+    width: calc(100% - 250px);
+    margin-top: 20px;
+    /* Account for the header height */
+  }
+
+  .menuButton {
+    display: none;
+  }
+}
