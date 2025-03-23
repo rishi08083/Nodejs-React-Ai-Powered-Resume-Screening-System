@@ -33,15 +33,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
-  console.log('da',BASE_URL)
+  console.log("da", BASE_URL);
   async function checkAuth() {
     try {
       const response = await fetch(BASE_URL + "/api/user/getuserdetails", {
         method: "POST",
         credentials: "include",
         headers: {
-          Authorization : "Bearer " + localStorage.getItem("token"),
-        }
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
       });
 
       if (response.ok) {
@@ -50,6 +50,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setUser(data.user);
         setLoading(false);
         console.log(user);
+      } else {
+        setUser(null);
+        setLoading(false);
       }
     } catch (error) {
       console.log(error);
@@ -68,19 +71,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     if (!res.ok) {
       const errorData = await res.json();
-      const errorMessages = errorData.errors?.map((error: { msg: string }) => error.msg).join(", ");
-      throw new Error(errorMessages || "Invalid Credentials"); 
+      const errorMessages = errorData.errors
+        ?.map((error: { msg: string }) => error.msg)
+        .join(", ");
+      throw new Error(errorMessages || "Invalid Credentials");
     }
-  
+
     const data = await res.json();
 
-  localStorage.setItem('token',data.token)
+    localStorage.setItem("token", data.token);
 
     await checkAuth();
     return data;
   };
   const logout = async () => {
-
+    localStorage.removeItem('token')
+    await checkAuth()
   };
   return (
     <AuthContext.Provider value={{ user, login, logout, loading, checkAuth }}>

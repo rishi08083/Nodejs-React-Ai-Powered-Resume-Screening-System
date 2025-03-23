@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -14,6 +14,7 @@ const ListJobs = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleViewButtonClick = (job: Job) => {
     setSelectedJob(job);
@@ -27,6 +28,7 @@ const ListJobs = () => {
       .then((data) => data.json())
       .then((response: Job[]) => {
         setJobs(response);
+        console.log(response);
         setIsLoading(false);
       })
       .catch((err) => {
@@ -36,7 +38,7 @@ const ListJobs = () => {
   }, []);
 
   return (
-    <div className="w-full p-4 md:p-6 lg:p-8">
+    <div className="w-full p-2  overflow-scroll">
       <div className="mb-6">
         <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
           Available Job Positions
@@ -55,9 +57,9 @@ const ListJobs = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="bg-white rounded-xl shadow-xl overflow-hidden"
+          className="bg-white rounded-xl shadow-xl overflow-scroll"
         >
-          <div className="overflow-x-auto">
+          <div className="overflow-scroll">
             <table className="min-w-full table-auto border-collapse">
               <thead>
                 <tr className="bg-yellow-50 border-b border-yellow-100">
@@ -134,7 +136,7 @@ const ListJobs = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 p-4 z-50"
+            className="fixed inset-0 flex items-center justify-center  bg-opacity-50 p-4 z-50"
           >
             <motion.div
               initial={{ scale: 0.9, y: 20 }}
@@ -173,7 +175,13 @@ const ListJobs = () => {
                     </svg>
                     <p className="mt-2 text-sm text-gray-600">
                       Drag and drop your file here, or
-                      <span className="text-yellow-600 font-medium">
+                      <span
+                        className="text-yellow-600 font-medium cursor-pointer"
+                        onClick={() => {
+                          //click input file manually from ref
+                          inputRef.current.click();
+                        }}
+                      >
                         {" "}
                         browse
                       </span>
@@ -181,7 +189,7 @@ const ListJobs = () => {
                     <p className="mt-1 text-xs text-gray-500">
                       PDF, DOC or DOCX up to 10MB
                     </p>
-                    <input type="file" className="hidden" />
+                    <input type="file" className="hidden" ref={inputRef} />
                   </div>
                 </div>
 

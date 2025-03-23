@@ -84,7 +84,8 @@
 
 .main {
   flex: 1;
-  padding: 0.7rem;
+  overflow-y: scroll;
+  margin-top: 20px;
 }
 
 /* Overlay to close sidebar when clicking outside */
@@ -127,8 +128,8 @@
     margin-left: 250px;
     padding: 2rem;
     width: calc(100% - 250px);
-
-    margin-top: 60px; /* Account for the header height */
+    margin-top: 20px;
+    /* Account for the header height */
   }
 
   .menuButton {

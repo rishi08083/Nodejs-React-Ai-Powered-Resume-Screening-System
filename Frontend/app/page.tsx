@@ -39,12 +39,12 @@ const Home = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
-    if (user == null) {
+    if (user == null && !loading) {
       router.push("/login");
       return;
     }
     if (user != null && user.role === "admin") {
-      setRole("recruiter");
+      setRole("admin");
     }
     if (user != null && user.role === "recruiter") {
       setRole("recruiter");

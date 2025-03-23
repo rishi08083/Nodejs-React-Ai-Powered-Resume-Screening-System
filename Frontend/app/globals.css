@@ -19,7 +19,7 @@ body {
 
 html,
 body {
-  overflow: hidden; /* Remove default scrollbar on the body */
+  overflow: scroll; /* Remove default scrollbar on the body */
 }
 
 /* Hide scrollbars for Webkit browsers (Chrome, Safari, etc.) */

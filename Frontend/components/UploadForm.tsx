@@ -55,7 +55,7 @@ const UploadForm = () => {
       >
         <option value="">Select a Job</option>
         {jobs.map((job, index) => (
-          <option key={index} value={job.title} className="bg-yellow-400">
+          <option key={index} value={job.title} className="hover:bg-amber-500">
             {job.title}
           </option>
         ))}
