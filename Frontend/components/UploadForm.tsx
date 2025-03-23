@@ -139,7 +139,7 @@ const UploadForm = () => {
         <label htmlFor="file-input">
           <button
             type="button"
-            className="mt-3 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+            className="mt-3 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition"
             onClick={() => fileInputRef.current?.click()}
           >
             Select Files
