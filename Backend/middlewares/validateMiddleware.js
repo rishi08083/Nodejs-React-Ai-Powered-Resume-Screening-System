@@ -1,12 +1,13 @@
 const { body, validationResult } = require("express-validator");
-
+// const Users = require("../models/users");
+const db = require("../models");
 exports.validateRegister = [
   body("name").notEmpty().withMessage("Name is required"),
   body("email")
     .isEmail()
     .withMessage("Valid email is required")
     .custom(async (email) => {
-      const existingUser = await UserActivation.findOne({ email });
+      const existingUser = await db.Users.findOne({ where: { email } });
       if (existingUser) {
         throw new Error("Email Already exists");
       }
