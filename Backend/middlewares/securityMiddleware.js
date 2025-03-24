@@ -5,6 +5,35 @@ const hpp = require("hpp");
 const cors = require("cors");
 
 module.exports = (app) => {
+  // Prevent XSS Attacks
+  app.use(xss());
+
+  // Enable CORS - Place this BEFORE other middleware
+  app.use(
+    cors({
+      origin: function (origin, callback) {
+        const allowedOrigins = [
+          "http://localhost:3000",
+          "http://localhost:3001",
+          // Add your production domain when ready
+        ];
+
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin || allowedOrigins.includes(origin)) {
+          callback(null, true);
+        } else {
+          console.log(`CORS blocked request from: ${origin}`);
+          callback(null, false);
+        }
+      },
+      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      credentials: true,
+      allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+      preflightContinue: false,
+      optionsSuccessStatus: 204,
+    })
+  );
+
   // Security Headers (Helmet)
   app.use(
     helmet({
@@ -17,47 +46,47 @@ module.exports = (app) => {
             "http://localhost:3000",
             "http://localhost:3001",
           ],
+          connectSrc: [
+            "'self'",
+            "http://localhost:3000",
+            "http://localhost:3001",
+          ],
           objectSrc: ["'none'"],
           imgSrc: ["'self'", "data:"],
           upgradeInsecureRequests: [],
         },
       },
-      crossOriginResourcePolicy: { policy: "cross-origin" }, // Restrict CORS within the same origin
+      crossOriginResourcePolicy: { policy: "cross-origin" },
+      crossOriginEmbedderPolicy: false,
     })
   );
 
-  // Prevent XSS Attacks
-  app.use(xss());
-
-  // Rate limiting (General API Limit: 100 requests per 10 mins)
+  // General API Rate Limiting
   const apiLimiter = rateLimit({
     windowMs: 10 * 60 * 1000, // 10 minutes
-    max: 100,
-    message: "Too many requests, please try again later",
+    max: 5,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: {
+      error: true,
+      message: "Too many requests, please try again later",
+    },
   });
-  app.use(apiLimiter);
+  app.use("/api/", apiLimiter);
 
-  // Rate limiting (Stricter for Login Routes: 5 attempts per 15 mins)
+  // Stricter Rate Limiting for Login Routes
   const loginLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 5,
-    message: "Too many login attempts, please try again later",
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: {
+      error: true,
+      message: "Too many login attempts, please try again later",
+    },
   });
   app.use("/api/auth/login", loginLimiter);
 
   // Prevent HTTP Parameter Pollution
   app.use(hpp());
-
-  // Enable CORS with Restriction (Only allow frontend domain)
-  app.use(
-    cors({
-      origin: [
-        "https://your-frontend-domain.com",
-        "http://localhost:3000",
-        "http://localhost:3001",
-      ],
-      methods: ["GET", "POST", "PUT", "DELETE"],
-      credentials: true,
-    })
-  );
 };
