@@ -68,19 +68,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       body: JSON.stringify(credentials),
       credentials: "include",
     });
+    //
+    //{"error":true,"message":"Too many requests, please try again later"}
+     
 
     if (!res.ok) {
       const errorData = await res.json();
       const errorMessages = errorData.errors
         ?.map((error: { msg: string }) => error.msg)
         .join(", ");
+        console.log(errorData)
+        console.log(errorMessages)
+
+      if(errorData?.error){
+         throw new Error(errorData.message);
+      }
       throw new Error(errorMessages || "Invalid Credentials");
     }
 
     const data = await res.json();
-
     localStorage.setItem("token", data.token);
-
     await checkAuth();
     return data;
   };
