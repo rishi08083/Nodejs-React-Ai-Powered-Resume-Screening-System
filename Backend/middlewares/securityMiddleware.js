@@ -72,7 +72,7 @@ module.exports = (app) => {
       message: "Too many requests, please try again later",
     },
   });
-  app.use("/api/", apiLimiter);
+  app.use("/api/auth/login", apiLimiter);
 
   // Stricter Rate Limiting for Login Routes
   const loginLimiter = rateLimit({
