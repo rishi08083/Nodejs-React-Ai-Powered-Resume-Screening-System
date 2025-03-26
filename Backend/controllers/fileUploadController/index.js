@@ -2,7 +2,7 @@ const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 
 const path = require("path");
 const crypto = require("crypto");
-const db = require("../models/");
+const db = require("../../models");
 
 require("dotenv").config();
 
