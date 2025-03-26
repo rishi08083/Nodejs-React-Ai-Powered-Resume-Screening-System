@@ -17,7 +17,7 @@ const adminRegister = async (req, res) => {
         email,
         password_hash: hashedPassword,
         role: "admin",
-        isActive: true,
+        is_active: "accepted",
       });
 
       res.status(201).json({ message: "Admin registered successfully", user });
@@ -57,7 +57,7 @@ const userLogin = async (req, res) => {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    if (user.isActive === true) {
+    if (user.is_active === "accepted") {
       const isMatch = await bcrypt.compare(password, user.password_hash);
       if (!isMatch) {
         return res.status(401).json({ message: "Invalid credentials" });

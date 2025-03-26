@@ -8,7 +8,7 @@ const { Op, where } = require("sequelize");
 const viewRecruiterReq = async (req, res) => {
   try {
     const users = await db.Users.findAll({
-      where: { isActive: false },
+      where: { is_active: "pending" },
       attributes: ["id", "name", "email", "role"],
     });
     res.status(200).json({
@@ -24,8 +24,8 @@ const approveRecruiterReq = async (req, res) => {
   try {
     const { email } = req.body;
     const [updatedRows] = await db.Users.update(
-      { isActive: true }, // Set isActive to true
-      { where: { email } } // Update only inactive users
+      { is_active: "accepted" }, 
+      { where: { email } } 
     );
 
     if (updatedRows === 0) {
@@ -43,8 +43,12 @@ const approveRecruiterReq = async (req, res) => {
 const rejectRecruiterReq = async (req, res) => {
   try {
     const { email } = req.body;
-    const deletedRows = await db.Users.destroy({ where: { email } });
-    if (deletedRows === 0) {
+    const [updatedRows] = await db.Users.update(
+      { is_active: "rejected" }, 
+      { where: { email } }
+    );
+
+    if (updatedRows === 0) {
       return res.status(404).json({ message: "Recruiter not found " });
     }
 

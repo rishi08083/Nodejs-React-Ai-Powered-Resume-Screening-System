@@ -57,7 +57,7 @@ db.Sequelize = Sequelize;
 
 // Sync database
 db.sequelize
-  .sync({ alter: true })
+  .sync({ force: true })
   .then(() => console.log("Database synchronized with associations!"))
   .catch((err) => console.error("Sync error:", err));
 

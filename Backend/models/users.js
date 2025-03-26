@@ -50,14 +50,6 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.ENUM("pending", "accepted", "rejected"),
         allowNull: false,
         defaultValue: "pending",
-        set(value) {
-          // Set "pending" only for recruiters
-          if (this.role === "recruiter" && !value) {
-            this.setDataValue("is_active", "pending");
-          } else {
-            this.setDataValue("is_active", value);
-          }
-        },
       },
     },
     {
