@@ -52,23 +52,40 @@ export default function RecruiterRegister() {
 
     try {
       const response = await fetchRecruiterRegister(formData); // Call the API service
-      setMessage(
-        "Your request has been sent successfully! Please wait for approval."
-      );
-      setIsOpen(true);
-      setTimeout(() => {
-        router.push("/login"); // Redirect to login page after a delay
-      }, 3000); // 3-second delay before redirecting
+
+      // Check if the response is OK (status code 200-299)
+      if (response.ok) {
+        const data = await response.json();
+
+        // Assuming the server sends a response with status and message
+        if (data.status === "success") {
+          setMessage(data.message || "Your request has been sent successfully! Please wait for approval.");
+          setIsOpen(true);
+
+          // Redirect after 3 seconds
+          setTimeout(() => {
+            router.push("/login");
+          }, 3000); // 3-second delay
+        } else {
+          // Handle case when status is error but response.ok is true
+          setMessage(data.message || "An error occurred while processing your request.");
+          setIsOpen(true);
+        }
+      } else {
+        // If response isn't OK (e.g., status 400 or 500), process the error response
+        const errorData = await response.json();
+        // Set the detailed error message from error.details
+        setMessage(errorData?.error?.details || errorData?.message || "Failed to send your request. Please try again.");
+        setIsOpen(true);
+      }
     } catch (error) {
+      // Catch network-related errors or unexpected errors
+      console.error("Error:", error);
       setMessage("Failed to send your request. Please try again.");
       setIsOpen(true);
-      setTimeout(() => {
-        setIsOpen(false);
-      }, 5000);
-      console.error("Error:", error);
     }
-  };
 
+  }
   const onClose = () => {
     setIsOpen(false);
   };
