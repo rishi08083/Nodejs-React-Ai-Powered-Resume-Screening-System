@@ -17,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
       });
 
       // Many-to-One: Jobs → Users
-      Jobs.belongsTo(models.Users, { foreignKey: "user_id", as: "user" });
+      Jobs.belongsTo(models.Users, { foreignKey: "user_id", as: "users" });
     }
   }
 
