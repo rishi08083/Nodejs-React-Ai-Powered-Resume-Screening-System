@@ -1,34 +1,34 @@
-'use strict';
+"use strict";
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('ParseResumes', {
+    await queryInterface.createTable("parse_resumes", {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
       },
       candidateID: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
       },
       resume_obj: {
-        type: Sequelize.JSON
+        type: Sequelize.JSON,
       },
       is_deleted: {
-        type: Sequelize.BOOLEAN
+        type: Sequelize.BOOLEAN,
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
-      }
+        type: Sequelize.DATE,
+      },
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('ParseResumes');
-  }
+    await queryInterface.dropTable("parse_resumes");
+  },
 };

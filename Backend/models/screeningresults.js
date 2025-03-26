@@ -7,19 +7,19 @@ module.exports = (sequelize, DataTypes) => {
       // One-to-One: ScreeningResults → Candidates
       ScreeningResults.belongsTo(models.Candidates, {
         foreignKey: "candidate_id",
-        as: "candidate",
+        as: "candidates",
       });
 
       // Many-to-One: ScreeningResults → Jobs
       ScreeningResults.belongsTo(models.Jobs, {
         foreignKey: "job_id",
-        as: "job",
+        as: "jobs",
       });
 
       // Many-to-One: ScreeningResults → Users
       ScreeningResults.belongsTo(models.Users, {
         foreignKey: "user_id",
-        as: "user",
+        as: "users",
       });
     }
   }

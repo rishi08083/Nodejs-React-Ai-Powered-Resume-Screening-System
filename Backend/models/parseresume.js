@@ -7,13 +7,13 @@ module.exports = (sequelize, DataTypes) => {
       // One-to-One: ParseResume → Candidates
       ParseResume.belongsTo(models.Candidates, {
         foreignKey: "candidate_id",
-        as: "candidate",
+        as: "candidates",
       });
 
       // One-to-Many: ParseResume → Users
       ParseResume.belongsTo(models.Users, {
         foreignKey: "user_id",
-        as: "user",
+        as: "users",
       });
     }
   }
@@ -28,7 +28,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       modelName: "ParseResume",
-      tableName: "parse_resume",
+      tableName: "parse_resumes",
       timestamps: true,
       underscored: true,
     }
