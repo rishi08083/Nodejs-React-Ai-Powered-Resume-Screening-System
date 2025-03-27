@@ -2,25 +2,59 @@ const express = require("express");
 const Router = express();
 
 const multer = require("multer");
-
-const s3fileUpload = require("../controllers/fileUploadController");
-
+const fileUploadController = require("../controllers/fileUploadController");
+const auth = require("../middlewares/authMiddleware");
 // Multer Setup for File Upload
 const storage = multer.memoryStorage();
-const upload = multer({ storage });
+const fileFilter = (req, file, cb) => {
+  const allowedMimeTypes = [
+    "application/pdf",
+    "application/msword",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "image/jpeg",
+    "image/png",
+    "image/gif",
+  ];
+  if (allowedMimeTypes.includes(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(
+      new Error(
+        "Invalid file type. Only PDF, DOC, DOCX, and images are allowed."
+      )
+    );
+  }
+};
 
-// upload job api
-
-const auth = require("../middlewares/authMiddleware");
+const upload = multer({
+  storage,
+  fileFilter,
+  limits: { files: 15 }, // Restrict to a maximum of 15 files
+});
 
 // File Upload API
 Router.post(
   "/upload-resume",
   auth.authMiddleware,
-  upload.array("resume-files", 10),
+  upload.array("resume-files"),
   (req, res, next) => {
-    s3fileUpload.uploadResumes(req, res).catch(next); // Pass errors to the error-handling middleware
+    fileUploadController.uploadResumes(req, res).catch(next);
   }
 );
+
+// Error handling for file validation
+Router.use((err, req, res, next) => {
+  if (
+    err instanceof multer.MulterError ||
+    err.message.startsWith("Invalid file type")
+  ) {
+    return res.status(400).json({
+      status: "error",
+      message: err.message,
+      error: { details: err.message },
+    });
+  }
+  next(err); // Pass other errors to the default error handler
+});
 
 module.exports = Router;

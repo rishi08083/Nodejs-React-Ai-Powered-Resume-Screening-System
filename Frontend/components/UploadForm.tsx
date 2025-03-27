@@ -91,7 +91,7 @@ const UploadForm = () => {
   const handleFile = (selectedFiles: FileList) => {
     const validFiles: File[] = [];
     const invalidFiles: string[] = [];
-
+  
     Array.from(selectedFiles).forEach((file) => {
       // Check by extension instead of mime type to be more reliable
       const extension = getFileExtension(file.name);

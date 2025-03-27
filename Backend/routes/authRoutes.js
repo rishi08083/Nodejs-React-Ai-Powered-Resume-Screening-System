@@ -2,27 +2,37 @@ const express = require("express");
 const router = express.Router();
 
 const {
-  register,
-  login,
   adminRegister,
-  forgetPassword,
-  resetPassword,
+  recruiterRegister,
+  userLogin
+} = require("../controllers/authControllers");
+
+const {
   viewRecruiterReq,
   approveRecruiterReq,
   rejectRecruiterReq,
-} = require("../controllers/authController");
+} = require('../controllers/authControllers/recruiterReqController');
+
+const {
+  forgetPassword,
+  resetPassword,
+} = require("../controllers/authControllers/forgetResetContoller");
+
 const {
   validateRegister,
   validateLogin,
 } = require("../middlewares/validateMiddleware");
 
-router.post("/register", validateRegister, register);
-router.post("/login", validateLogin, login);
+
+router.post("/register", validateRegister, recruiterRegister);
+router.post("/login", validateLogin, userLogin);
 router.post("/adminregister", adminRegister);
-router.post("/forget-password", forgetPassword);
-router.post("/reset-password", resetPassword);
+
 router.get("/view-recruiter-req", viewRecruiterReq);
 router.post("/approve-recruiter-req", approveRecruiterReq);
 router.delete("/reject-recruiter-req", rejectRecruiterReq);
+
+router.post("/forget-password", forgetPassword);
+router.post("/reset-password", resetPassword);
 
 module.exports = router;
