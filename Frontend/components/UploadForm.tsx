@@ -22,6 +22,7 @@ const UploadForm = () => {
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
   const [uploadProgress, setUploadProgress] = useState<number>(0);
+  const [successMessage,setSuccessMessage] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -161,8 +162,9 @@ const UploadForm = () => {
       // Small delay to show 100% progress before hiding the loader
       setTimeout(async () => {
         if (response.ok) {
-          alert("Files uploaded successfully!");
           setFiles([]); // Reset the files after successful upload
+          setErrorMessage("");
+          setSuccessMessage("Files uploaded successfully.");
         } else {
           const errorData = await response.json();
           setErrorMessage(errorData.message || "Failed to upload the files.");
@@ -197,7 +199,7 @@ const UploadForm = () => {
     <div className="max-w-lg mx-auto p-6 bg-white shadow-lg rounded-lg transition-all duration-300 hover:shadow-xl relative">
       <h1 className="text-2xl font-bold mb-6 text-center text-yellow-800">
         <span className="inline-block mr-2">📤</span>
-        Upload Bulk Resume
+        Upload Bulk Resumes
       </h1>
 
       {/* Custom Dropdown */}
@@ -290,6 +292,17 @@ const UploadForm = () => {
           </div>
         </div>
       )}
+      {successMessage && (
+        <div className="mt-4 p-4 bg-yellow-100 text-gray-400 rounded-lg border border-red-200">
+          <div className="flex items-center">
+            <span className="mr-2">✔️</span>
+             {successMessage}
+          </div>
+
+        </div>
+      )}
+
+
 
       {files.length > 0 && (
         <div className="mt-6 bg-gray-50 p-4 rounded-lg border border-gray-100">
@@ -345,7 +358,7 @@ const UploadForm = () => {
               <p className="text-gray-600 mb-6 text-center">
                 Please wait while we process your files...
               </p>
-
+              
               <div className="w-full bg-gray-200 rounded-full h-4 mb-3">
                 <div
                   className="bg-yellow-500 h-4 rounded-full transition-all duration-300"
