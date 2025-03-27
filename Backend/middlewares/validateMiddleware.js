@@ -1,36 +1,30 @@
 const { body, validationResult } = require("express-validator");
-// const Users = require("../models/users");
+const dns = require("dns").promises; // Ensure DNS module is imported
 const db = require("../models");
+
 exports.validateRegister = [
   body("name")
-    // Trim the name to remove leading/trailing spaces
     .trim()
-    .customSanitizer((value) => value.replace(/\s+/g, " ")) // Replace multiple spaces with a single space
+    .customSanitizer((value) => value.replace(/\s+/g, " "))
     .matches(/^[A-Za-z]+( [A-Za-z]+)?$/)
     .withMessage(
       "Name must contain only alphabets and a single space between first and last name. No numbers or special characters allowed."
     )
-
     .custom((value) => {
-      // Check name length
       if (value.length < 2) {
         throw new Error("Name must be at least 2 characters long");
       }
-
       if (value.length > 50) {
         throw new Error("Name must be less than 50 characters long");
       }
-
       return true;
     }),
 
-  // Email Validation
   body("email")
     .trim()
     .toLowerCase()
     .isEmail()
     .withMessage("Valid email is required")
-    // Syntax validation
     .custom((value) => {
       if (value.length < 8) {
         throw new Error("Email must be at least 8 characters long");
@@ -46,11 +40,8 @@ exports.validateRegister = [
       }
       return true;
     })
-    // Domain validation (Checks if domain has an MX record)
     .custom(async (email) => {
-      const domain = email.split("@")[1]; // Extract domain
-
-      // Skip MX check for common email providers to avoid false negatives
+      const domain = email.split("@")[1];
       const trustedDomains = [
         "gmail.com",
         "yahoo.com",
@@ -58,9 +49,8 @@ exports.validateRegister = [
         "hotmail.com",
       ];
       if (trustedDomains.includes(domain)) {
-        return true; // Skip MX record check for known domains
+        return true;
       }
-
       try {
         const mxRecords = await dns.resolveMx(domain);
         if (!mxRecords || mxRecords.length === 0) {
@@ -71,7 +61,6 @@ exports.validateRegister = [
       }
       return true;
     })
-    // Existing email check with trimmed and lowercased email
     .custom(async (email) => {
       const existingUser = await db.Users.findOne({ where: { email } });
       if (existingUser) {
@@ -93,7 +82,11 @@ exports.validateRegister = [
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+      return res.status(400).json({
+        status: "error",
+        message: "Validation failed",
+        error: { details: errors.array() },
+      });
     }
     next();
   },
@@ -105,7 +98,11 @@ exports.validateLogin = [
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+      return res.status(400).json({
+        status: "error",
+        message: "Validation failed",
+        error: { details: errors.array() },
+      });
     }
     next();
   },

@@ -4,11 +4,9 @@ const db = require("../../models");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 const { Op, where } = require("sequelize");
-
 const adminRegister = async (req, res) => {
   try {
     const { name, email, password, apikey } = req.body;
-    console.log(req.body);
     if (apikey === "Niket") {
       const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -20,16 +18,26 @@ const adminRegister = async (req, res) => {
         is_active: "accepted",
       });
 
-      res.status(201).json({ message: "Admin registered successfully", user });
+      res.status(201).json({
+        status: "success",
+        message: "Admin registered successfully",
+        data: { user },
+      });
     } else {
-      res.status(500).json("Not Authorized");
+      res.status(400).json({
+        status: "error",
+        message: "Not Authorized",
+        error: { details: "Invalid API key" },
+      });
     }
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({
+      status: "error",
+      message: "Internal Server Error",
+      error: { details: error.message },
+    });
   }
 };
-
 const recruiterRegister = async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -42,10 +50,17 @@ const recruiterRegister = async (req, res) => {
       role: "recruiter",
     });
 
-    res.status(201).json({ message: "User registered successfully", user });
+    res.status(201).json({
+      status: "success",
+      message: "Recruiter registered successfully",
+      data: { user },
+    });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({
+      status: "error",
+      message: "Internal Server Error",
+      error: { details: error.message },
+    });
   }
 };
 
@@ -55,13 +70,21 @@ const userLogin = async (req, res) => {
     const user = await db.Users.findOne({ where: { email } });
 
     if (!user) {
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res.status(400).json({
+        status: "error",
+        message: "Invalid credentials",
+        error: { details: "User not found or incorrect email" },
+      });
     }
 
     if (user.is_active === "accepted") {
       const isMatch = await bcrypt.compare(password, user.password_hash);
       if (!isMatch) {
-        return res.status(401).json({ message: "Invalid credentials" });
+        return res.status(400).json({
+          status: "error",
+          message: "Invalid credentials",
+          error: { details: "Incorrect password" },
+        });
       }
 
       // Generate JWT Token
@@ -71,19 +94,28 @@ const userLogin = async (req, res) => {
         { expiresIn: "1h" }
       );
       res.status(200).json({
-        message: `logged in successfully`,
-        token
+        status: "success",
+        message: "Logged in successfully",
+        data: { token },
       });
     } else {
-      res.status(401).json({ message: `Unauthorized Access` });
+      res.status(401).json({
+        status: "error",
+        message: "Unauthorized Access",
+        error: { details: "User is not active" },
+      });
     }
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({
+      status: "error",
+      message: "Internal Server Error",
+      error: { details: error.message },
+    });
   }
 };
 
 module.exports = {
-    adminRegister,
-    recruiterRegister,
-    userLogin
-}
+  adminRegister,
+  recruiterRegister,
+  userLogin,
+};

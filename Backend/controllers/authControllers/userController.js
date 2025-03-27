@@ -1,19 +1,30 @@
 exports.getUserDetails = async (req, res) => {
   try {
     if (!req.user) {
-      return res.status(401).json({ message: "Unauthorized" });
+      return res.status(401).json({
+        status: "error",
+        message: "Unauthorized",
+        error: { details: "User is not authenticated" },
+      });
     }
-    // return the user details
+    // Return the user details
     return res.status(200).json({
+      status: "success",
       message: "User details fetched successfully",
-      user: {
-        id: req.user.id,
-        name: req.user.user.name,
-        role: req.user.user.role,
-        email: req.user.user.email,
+      data: {
+        user: {
+          id: req.user.id,
+          name: req.user.user.name,
+          role: req.user.user.role,
+          email: req.user.user.email,
+        },
       },
     });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return res.status(500).json({
+      status: "error",
+      message: "Internal Server Error",
+      error: { details: err.message },
+    });
   }
 };
