@@ -2,8 +2,7 @@ const express = require("express");
 const Router = express();
 
 const multer = require("multer");
-const fileUploadController = require("../controllers/fileUploadController");
-const auth = require("../middlewares/authMiddleware");
+const rcdUploadController = require("../controllers/rcdControllers");
 
 // Multer Setup for File Upload
 const storage = multer.memoryStorage();
@@ -12,40 +11,29 @@ const fileFilter = (req, file, cb) => {
     "application/pdf",
     "application/msword",
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-    "image/jpeg",
-    "image/png",
-    "image/gif",
   ];
   if (allowedMimeTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(
-      new Error(
-        "Invalid file type. Only PDF, DOC, DOCX, and images are allowed."
-      )
-    );
+    cb(new Error("Invalid file type. Only PDF, DOC, and DOCX are allowed."));
   }
 };
 
 const upload = multer({
   storage,
   fileFilter,
-  limits: { files: 15 }, // Restrict to a maximum of 15 files
+  limits: { files: 10 }, // Restrict to a maximum of 10 files
 });
 
-// File Upload API
-Router.post(
-  "/upload-resume",
-  auth.authMiddleware,
-  upload.array("resume-files"),
-  async (req, res, next) => {
-    try {
-      await fileUploadController.uploadResumes(req, res);
-    } catch (err) {
-      next(err);
-    }
-  }
-);
+// RCD Upload API
+Router.post("/upload-rcd", upload.single("rcd"), (req, res, next) => {
+  rcdUploadController.uploadRCD(req, res).catch(next);
+});
+
+// Get RCDs API
+Router.get("/get-rcd/:jobId", (req, res, next) => {
+  rcdUploadController.getRCD(req, res).catch(next);
+});
 
 // Error handling for file validation
 Router.use((err, req, res, next) => {
