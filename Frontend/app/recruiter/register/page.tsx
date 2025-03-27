@@ -47,43 +47,114 @@ export default function RecruiterRegister() {
       setTimeout(() => {
         setIsOpen(false);
       }, 5000);
-      return;
+      return
+      
     }
-
+    console.log("outside");
     try {
       const response = await fetchRecruiterRegister(formData); // Call the API service
-
+    
+      console.log("response =---=", response);
+    
       // Check if the response is OK (status code 200-299)
       if (response.ok) {
         const data = await response.json();
-
+        console.log("data in success", data);
+    
         // Assuming the server sends a response with status and message
         if (data.status === "success") {
           setMessage(data.message || "Your request has been sent successfully! Please wait for approval.");
           setIsOpen(true);
-
+          console.log("success");
+          
           // Redirect after 3 seconds
           setTimeout(() => {
             router.push("/login");
           }, 3000); // 3-second delay
         } else {
           // Handle case when status is error but response.ok is true
-          setMessage(data.message || "An error occurred while processing your request.");
+          const errorMessages = handleErrors(data.errors);
+        
+          setMessage(errorMessages || "An error occurred while processing your request.");
           setIsOpen(true);
+          console.log("error in error", data);
         }
       } else {
         // If response isn't OK (e.g., status 400 or 500), process the error response
-        const errorData = await response.json();
-        // Set the detailed error message from error.details
-        setMessage(errorData?.error?.details || errorData?.message || "Failed to send your request. Please try again.");
-        setIsOpen(true);
+        // const errorData = await response.json();
+        // console.log("errorData", errorData);
+    
+        // Extract and handle error messages from errorData
+        // const errorMessages = handleErrors(errorData.errors);
+        // setMessage(errorMessages || "Failed to send your request. Please try again.");
+        // setIsOpen(true);
+        setMessage( response.errors[0].msg);
+          console.log("new ",response.errors[0].msg);
       }
     } catch (error) {
       // Catch network-related errors or unexpected errors
       console.error("Error:", error);
+      console.log("error in catch", error);
+      
       setMessage("Failed to send your request. Please try again.");
       setIsOpen(true);
     }
+    
+    // Helper function to process and extract error messages
+    function handleErrors(errors) {
+      if (Array.isArray(errors)) {
+        return errors
+          .map((error) => `${error.msg} (Field: ${error.path}, Value: ${error.value})`)
+          .join(", ");
+      } else {
+        return "Unknown error occurred.";
+      }
+    }
+    
+    // try {
+    //   const response = await fetchRecruiterRegister(formData); // Call the API service
+
+    //   console.log("response",response);
+      
+    //   // Check if the response is OK (status code 200-299)
+    //   if (response.ok) {
+    //     const data = await response.json();
+    //     console.log("data in success",data);
+        
+
+    //     // Assuming the server sends a response with status and message
+    //     if (data.status === "success") {
+    //       setMessage(data.message || "Your request has been sent successfully! Please wait for approval.");
+    //       setIsOpen(true);
+
+    //       // Redirect after 3 seconds
+    //       setTimeout(() => {
+    //         router.push("/login");
+    //       }, 3000); // 3-second delay
+    //     } else {
+    //       // Handle case when status is error but response.ok is true
+    //       setMessage(data.error.msg || "An error occurred while processing your request.");
+    //       setIsOpen(true);
+    //       console.log("error in error",data);
+          
+    //     }
+    //   } else {
+    //     // If response isn't OK (e.g., status 400 or 500), process the error response
+    //     const errorData = await response.json();
+    //     console.log(errorData);
+        
+    //     // Set the detailed error message from error.details
+    //     setMessage(errorData?.error?.details || errorData?.msg || "Failed to send your request. Please try again.");
+    //     setIsOpen(true);
+    //     // console.log(errorData);
+        
+    //   }
+    // } catch (error) {
+    //   // Catch network-related errors or unexpected errors
+    //   console.error("Error:", error);
+    //   setMessage("Failed to send your request. Please try again.");
+    //   setIsOpen(true);
+    // }
 
   }
   const onClose = () => {

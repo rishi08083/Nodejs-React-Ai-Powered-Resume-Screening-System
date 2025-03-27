@@ -5,6 +5,7 @@ import Image from "next/image";
 import ListJobs from "../components/JobList";
 import { useRouter } from "next/navigation";
 import UploadForm from "../components/UploadForm";
+import Candidate from "../components/Candidates";
 import RecruiterRequests from "../components/admin/RecruiterRequests";
 import { useAuth } from "../lib/auth";
 import { HiMenu, HiX } from "react-icons/hi";
@@ -138,10 +139,10 @@ const Home = () => {
                 Upload Resume
               </button>
               <button
-                onClick={() => setActiveSection("post")}
-                className={state.activeSection === "post" ? "font-bold" : ""}
+                onClick={() => setActiveSection("candidate")}
+                className={state.activeSection === "candidate" ? "font-bold" : ""}
               >
-                Post Jobs
+                Candidate
               </button>
               <button
                 onClick={() => setActiveSection("profile")}
@@ -191,8 +192,8 @@ const Home = () => {
         {role === "recruiter" && state.activeSection === "upload" && (
           <UploadForm />
         )}
-        {role === "recruiter" && state.activeSection === "post" && (
-          <div>Post Jobs Content</div>
+         {role === "recruiter" && state.activeSection === "candidate" && (
+          <Candidate /> 
         )}
         {role === "recruiter" && state.activeSection === "profile" && (
           <div>Profile Content</div>
