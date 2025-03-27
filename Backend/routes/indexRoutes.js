@@ -4,12 +4,12 @@ const authRoutes = require("../routes/authRoutes");
 const uploadRoutes = require("../routes/uploadRoutes");
 const homeRoutes = require("../routes/homeRoutes");
 const userRoutes = require("../routes/userRoutes");
-const createJobRoutes = require("./createJobRoutes.js");
+const jobRoutes = require("./jobRoutes.js");
 
 router.get("/", homeRoutes);
 router.use("/auth", authRoutes);
 router.use("/upload", uploadRoutes);
-router.use("/create-job", createJobRoutes);
+router.use("/job", jobRoutes);
 router.use("/user", userRoutes);
 
 module.exports = router;
