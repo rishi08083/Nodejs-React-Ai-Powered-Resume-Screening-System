@@ -22,7 +22,7 @@ const UploadForm = () => {
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
   const [uploadProgress, setUploadProgress] = useState<number>(0);
-  const [successMessage,setSuccessMessage] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -92,7 +92,7 @@ const UploadForm = () => {
   const handleFile = (selectedFiles: FileList) => {
     const validFiles: File[] = [];
     const invalidFiles: string[] = [];
-  
+
     Array.from(selectedFiles).forEach((file) => {
       // Check by extension instead of mime type to be more reliable
       const extension = getFileExtension(file.name);
@@ -170,7 +170,6 @@ const UploadForm = () => {
           setErrorMessage(errorData.message || "Failed to upload the files.");
         }
         setIsLoading(false);
-        setErrorMessage("");
       }, 500);
     } catch (error) {
       console.error("Error uploading files:", error);
@@ -296,13 +295,10 @@ const UploadForm = () => {
         <div className="mt-4 p-4 bg-yellow-100 text-gray-400 rounded-lg border border-red-200">
           <div className="flex items-center">
             <span className="mr-2">✔️</span>
-             {successMessage}
+            {successMessage}
           </div>
-
         </div>
       )}
-
-
 
       {files.length > 0 && (
         <div className="mt-6 bg-gray-50 p-4 rounded-lg border border-gray-100">
@@ -358,7 +354,7 @@ const UploadForm = () => {
               <p className="text-gray-600 mb-6 text-center">
                 Please wait while we process your files...
               </p>
-              
+
               <div className="w-full bg-gray-200 rounded-full h-4 mb-3">
                 <div
                   className="bg-yellow-500 h-4 rounded-full transition-all duration-300"
