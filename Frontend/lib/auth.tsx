@@ -46,8 +46,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log(data.user);
-        setUser(data.user);
+        // console.log(data.user);
+        setUser(data.data.user);
         setLoading(false);
         console.log(user);
       } else {
@@ -70,30 +70,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
     //
     //{"error":true,"message":"Too many requests, please try again later"}
-     
 
     if (!res.ok) {
       const errorData = await res.json();
-      const errorMessages = errorData.errors
-        ?.map((error: { msg: string }) => error.msg)
-        .join(", ");
-        console.log(errorData)
-        console.log(errorMessages)
-
-      if(errorData?.error){
-         throw new Error(errorData.message);
+      if (errorData.status === "error") {
+        if (errorData.message === "Invalid credentials") {
+          throw new Error(errorData.error.details);
+        }
+        if (errorData.message === "Validation failed") {
+          throw new Error(errorData.error.details[0].msg);
+        }
+      } else {
+        throw new Error(errorData.message || "Some error occurred");
       }
-      throw new Error(errorMessages || "Invalid Credentials");
     }
 
     const data = await res.json();
-    localStorage.setItem("token", data.token);
+    localStorage.setItem("token", data.data.token);
     await checkAuth();
     return data;
   };
   const logout = async () => {
-    localStorage.removeItem('token')
-    await checkAuth()
+    localStorage.removeItem("token");
+    await checkAuth();
   };
   return (
     <AuthContext.Provider value={{ user, login, logout, loading, checkAuth }}>
