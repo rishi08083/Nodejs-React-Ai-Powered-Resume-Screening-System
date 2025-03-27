@@ -7,7 +7,9 @@ type Job = {
 };
 
 const UploadForm = () => {
-  const fileTypes = ["pdf", "docx"];
+  const fileTypes = ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"];
+
+
   const [files, setFiles] = useState<File[]>([]);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [selectedJob, setSelectedJob] = useState<string>("");
@@ -32,9 +34,9 @@ const UploadForm = () => {
   const handleFile = (selectedFiles: FileList) => {
     const validFiles: File[] = [];
     const invalidFiles: string[] = [];
-
+  
     Array.from(selectedFiles).forEach((file) => {
-      if (fileTypes.includes(file.type.split("/")[1])) {
+      if (fileTypes.includes(file.type)) {
         validFiles.push(file);
       } else {
         invalidFiles.push(file.name);
@@ -94,7 +96,7 @@ const UploadForm = () => {
       console.error("Error uploading files:", error);
       setErrorMessage("An error occurred while uploading the files.");
     } finally {
-      setIsLoading(false); // Stop loading
+      setIsLoading(false); 
     }
   };
 
