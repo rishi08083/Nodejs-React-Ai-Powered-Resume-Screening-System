@@ -1,8 +1,8 @@
 exports.getHomeController = (req, res) => {
     const response = {
-        message: 'Welcome to the ATS API',
-        type: "success"
+        status: "success",
+        message: "Welcome to the ATS API",
+        data: {}
     };
     res.status(200).json(response);
 };
-

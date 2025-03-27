@@ -26,13 +26,13 @@ const upload = multer({
 });
 
 // RCD Upload API
-Router.post("/upload-rcd", upload.array("rcds", 10), (req, res, next) => {
-  rcdUploadController.uploadRCDs(req, res).catch(next);
+Router.post("/upload-rcd", upload.single("rcd"), (req, res, next) => {
+  rcdUploadController.uploadRCD(req, res).catch(next);
 });
 
 // Get RCDs API
-Router.get("/get-rcds", (req, res, next) => {
-  rcdUploadController.getRCDs(req, res).catch(next);
+Router.get("/get-rcd/:jobId", (req, res, next) => {
+  rcdUploadController.getRCD(req, res).catch(next);
 });
 
 // Error handling for file validation

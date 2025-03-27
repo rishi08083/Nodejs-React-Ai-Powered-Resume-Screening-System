@@ -4,6 +4,7 @@ const Router = express();
 const multer = require("multer");
 const fileUploadController = require("../controllers/fileUploadController");
 const auth = require("../middlewares/authMiddleware");
+
 // Multer Setup for File Upload
 const storage = multer.memoryStorage();
 const fileFilter = (req, file, cb) => {
@@ -37,8 +38,12 @@ Router.post(
   "/upload-resume",
   auth.authMiddleware,
   upload.array("resume-files"),
-  (req, res, next) => {
-    fileUploadController.uploadResumes(req, res).catch(next);
+  async (req, res, next) => {
+    try {
+      await fileUploadController.uploadResumes(req, res);
+    } catch (err) {
+      next(err);
+    }
   }
 );
 

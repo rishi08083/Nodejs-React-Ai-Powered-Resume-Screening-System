@@ -5,11 +5,13 @@ const uploadRoutes = require("../routes/uploadRoutes");
 const homeRoutes = require("../routes/homeRoutes");
 const userRoutes = require("../routes/userRoutes");
 const createJobRoutes = require("./createJobRoutes.js");
+const rcdRoutes = require("./rcdRoutes.js");
 
 router.get("/", homeRoutes);
 router.use("/auth", authRoutes);
 router.use("/upload", uploadRoutes);
 router.use("/create-job", createJobRoutes);
 router.use("/user", userRoutes);
+router.use("/rcd", rcdRoutes);
 
 module.exports = router;
