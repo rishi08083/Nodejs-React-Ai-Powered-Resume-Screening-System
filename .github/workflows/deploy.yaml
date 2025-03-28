@@ -1,0 +1,47 @@
+name: Dev Deployment
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Add known hosts
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_KNOWN_HOSTS }}" >> ~/.ssh/known_hosts
+
+      # Fetch all environment variables and create the .env file
+      - name: Create .env file from all repository variables
+        run: |
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+            cd ~/Internship-2025/Resume-Screening-App
+
+            # Pull the latest code
+            git pull origin dev
+
+            # Create the .env file dynamically from all environment variables
+            mkdir -p Backend
+            printenv | grep -E '^(DATABASE_URL|JWT_SECRET|NEXT_PUBLIC_.*)=' > Backend/.env
+
+            # Display the .env content for debugging
+            cat Backend/.env
+
+            # Stop existing containers
+            docker-compose down
+
+            # Build and start the containers
+            docker-compose up -d --build
+          EOF
