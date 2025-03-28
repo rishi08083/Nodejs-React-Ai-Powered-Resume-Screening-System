@@ -1,11 +1,11 @@
-version: '3'
 services:
   nextjs:
     build: .
     ports:
-      - "3000:3000"
+      - "3001:3001"  # Expose the app on port 3000
     volumes:
-      - .:/app
+      - .:/app  # Mount the current directory to the container's /app
+      - /app/node_modules  # Ensure node_modules is mounted correctly
     environment:
-      - NODE_ENV=development
-    command: npm run dev
+      - NODE_ENV=development  # Set environment to development for hot reloading
+    command: npm run dev  # Run Next.js in development mode for hot-reloading
