@@ -1,10 +1,10 @@
-name: Fetch Multiple Environment Variables from a Particular Environment
+name: Fetch Environment Variables
 
 on:
   push:
     branches:
       - feature/testingdevdeploy
-  
+
 jobs:
   fetch:
     runs-on: ubuntu-latest
@@ -15,11 +15,9 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Fetch Variables from Repository
-        env:
-          VARS_JSON: ${{ toJSON(vars) }}
         run: |
           echo "Fetching all environment variables and creating a .env file..."
-          echo "$VARS_JSON" | jq -r 'to_entries | map("\(.key)=\(.value)")[]' > test.env
+          printenv | grep -E '^(DATABASE_URL|JWT_SECRET|NEXT_PUBLIC_.*)=' > test.env
 
           echo "This is the content of test.env file:"
           cat test.env
