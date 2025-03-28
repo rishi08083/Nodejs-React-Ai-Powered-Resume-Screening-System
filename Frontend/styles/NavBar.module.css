@@ -1,4 +1,3 @@
-/* NavBar.module.css */
 .container {
   min-height: 100vh;
   position: relative;
@@ -9,10 +8,23 @@
   padding: 1rem;
   display: flex;
   align-items: center;
+  justify-content: space-between; /* Ensure items are spread out */
   box-shadow: 0 2px 4px rgba(184, 165, 165, 0.1);
   position: sticky;
   top: 0;
   z-index: 10;
+  width: 100%; /* Full width by default */
+}
+
+.headerContent {
+  display: flex;
+  align-items: center;
+}
+
+.welcomeInfo {
+  display: flex;
+  flex-direction: column;
+  margin-left: 1rem;
 }
 
 .menuButton {
@@ -81,7 +93,9 @@
 .sidebar button:active {
   transform: translateY(0);
 }
-
+.active-state {
+  background-color: #ffd700;
+}
 .main {
   flex: 1;
   overflow-y: scroll;
