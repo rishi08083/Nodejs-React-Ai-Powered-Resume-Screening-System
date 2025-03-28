@@ -196,7 +196,7 @@ const Login = () => {
                 Forgot your password?
               </Link>
               <div className="w-full border-t border-gray-200 my-2"></div>
-              <p className="text-gray-600">Don't have an account?</p>
+              <p className="text-gray-600">{`Don't have an account?`}</p>
               <Link
                 href="/recruiter/register"
                 className="w-full bg-white border-2 border-yellow-400 text-yellow-500 font-medium py-2.5 rounded-lg text-center hover:bg-yellow-50 transition-colors duration-300"

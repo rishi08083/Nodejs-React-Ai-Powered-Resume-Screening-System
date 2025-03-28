@@ -60,7 +60,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }
   useEffect(() => {
     checkAuth();
-  }, []);
+  }, [checkAuth]); // Add checkAuth as a dependency
   const login = async (credentials: { email: string; password: string }) => {
     const res = await fetch(`${BASE_URL}/api/auth/login`, {
       method: "POST",

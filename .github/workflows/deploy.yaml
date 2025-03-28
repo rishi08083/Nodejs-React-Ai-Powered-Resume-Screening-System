@@ -1,0 +1,25 @@
+name: Test Env Variables
+
+on:
+  push:
+    branches:
+      - feature/testingdevdevelopment
+
+jobs:
+  test-env:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Test Environment Variables Step
+      - name: Test Environment Variables
+        run: |
+          echo "Testing environment variable fetching..."
+          echo "API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}"
+          echo "DATABASE_URL: ${{ secrets.DATABASE_URL }}"
+          echo "JWT_SECRET: ${{ secrets.JWT_SECRET }}"
+          echo "POSTGRES_USER: ${{ secrets.POSTGRES_USER }}"
+          echo "POSTGRES_PASSWORD: [HIDDEN]"  # Masked for safety
+          echo "POSTGRES_DB: ${{ secrets.POSTGRES_DB }}"
