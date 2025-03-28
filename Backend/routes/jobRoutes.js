@@ -13,7 +13,7 @@ router.post("/create", createJobs);
 router.post("/fetch", fetchJobs);
 router.get("/view", getAllJobs);
 router.get("/view/:id", getJobById);
-router.put("/update/:id", updateJobs);
-router.delete("/delete/:id", deleteJobs);
+// router.put("/update/:id", updateJobs);
+// router.delete("/delete/:id", deleteJobs);
 
 module.exports = router;
