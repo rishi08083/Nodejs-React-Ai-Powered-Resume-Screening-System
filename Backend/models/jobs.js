@@ -23,7 +23,7 @@ module.exports = (sequelize, DataTypes) => {
       title: DataTypes.STRING,
       description: DataTypes.TEXT,
       location: DataTypes.STRING,
-      experience_required: DataTypes.INTEGER,
+      experience_required: DataTypes.STRING,
       job_type: DataTypes.STRING,
       openings: DataTypes.INTEGER,
       company_name: DataTypes.STRING,
