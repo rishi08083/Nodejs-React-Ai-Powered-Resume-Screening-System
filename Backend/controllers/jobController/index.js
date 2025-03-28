@@ -26,9 +26,16 @@ exports.fetchJobs = async(req, res) => {
             });
         })
     
-        res.status(201).json({ message: "Jobs stored successfully" });
+        res.status(201).json({ 
+            status: "success",
+            message: "Jobs stored successfully"
+        });
       } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ 
+            status: "error",
+            message: "Error while fetching job",
+            error: { details: error.message }
+        });
       }
 }
 
@@ -62,19 +69,38 @@ exports.createJobs = async (req, res) => {
             salary_range,
             application_deadline,
         });
-        res.status(201).json(jobs);
+        res.status(201).json({
+            status: "success",
+            message: "Jobs created successfully",
+            data: jobs
+        });
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        res.status(400).json({ 
+            status: "error",
+            message: "Error while creating job",
+            error: { details: error.message } 
+        });
+
     }
 };
 
 // Get All jobs
 exports.getAllJobs = async (req, res) => {
     try {
-        const jobs = await db.Jobs.findAll();
-        res.status(200).json(jobs);
+        const jobs = await db.Jobs.findAll({
+            attributes: ["id", "title", "experience_required", "openings"]
+        });
+        res.status(200).json({
+            status: "success",
+            message: "Jobs retrieved successfully",
+            data: jobs
+        });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ 
+            status: "error",
+            message: "Failed to retrieve job",
+            error: { details: error.message }  
+        });
     }
 };
 
@@ -82,35 +108,73 @@ exports.getAllJobs = async (req, res) => {
 exports.getJobById = async (req, res) => {
     try {
         const jobs = await db.Jobs.findByPk(req.params.id);
-        if (!jobs) return res.status(404).json({ error: "jobs not found" });
-        res.status(200).json(jobs);
+
+        if (!jobs) return res.status(404).json({ 
+            status: "error",
+            message: "Failed to retrieve job by ID",
+        });
+        res.status(200).json({
+            status: "success",
+            message: "Job retrieved by ID successfully",
+            data: jobs
+        });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ 
+            status: "error",
+            message: "Failed to retrieve job by ID",
+            error: { details: error.message }
+        });
     }
 };
 
 // Update jobs
 exports.updateJobs = async (req, res) => {
     try {
-        const jobs = await db.Jobs.findByPk(req.params.id);
-        if (!jobs) return res.status(404).json({ error: "jobs not found" });
+        const job = await db.Jobs.findByPk(req.params.id);
 
-        await db.Jobs.update(req.body);
-        res.status(200).json(jobs);
+        if (!job) {
+            return res.status(404).json({
+                status: "error",
+                message: "Job not found",
+            });
+        }
+
+        await job.update(req.body);
+        res.status(200).json({
+            status: "success",
+            message: "Job updated successfully",
+            data: job,
+        });
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        res.status(400).json({
+            status: "error",
+            message: "Failed to update job",
+            error: { details: error.message },
+        });
     }
 };
 
 // Delete jobs
 exports.deleteJobs = async (req, res) => {
     try {
-        const jobs = await db.Jobs.findByPk(req.params.id);
-        if (!jobs) return res.status(404).json({ error: "jobs not found" });
+        const job = await db.Jobs.findByPk(req.params.id);
+        if (!job) {
+            return res.status(404).json({
+                status: "error",
+                message: "Job not found",
+            });
+        }
 
-        await db.Jobs.destroy();
-        res.status(200).json({ message: "jobs deleted successfully" });
+        await job.destroy();
+        res.status(200).json({
+            status: "success",
+            message: "Job deleted successfully",
+        });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({
+            status: "error",
+            message: "Failed to delete job",
+            error: { details: error.message },
+        });
     }
 };
