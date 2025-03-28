@@ -1,3 +1,25 @@
+const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
+
+const path = require("path");
+const crypto = require("crypto");
+const db = require("../../models");
+
+require("dotenv").config();
+
+// AWS S3 Configuration
+const s3 = new S3Client({
+  region: process.env.AWS_REGION,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  },
+});
+
+const generateFileName = (originalName) => {
+  const ext = path.extname(originalName);
+  return `${crypto.randomBytes(10).toString("hex")}${ext}`;
+};
+
 exports.uploadResumes = async (req, res) => {
   try {
     if (!req.files || req.files.length === 0) {
