@@ -13,15 +13,25 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Fetch Variables from GitHub API
+      - name: Fetch Variables and Create .env
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GitHub-provided token or your PAT
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "Fetching all repository variables using GitHub API..."
-          curl -s -H "Authorization: Bearer $GITHUB_TOKEN" \
+          
+          # Fetch repository variables as JSON
+          VARS_JSON=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" \
             -H "Accept: application/vnd.github+json" \
-            "https://api.github.com/repos/${{ github.repository }}/environments/production/variables" \
-            | jq -r '.variables[] | "\(.name)=\(.value)"' > test.env
+            "https://api.github.com/repos/${{ github.repository }}/actions/variables")
+          
+          # Check if the response contains variables
+          if [[ $(echo "$VARS_JSON" | jq -r '.total_count') -eq 0 ]]; then
+            echo "No variables found."
+            exit 1
+          fi
+
+          # Create .env file from fetched variables
+          echo "$VARS_JSON" | jq -r '.variables[] | "\(.name)=\(.value)"' > test.env
 
           echo "This is the content of the test.env file:"
           cat test.env
