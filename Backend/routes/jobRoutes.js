@@ -1,5 +1,7 @@
 const express = require("express");
 const router = express.Router();
+
+const {authMiddleware} = require('../middlewares/authMiddleware');
 const {
     fetchJobs,
     createJobs,
@@ -9,9 +11,9 @@ const {
     deleteJobs,
 } = require("../controllers/jobController");
 
-router.post("/create", createJobs);
-router.post("/fetch", fetchJobs);
-router.get("/view", getAllJobs);
+router.post("/create", authMiddleware, createJobs);
+router.post("/fetch", authMiddleware, fetchJobs);
+router.get("/view", authMiddleware, getAllJobs);
 router.get("/view/:id", getJobById);
 // router.put("/update/:id", updateJobs);
 // router.delete("/delete/:id", deleteJobs);
