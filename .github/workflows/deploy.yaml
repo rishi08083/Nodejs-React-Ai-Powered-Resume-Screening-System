@@ -1,32 +1,25 @@
-name: Dev Deployment
+name: Fetch Multiple Environment Variables from a Particular Environment
 
 on:
   push:
     branches:
       - feature/testingdevdeploy
-
+  
 jobs:
-  deploy:
+  fetch:
     runs-on: ubuntu-latest
+    environment: production  # Replace with your environment name
 
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v3
 
-      # Create .env file from all repository variables
-      - name: Create .env file from all variables
+      - name: Fetch Variables from Repository
+        env:
+          VARS_JSON: ${{ toJSON(vars) }}
         run: |
-          echo "Creating .env file from repository variables..."
+          echo "Fetching all environment variables and creating a .env file..."
+          echo "$VARS_JSON" | jq -r 'to_entries | map("\(.key)=\(.value)")[]' > test.env
 
-          # Define the list of expected variables (manually)
-          variables=("DATABASE_URL" "JWT_SECRET" "NEXT_PUBLIC_API_URL" "NEXT_PUBLIC_BASE_URL")
-
-          # Create the .env file
-          for var in "${variables[@]}"; do
-            value="${{ vars[$var] }}"
-            echo "$var=$value" >> .env
-          done
-
-          # Display the .env file content
-          echo "Generated .env file:"
-          cat .env
+          echo "This is the content of test.env file:"
+          cat test.env
