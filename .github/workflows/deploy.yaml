@@ -20,6 +20,7 @@ jobs:
           echo "API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}"
           echo "DATABASE_URL: ${{ secrets.DATABASE_URL }}"
           echo "JWT_SECRET: ${{ secrets.JWT_SECRET }}"
-          echo "POSTGRES_USER: ${{ secrets.POSTGRES_USER }}"
-          echo "POSTGRES_PASSWORD: [HIDDEN]"  # Masked for safety
-          echo "POSTGRES_DB: ${{ secrets.POSTGRES_DB }}"
+          echo "SSH_HOST: ${{ secrets.SSH_HOST }}"
+          echo "SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}"
+          echo "SSH_USER: ${{ secrets.SSH_USER }}"
+          echo "SSH_PRIVATE_KEY: [HIDDEN]"  # Masked for safety
