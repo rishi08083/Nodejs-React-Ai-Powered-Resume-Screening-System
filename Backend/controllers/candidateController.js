@@ -42,9 +42,9 @@ module.exports.addCandidate = async (req, res) => {
     });
 
     return res.status(201).json({
-    status: "success",
-    message: "Candiadte Created successfully",
-    data: { candidate },
+      status: "success",
+      message: "Candiadte Created successfully",
+      data: { candidate },
     });
   } catch (error) {
     console.error("Error adding candidate:", error);
@@ -55,9 +55,19 @@ module.exports.addCandidate = async (req, res) => {
 };
 module.exports.listCandidate = async (req, res) => {
   try {
-    const users = await db.Candidates.findAll();
-    if (users.legth == 0) {
-      res.status(200).json({
+    const { job_id } = req.params;
+    if (!job_id) {
+      return res.status(400).json({
+        status: "error",
+        message: "Job ID is required",
+      });
+    }
+    const candidates = await db.Candidates.findAll({
+      where: { job_id },
+    });
+    console.log(candidates);
+    if (candidates.length == 0) {
+      return res.status(200).json({
         status: "success",
         message: "No Candiadtes Found",
       });
@@ -65,7 +75,7 @@ module.exports.listCandidate = async (req, res) => {
     res.status(200).json({
       status: "success",
       message: "Candiadtes Fetched successfully",
-      data: { users },
+      data: { candidates },
     });
   } catch (error) {
     console.error("Error fetching candidates:", error);

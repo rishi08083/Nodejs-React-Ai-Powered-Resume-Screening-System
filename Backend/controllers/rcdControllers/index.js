@@ -1,7 +1,8 @@
-const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
+const { S3Client, PutObjectCommand, GetObjectCommand } = require("@aws-sdk/client-s3");
+const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 const path = require("path");
 const crypto = require("crypto");
-const db = require("../../models");
+const db = require("../../models/index.js");
 
 require("dotenv").config();
 
