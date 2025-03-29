@@ -2,11 +2,16 @@
 import { useEffect, useState, useRef } from "react";
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Eye, Upload, FileText } from "lucide-react";
 
 interface Job {
+  id: number;
   title: string;
-  experience: string;
+  experience_required: string;
   openings: number;
+  rcd_url?: string;
+  is_rcd_uploaded:boolean;
+
 }
 
 const ListJobs = () => {
@@ -14,6 +19,10 @@ const ListJobs = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [jobError,setJobError] = useState<string | null>(null);
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
+  const [uploadStatus, setUploadStatus] = useState<'idle' | 'uploading' | 'success' | 'error'>('idle');
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleViewButtonClick = (job: Job) => {
@@ -21,24 +30,97 @@ const ListJobs = () => {
     setShowModal(true);
   };
 
+  const handleUploadRCD = async () => {
+    if (!inputRef.current?.files?.length) {
+      setUploadStatus('error');
+      setError('Please select a file to upload');
+      return;
+    }
+
+    const file = inputRef.current.files[0];
+    const formData = new FormData();
+    formData.append('rcd', file);
+    formData.append('jobId', selectedJob?.id.toString() || '');
+
+    try {
+      setUploadStatus('uploading');
+      setUploadProgress(0);
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', `${process.env.NEXT_PUBLIC_API_URL}/api/rcd/upload-rcd`, true);
+      xhr.setRequestHeader('Authorization', `Bearer ${localStorage.getItem('token')}`);
+      xhr.upload.onprogress = (event) => {
+        if (event.lengthComputable) {
+          const percentComplete = (event.loaded / event.total) * 100;
+          setUploadProgress(percentComplete);
+        }
+      };
+      xhr.onload = () => {
+        if (xhr.status === 200) {
+          const data = JSON.parse(xhr.responseText);
+          setUploadStatus('success');
+          setJobs(prevJobs => 
+            prevJobs.map(job => 
+              job.id === selectedJob?.id 
+                ? {...job, rcd_url: data.data.documents[0]} 
+                : job
+            )
+          );
+          setTimeout(() => {
+            setShowModal(false);
+            setUploadStatus('idle');
+            setUploadProgress(0);
+          }, 2000);
+        } else {
+          const errorData = JSON.parse(xhr.responseText);
+          setUploadStatus('error');
+          setError(errorData.message || 'Upload failed');
+        }
+      };
+
+      xhr.onerror = () => {
+        setUploadStatus('error');
+        setError('Network error. Please try again.');
+      };
+
+      xhr.send(formData);
+    } catch (error) {
+      setUploadStatus('error');
+      setError(error instanceof Error ? error.message : 'An unexpected error occurred');
+    }
+  };
+
+  const getJobDetails = async () => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/job/view`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setJobs(data.data);
+        setIsLoading(false);
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.message);
+      }
+    } catch (error) {
+      setJobError(error instanceof Error ? error.message : 'Failed to fetch jobs');
+      setIsLoading(false);
+    }
+  };
+
+
   // Fetch jobs from the API
   useEffect(() => {
-    setIsLoading(true);
-    fetch("/api/getjobs")
-      .then((data) => data.json())
-      .then((response: Job[]) => {
-        setJobs(response);
-        console.log(response);
-        setIsLoading(false);
-      })
-      .catch((err) => {
-        alert("Failed to load jobs: " + err);
-        setIsLoading(false);
-      });
+    getJobDetails();
   }, []);
 
   return (
-    <div className="w-full p-2  overflow-scroll">
+    <div className="w-full p-2 overflow-scroll">
       <div className="mb-6">
         <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
           Available Job Positions
@@ -51,6 +133,11 @@ const ListJobs = () => {
       {isLoading ? (
         <div className="flex justify-center items-center h-64">
           <div className="w-12 h-12 rounded-full border-4 border-yellow-400 border-t-transparent animate-spin"></div>
+        </div>
+      ) : jobError ? (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+          <strong className="font-bold">Error: </strong>
+          <span className="block sm:inline">{jobError}</span>
         </div>
       ) : (
         <motion.div
@@ -73,14 +160,14 @@ const ListJobs = () => {
                     Openings
                   </th>
                   <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">
-                    Action
+                    Actions
                   </th>
                 </tr>
               </thead>
               <tbody>
                 {jobs.map((job, index) => (
                   <motion.tr
-                    key={index}
+                    key={job.id}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: index * 0.1 }}
@@ -90,36 +177,37 @@ const ListJobs = () => {
                       {job.title}
                     </td>
                     <td className="px-4 py-4 text-sm text-gray-600">
-                      {job.experience}
+                      {job.experience_required}
                     </td>
                     <td className="px-4 py-4 text-sm">
                       <span className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">
                         {job.openings} positions
                       </span>
                     </td>
-                    <td className="px-4 py-4 text-sm">
+                    <td className="px-4 py-4 text-sm flex space-x-2">
                       <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        className="px-4 py-2 bg-yellow-400 text-black font-medium rounded-lg hover:bg-yellow-500 transition-colors duration-200 shadow-md hover:shadow-lg flex items-center space-x-1"
+                        className="px-3 py-2 bg-yellow-400 text-black font-medium rounded-lg hover:bg-yellow-500 transition-colors duration-200 shadow-md hover:shadow-lg flex items-center space-x-1"
                         onClick={() => handleViewButtonClick(job)}
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-4 w-4"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
-                          />
-                        </svg>
-                        <span>Upload RCD</span>
+                        <Upload className="h-4 w-4" />
+                        {job.is_rcd_uploaded? <span>Update RCD</span>:<span>Upload RCD</span>}
+                        
                       </motion.button>
+                      
+                        <motion.a
+                          href={'#'}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          className="px-3 py-2 bg-gray-200 text-black font-medium rounded-lg hover:bg-gray-500 transition-colors duration-200 shadow-md hover:shadow-lg flex items-center space-x-1"
+                        >
+                          <Eye className="h-4 w-4" />
+                          <span>View</span>
+                        </motion.a>
+                      
                     </td>
                   </motion.tr>
                 ))}
@@ -149,37 +237,41 @@ const ListJobs = () => {
                   Upload RCD for {selectedJob.title}
                 </h2>
                 <p className="text-yellow-800 mt-1 text-sm">
-                  Experience required: {selectedJob.experience}
+                  Experience required: {selectedJob.experience_required}
                 </p>
               </div>
 
               <div className="p-6">
+                {uploadStatus === 'error' && (
+                  <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                    {error}
+                  </div>
+                )}
+
+                {uploadStatus === 'success' && (
+                  <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+                    Document uploaded successfully!
+                  </div>
+                )}
+
                 <div className="mb-6">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Resume, CV or Document
+                   Upload RCD documents
                   </label>
-                  <div className="border-2 border-dashed border-yellow-300 rounded-lg p-6 text-center hover:border-yellow-400 transition-colors duration-200">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="mx-auto h-12 w-12 text-yellow-400"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                      />
-                    </svg>
+                  <div 
+                    className={`border-2 ${
+                      uploadStatus === 'error' 
+                        ? 'border-red-300' 
+                        : 'border-dashed border-yellow-300'
+                    } rounded-lg p-6 text-center hover:border-yellow-400 transition-colors duration-200`}
+                  >
+                    <FileText className="mx-auto h-12 w-12 text-yellow-400" />
                     <p className="mt-2 text-sm text-gray-600">
                       Drag and drop your file here, or
                       <span
                         className="text-yellow-600 font-medium cursor-pointer"
                         onClick={() => {
-                          //click input file manually from ref
-                          inputRef.current.click();
+                          inputRef.current?.click();
                         }}
                       >
                         {" "}
@@ -189,25 +281,50 @@ const ListJobs = () => {
                     <p className="mt-1 text-xs text-gray-500">
                       PDF, DOC or DOCX up to 10MB
                     </p>
-                    <input type="file" className="hidden" ref={inputRef} />
+                    <input 
+                      type="file" 
+                      className="hidden" 
+                      ref={inputRef} 
+                      accept=".pdf,.doc,.docx"
+                    />
                   </div>
                 </div>
+
+                {uploadStatus === 'uploading' && (
+                  <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4">
+                    <div 
+                      className="bg-yellow-400 h-2.5 rounded-full" 
+                      style={{ width: `${uploadProgress}%` }}
+                    ></div>
+                  </div>
+                )}
 
                 <div className="flex justify-end space-x-3">
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     className="px-4 py-2 bg-gray-200 text-gray-800 font-medium rounded-lg hover:bg-gray-300 transition-colors duration-200"
-                    onClick={() => setShowModal(false)}
+                    onClick={() => {
+                      setShowModal(false);
+                      setUploadStatus('idle');
+                      setUploadProgress(0);
+                    }}
+                    disabled={uploadStatus === 'uploading'}
                   >
                     Cancel
                   </motion.button>
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="px-4 py-2 bg-yellow-400 text-black font-medium rounded-lg hover:bg-yellow-500 transition-colors duration-200 shadow-md hover:shadow-lg"
+                    className={`px-4 py-2 text-black font-medium rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg ${
+                      uploadStatus === 'uploading' 
+                        ? 'bg-yellow-300 cursor-not-allowed' 
+                        : 'bg-yellow-400 hover:bg-yellow-500'
+                    }`}
+                    onClick={handleUploadRCD}
+                    disabled={uploadStatus === 'uploading'}
                   >
-                    Upload
+                    {uploadStatus === 'uploading' ? 'Uploading...' : 'Upload'}
                   </motion.button>
                 </div>
               </div>

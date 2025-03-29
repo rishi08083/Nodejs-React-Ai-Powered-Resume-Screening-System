@@ -13,8 +13,6 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "job_id",
         as: "screening_results",
       });
-
-      Jobs.belongsTo(models.Users, { foreignKey: "user_id", as: "user" });
     }
   }
 
@@ -39,7 +37,6 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: true,
       },
-      user_id: DataTypes.INTEGER,
       is_deleted: DataTypes.BOOLEAN,
     },
     {
