@@ -12,6 +12,12 @@ module.exports = {
       title: {
         type: Sequelize.STRING,
       },
+      years_of_experience: {
+        type: Sequelize.INTEGER,
+      },
+      salary: {
+        type: Sequelize.INTEGER,
+      },
       description: {
         type: Sequelize.TEXT,
       },

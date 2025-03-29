@@ -20,7 +20,6 @@ const generateFileName = (originalName) => {
   return `${crypto.randomBytes(10).toString("hex")}${ext}`;
 };
 
-// Upload Multiple Resumes API
 exports.uploadResumes = async (req, res) => {
   try {
     if (!req.files || req.files.length === 0) {
@@ -68,7 +67,7 @@ exports.uploadResumes = async (req, res) => {
     res.status(200).json({
       status: "success",
       message: "Files uploaded successfully",
-      data: { files: uploadedFiles },
+      data: { documents: uploadedFiles },
     });
   } catch (error) {
     console.error("Error uploading files:", error);

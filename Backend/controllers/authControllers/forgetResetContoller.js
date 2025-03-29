@@ -18,7 +18,13 @@ const forgetPassword = async (req, res) => {
     const { email } = req.body;
     const user = await db.Users.findOne({ where: { email } });
 
-    if (!user) return res.status(404).json({ message: "User not found" });
+    if (!user) {
+      return res.status(404).json({
+        status: "error",
+        message: "User not found",
+        error: { details: "No user exists with the provided email address" },
+      });
+    }
 
     const resetToken = crypto.randomBytes(32).toString("hex");
     const tokenExpiry = Date.now() + 3600000;
@@ -38,9 +44,18 @@ const forgetPassword = async (req, res) => {
     };
 
     await transporter.sendMail(mailOptions);
-    res.json({ message: "Password reset email sent." });
+
+    res.status(200).json({
+      status: "success",
+      message: "Password reset email sent successfully",
+      data: { email },
+    });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({
+      status: "error",
+      message: "An error occurred while processing the request",
+      error: { details: error.message },
+    });
   }
 };
 
@@ -55,8 +70,13 @@ const resetPassword = async (req, res) => {
       },
     });
 
-    if (!user)
-      return res.status(400).json({ message: "Invalid or expired token" });
+    if (!user) {
+      return res.status(400).json({
+        status: "error",
+        message: "Invalid or expired token",
+        error: { details: "The provided token is either invalid or has expired" },
+      });
+    }
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
@@ -65,9 +85,17 @@ const resetPassword = async (req, res) => {
     user.resetTokenExpires = null;
     await user.save();
 
-    res.json({ message: "Password updated successfully." });
+    res.status(200).json({
+      status: "success",
+      message: "Password updated successfully",
+      data: { email: user.email },
+    });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({
+      status: "error",
+      message: "An error occurred while resetting the password",
+      error: { details: error.message },
+    });
   }
 };
 
