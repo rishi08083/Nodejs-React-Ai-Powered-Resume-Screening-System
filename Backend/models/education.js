@@ -17,7 +17,6 @@ module.exports = (sequelize, DataTypes) => {
       candidate_id: DataTypes.INTEGER,
       institution_name: DataTypes.STRING,
       degree: DataTypes.STRING,
-      field_of_study: DataTypes.STRING,
       start_date: DataTypes.DATE,
       end_date: DataTypes.DATE,
       is_deleted: DataTypes.BOOLEAN,

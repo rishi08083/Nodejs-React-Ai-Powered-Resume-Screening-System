@@ -47,7 +47,7 @@ module.exports = (sequelize, DataTypes) => {
       resetToken: { type: DataTypes.STRING, allowNull: true },
       resetTokenExpires: { type: DataTypes.DATE, allowNull: true },
       is_active: {
-        type: DataTypes.ENUM("pending", "accepted", "rejected"),
+        type: DataTypes.ENUM("pending", "accepted", "rejected"), // Changed from BOOLEAN
         allowNull: false,
         defaultValue: "pending",
       },
