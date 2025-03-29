@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useMemo } from "react";
-import styles from "../styles/Home.module.css";
+import { motion } from "framer-motion";
+import { fetchJobs, fetchCandidates, checkCandidateCompatibility } from "../api-services/CandidateServices";
+import { log } from "console";
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 type Job = {
   id: string;
@@ -10,192 +13,213 @@ type Candidate = {
   id: string;
   name: string;
   email: string;
-  contact: string;
-  resume: string;
+  phone_number: string;
+  resume_url: string;
   compatibilityScore: number;
   feedback: string;
 };
+
+
 
 const UploadForm = () => {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [selectedJob, setSelectedJob] = useState<string>("");
   const [candidates, setCandidates] = useState<Candidate[]>([]);
+  const [searchTerm, setSearchTerm] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const candidatesPerPage = 5;
+  const [compatibilityResponses, setCompatibilityResponses] = useState<{ [id: string]: string }>({});
+  const candidatesPerPage = 10;
 
-  useEffect(() => {
-    fetch("/api/getjobs")
-      .then((res) => res.json())
-      .then((data) => setJobs(data))
-      .catch((err) => console.error("Error fetching jobs:", err));
-  }, []);
+useEffect(() => {
+  const getJobDetails = async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/job/view`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      });
+  
+      if (response.ok) {
+        const data = await response.json();
+        setJobs(data.data);
+        // setIsLoading(false);
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.message);
+      }
+    } catch (error) {
+      // setJobError(error instanceof Error ? error.message : 'Failed to fetch jobs');
+      // setIsLoading(false);
+    }
+  };
+  getJobDetails();
+},[]);
 
-  // useEffect(() => {
-  //   if (selectedJob) {
-  //     fetch(`/api/getCandidates?jobId=${selectedJob}`)
-  //       .then((res) => res.json())
-  //       .then((data) => setCandidates(data))
-  //       .catch((err) => console.error("Error fetching candidates:", err));
-  //   }
-  // }, [selectedJob]);
-  // useEffect(() => { 
-  //   setCandidates([{
-  //     id: "1",
-  //     name: "Alice Johnson",
-  //     email: "alice.johnson@example.com",
-  //     contact: "9876543210",
-  //     resume: "https://example.com/resume/alice.pdf",
-  //     compatibilityScore: 85,
-  //     feedback: "Strong analytical skills, great communication.",
-  //   },
-  //   {
-  //     id: "2",
-  //     name: "Bob Smith",
-  //     email: "bob.smith@example.com",
-  //     contact: "9876543211",
-  //     resume: "https://example.com/resume/bob.pdf",
-  //     compatibilityScore: 78,
-  //     feedback: "Good technical skills but needs improvement in teamwork.",
-  //   },
-  //   {
-  //     id: "3",
-  //     name: "Charlie Brown",
-  //     email: "charlie.brown@example.com",
-  //     contact: "9876543212",
-  //     resume: "https://example.com/resume/charlie.pdf",
-  //     compatibilityScore: 90,
-  //     feedback: "Excellent coding skills and problem-solving abilities.",
-  //   },
-  //   {
-  //     id: "4",
-  //     name: "David Wilson",
-  //     email: "david.wilson@example.com",
-  //     contact: "9876543213",
-  //     resume: "https://example.com/resume/david.pdf",
-  //     compatibilityScore: 82,
-  //     feedback: "Great leadership skills but needs more hands-on experience.",
-  //   },
-  //   {
-  //     id: "5",
-  //     name: "Evelyn Martinez",
-  //     email: "evelyn.martinez@example.com",
-  //     contact: "9876543214",
-  //     resume: "https://example.com/resume/evelyn.pdf",
-  //     compatibilityScore: 75,
-  //     feedback: "Good at project management but needs to improve coding speed.",
-  //   },
-  //   {
-  //     id: "6",
-  //     name: "Franklin Thomas",
-  //     email: "franklin.thomas@example.com",
-  //     contact: "9876543215",
-  //     resume: "https://example.com/resume/franklin.pdf",
-  //     compatibilityScore: 88,
-  //     feedback: "Very strong in algorithms and data structures.",
-  //   },
-  //   {
-  //     id: "7",
-  //     name: "Grace Lee",
-  //     email: "grace.lee@example.com",
-  //     contact: "9876543216",
-  //     resume: "https://example.com/resume/grace.pdf",
-  //     compatibilityScore: 80,
-  //     feedback: "Quick learner, adapts well to new technologies.",
-  //   },
-  //   {
-  //     id: "8",
-  //     name: "Henry Scott",
-  //     email: "henry.scott@example.com",
-  //     contact: "9876543217",
-  //     resume: "https://example.com/resume/henry.pdf",
-  //     compatibilityScore: 77,
-  //     feedback: "Good problem solver but needs better time management.",
-  //   },
-  //   {
-  //     id: "9",
-  //     name: "Isabella Lopez",
-  //     email: "isabella.lopez@example.com",
-  //     contact: "9876543218",
-  //     resume: "https://example.com/resume/isabella.pdf",
-  //     compatibilityScore: 92,
-  //     feedback: "Exceptional communication and leadership skills.",
-  //   },
-  //   {
-  //     id: "10",
-  //     name: "James Anderson",
-  //     email: "james.anderson@example.com",
-  //     contact: "9876543219",
-  //     resume: "https://example.com/resume/james.pdf",
-  //     compatibilityScore: 79,
-  //     feedback: "Good full-stack developer, needs improvement in backend optimization.",
-  //   },
-  // ])
-  // }, []);
 
-  const jobOptions = useMemo(
-    () =>
-      jobs.map((job) => (
-        <option key={job.id} value={job.id}>
-          {job.title}
-        </option>
-      )),
-    [jobs]
-  );
+useEffect(() => {
+  // log(selectedJob, "selectedJob")
+  const getCandidateDtails = async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/candidates/list/${selectedJob}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      });
+  
+      if (response.ok) {
+        const data = await response.json();
+        setCandidates(data.data.candidates);
+        // setIsLoading(false);
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.message);
+      }
+    } catch (error) {
+      console.log(error, "error");
+    }
+  };
+  getCandidateDtails();
+},[selectedJob]);
+
+  const filteredCandidates = useMemo(() => {
+    return candidates.filter(
+      (candidate) =>
+        candidate.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        candidate.id.toString().includes(searchTerm)
+    );
+  }, [candidates, searchTerm]);
 
   const indexOfLastCandidate = currentPage * candidatesPerPage;
   const indexOfFirstCandidate = indexOfLastCandidate - candidatesPerPage;
-  const currentCandidates = candidates.slice(indexOfFirstCandidate, indexOfLastCandidate);
+  const currentCandidates = filteredCandidates.slice(indexOfFirstCandidate, indexOfLastCandidate);
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
-  return (
-    <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg">
-      <h1 className="text-2xl font-bold mb-4 text-center">Candidate List</h1>
-      <select
-        className="w-full p-3 border rounded mb-4 text-gray-700"
-        value={selectedJob}
-        onChange={(e) => setSelectedJob(e.target.value)}
-      >
-        <option value="">Select a Job</option>
-        {jobOptions}
-      </select>
+  const handleCheckCompatibility = async (candidateId: string) => {
+    try {
+      const data = await checkCandidateCompatibility(candidateId);
+      setCompatibilityResponses((prev) => ({
+        ...prev,
+        [candidateId]: data.message, // Assuming the API returns a "message" field
+      }));
+    } catch (error) {
+      console.error("Error checking compatibility:", error);
+      setCompatibilityResponses((prev) => ({
+        ...prev,
+        [candidateId]: "Error checking compatibility",
+      }));
+    }
+  };
 
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse border border-gray-300">
+  return (
+    <div className="w-full p-4 bg-gray-50">
+      <div className="mb-6">
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Candidate List</h1>
+        <p className="text-gray-600 mt-2">Search and manage candidates for your job postings.</p>
+      </div>
+
+      {/* Search and Filter */}
+      <div className="flex flex-col md:flex-row items-center justify-between mb-6 space-y-4 md:space-y-0">
+        <input
+          type="text"
+          placeholder="Search by ID or Name"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full md:w-1/2 p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
+        />
+        <select
+          className="w-full md:w-1/4 p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
+          value={selectedJob}
+          onChange={(e) => setSelectedJob(e.target.value)}
+        >
+          <option value="">Select a Job</option>
+          {jobs.map((job) => (
+            <option key={job.id} value={job.id}>
+              {job.title}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Candidate Table */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="bg-white rounded-lg shadow-lg overflow-hidden"
+      >
+        <table className="min-w-full table-auto border-collapse">
           <thead>
-            <tr className="bg-gray-200">
-              <th className="p-2 border">Candidate Name</th>
-              <th className="p-2 border">Email</th>
-              <th className="p-2 border">Contact</th>
-              <th className="p-2 border">Resume</th>
-              <th className="p-2 border">Compatibility Score</th>
-              <th className="p-2 border">Feedback</th>
+            <tr className="bg-yellow-50 border-b border-yellow-100">
+              <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">Candidate Name</th>
+              <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">Email</th>
+              <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">Contact</th>
+              <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">Resume</th>
+              <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">Compatibility</th>
+              <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">Feedback</th>
             </tr>
           </thead>
           <tbody>
-            {currentCandidates.map((candidate) => (
-              <tr key={candidate.id} className="border">
-                <td className="p-2 border">{candidate.name}</td>
-                <td className="p-2 border">{candidate.email}</td>
-                <td className="p-2 border">{candidate.contact}</td>
-                <td className="p-2 border">
-                  <a href={candidate.resume} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">
+            {currentCandidates.map((candidate, index) => (
+              <motion.tr
+                key={candidate.id}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: index * 0.1 }}
+                className="border-b border-gray-100 hover:bg-yellow-50 transition-colors duration-200"
+              >
+                <td className="px-4 py-4 text-sm font-medium text-gray-800">{candidate.name}</td>
+                <td className="px-4 py-4 text-sm text-gray-600">{candidate.email}</td>
+                <td className="px-4 py-4 text-sm text-gray-600">{candidate.phone_number}</td>
+                <td className="px-4 py-4 text-sm">
+                  <a
+                    href={candidate.resume_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-yellow-600 underline hover:text-yellow-800"
+                  >
                     View Resume
                   </a>
                 </td>
-                <td className="p-2 border">{candidate.compatibilityScore}%</td>
-                <td className="p-2 border">{candidate.feedback}</td>
-              </tr>
+                <td className="px-4 py-4 text-sm text-gray-600">
+                  {compatibilityResponses[candidate.id] ? (
+                    <span>{compatibilityResponses[candidate.id]}</span>
+                  ) : (
+                    <button
+                      onClick={() => handleCheckCompatibility(candidate.id)}
+                      className="px-3 py-1 bg-yellow-400 text-white rounded-lg shadow hover:bg-yellow-500"
+                    >
+                      Check Compatibility
+                    </button>
+                  )}
+                </td>
+                <td className="px-4 py-4 text-sm text-gray-600">{candidate.feedback}</td>
+              </motion.tr>
             ))}
           </tbody>
         </table>
-      </div>
+      </motion.div>
 
-      <div className="flex justify-center space-x-2 mt-4">
-        {[...Array(Math.ceil(candidates.length / candidatesPerPage)).keys()].map((number) => (
-          <button key={number + 1} onClick={() => paginate(number + 1)} className="px-3 py-1 bg-gray-300 rounded hover:bg-gray-400">
+      {/* Pagination */}
+      <div className="flex justify-center space-x-2 mt-6">
+        {[...Array(Math.ceil(filteredCandidates.length / candidatesPerPage)).keys()].map((number) => (
+          <motion.button
+            key={number + 1}
+            onClick={() => paginate(number + 1)}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className={`px-4 py-2 rounded-lg shadow-md ${
+              currentPage === number + 1
+                ? "bg-yellow-400 text-white"
+                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+            }`}
+          >
             {number + 1}
-          </button>
+          </motion.button>
         ))}
       </div>
     </div>
