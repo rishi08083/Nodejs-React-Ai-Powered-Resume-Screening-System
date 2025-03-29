@@ -40,7 +40,7 @@ jobs:
         with:
           host: ${{ secrets.IP }}
           username: ${{ secrets.USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          key: ${{ secrets.PRIVATE_KEY }}
           script: |
             cd Internship-2025/Resume-Screening-App
             docker compose up -d db
@@ -77,7 +77,7 @@ jobs:
         with:
           host: ${{ secrets.IP }}
           username: ${{ secrets.USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          key: ${{ secrets.PRIVATE_KEY }}
           script: |
             cd Internship-2025/Resume-Screening-App
             docker compose --build backend
