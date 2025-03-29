@@ -44,7 +44,7 @@ const initialState: State = { activeSection: "jobs" };
 const Home = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [role, setRole] = useState<"admin" | "recruiter">("recruiter");
-  const { user, logout, checkAuth, loading } = useAuth();
+  const { user, logout, loading } = useAuth();
   const router = useRouter();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);

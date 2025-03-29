@@ -118,6 +118,7 @@
     padding: 2rem;
     width: calc(100% - 250px);
     margin-top: 20px;
+
     /* Account for the header height */
   }
 
