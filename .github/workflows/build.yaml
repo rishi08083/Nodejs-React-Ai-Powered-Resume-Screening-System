@@ -1,0 +1,119 @@
+# name: Build
+
+# on:
+#   pull_request:
+#     branches:
+#       - dev
+
+# jobs:
+#   build-backend:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v3
+
+#       - name: Set up Node.js
+#         uses: actions/setup-node@v3
+#         with:
+#           node-version: '18'
+
+#       - name: Install dependencies for Backend
+#         working-directory: ./Backend
+#         run: npm install
+
+#       - name: Run Backend Tests
+#         working-directory: ./Backend
+#         run: npm test
+
+#       - name: Build Backend
+#         working-directory: ./Backend
+#         run: npm run build
+
+#   build-frontend:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v3
+
+#       - name: Set up Node.js
+#         uses: actions/setup-node@v3
+#         with:
+#           node-version: '18'
+
+#       - name: Install dependencies for Frontend
+#         working-directory: ./Frontend
+#         run: npm install
+
+#       - name: Run Frontend Tests
+#         working-directory: ./Frontend
+#         run: npm test
+
+#       - name: Build Frontend
+#         working-directory: ./Frontend
+#         run: npm run build
+
+name: Build
+
+on:
+  pull_request:
+    branches:
+      - dev
+
+jobs:
+  build-backend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies for Backend
+        working-directory: ./Backend
+        run: npm install
+
+      - name: Lint Backend Code
+        working-directory: ./Backend
+        run: npm run lint
+
+      - name: Format Check for Backend
+        working-directory: ./Backend
+        run: npm run format:check
+  
+      - name: Build Backend
+        working-directory: ./Backend
+        run: npm run build
+
+  build-frontend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies for Frontend
+        working-directory: ./Frontend
+        run: npm install
+
+      - name: Lint Frontend Code
+        working-directory: ./Frontend
+        run: npm run lint
+
+      - name: Format Check for Frontend
+        working-directory: ./Frontend
+        run: npm run format:check
+
+      - name: Build Frontend
+        working-directory: ./Frontend
+        run: npm run build

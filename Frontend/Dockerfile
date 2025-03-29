@@ -13,8 +13,11 @@ RUN npm install
 # Copy the rest of the application files
 COPY . .
 
+# Build the frontend for production
+RUN npm run build
+
 # Expose the port that the app will run on
 EXPOSE 3000
 
-# Command to run the app in development mode
-CMD ["npm", "run", "dev"]
+# Start the frontend server in production mode
+CMD ["npm", "start"]

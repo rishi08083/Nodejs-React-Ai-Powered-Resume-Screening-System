@@ -1,0 +1,61 @@
+# version: '3.8'
+
+# services:
+#   backend:
+#     build:
+#       context: ./Backend
+#     container_name: resume-backend
+#     ports:
+#       - "3000:3000"
+#     env_file:
+#       - ./Backend/.env
+#     networks:
+#       - resume-network
+
+#   frontend:
+#     build:
+#       context: ./Frontend
+#     container_name: resume-frontend
+#     ports:
+#       - "3001:3000"  # Exposing frontend on port 3001
+#     environment:
+#       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+#     networks:
+#       - resume-network
+#     depends_on:
+#       - backend
+
+# networks:
+#   resume-network:
+#     driver: bridge
+
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./Backend
+    container_name: resume-backend
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./Backend/.env
+    networks:
+      - resume-network
+
+  frontend:
+    build:
+      context: ./Frontend
+    container_name: resume-frontend
+    ports:
+      - "3001:3000"  # Frontend exposed on port 3001
+    environment:
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+    networks:
+      - resume-network
+    depends_on:
+      - backend
+
+networks:
+  resume-network:
+    driver: bridge
