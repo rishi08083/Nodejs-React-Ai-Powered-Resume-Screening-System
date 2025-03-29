@@ -112,6 +112,25 @@ const ListJobs = () => {
       setIsLoading(false);
     }
   };
+  const handlercdRedirect = async (id) =>{
+    try{
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/rcd/get-rcd/${id}`,{
+          method:'GET',
+          headers:{
+            Authorization : "Bearer " + localStorage.getItem("token"),
+          }
+        })
+        if(response.ok){
+          const data = await response.json();
+          // redirect to new web page
+          window.open(data.data.documents);
+        }else{
+            
+        }
+    }catch(err){
+          console.log(err)
+    }
+  }
 
 
   // Fetch jobs from the API
@@ -196,17 +215,17 @@ const ListJobs = () => {
                         
                       </motion.button>
                       
-                        <motion.a
-                          href={'#'}
-                          target="_blank"
-                          rel="noopener noreferrer"
+                        <motion.button
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
+                          onClick={()=>{
+                            handlercdRedirect(job.id)
+                          }}
                           className="px-3 py-2 bg-gray-200 text-black font-medium rounded-lg hover:bg-gray-500 transition-colors duration-200 shadow-md hover:shadow-lg flex items-center space-x-1"
                         >
                           <Eye className="h-4 w-4" />
                           <span>View</span>
-                        </motion.a>
+                        </motion.button>
                       
                     </td>
                   </motion.tr>
