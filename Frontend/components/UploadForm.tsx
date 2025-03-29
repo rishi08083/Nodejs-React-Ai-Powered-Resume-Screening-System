@@ -26,12 +26,31 @@ const UploadForm = () => {
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
-
+  const getJobDetails = async () => {
+    try{
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/job/view`,{
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: "Bearer " + localStorage.getItem("token"),
+              },
+          })
+          if(response.ok){
+            const data = await response.json();
+            console.log(data)
+            setJobs(data.data);
+            setIsLoading(false);
+          }else{
+            const errorData = await response.json();
+            throw new Error(errorData.message);
+          }
+         
+    }catch(error){
+       console.error(error);
+    }
+  }
   useEffect(() => {
-    fetch("/api/getjobs")
-      .then((res) => res.json())
-      .then((data) => setJobs(data))
-      .catch((err) => console.error("Error fetching jobs:", err));
+    getJobDetails();
   }, []);
 
   // Simulate progress for loader
