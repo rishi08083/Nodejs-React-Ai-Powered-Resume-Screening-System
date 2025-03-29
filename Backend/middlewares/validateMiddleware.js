@@ -35,7 +35,7 @@ exports.validateRegister = [
       if (/\.{2,}/.test(value)) {
         throw new Error("Email cannot contain consecutive dots");
       }
-      if (!/\.[a-zA-Z]{2,}$/.test(value)) {
+      if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(?!com\.com)([a-zA-Z]{2,})(\.[a-zA-Z]{2,})?$/.test(value)) {
         throw new Error("Please provide a valid email domain");
       }
       return true;
@@ -47,6 +47,7 @@ exports.validateRegister = [
         "yahoo.com",
         "outlook.com",
         "hotmail.com",
+        "promactinfo.com"
       ];
       if (trustedDomains.includes(domain)) {
         return true;

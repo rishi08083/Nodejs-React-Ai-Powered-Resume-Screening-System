@@ -52,6 +52,19 @@ const Home = () => {
     logout();
     setIsLogoutModalOpen(false);
   };
+//   {
+//     title,
+//     description,
+//     location,
+//     experience_required,
+//     job_type,
+//     openings,
+//     company_name,
+//     skills_required,
+//     contact_info,
+//     salary_range,
+//     application_deadline,
+// }
   const LogoutModal = () => (
     <div className="fixed inset-0  bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full">

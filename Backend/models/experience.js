@@ -15,8 +15,8 @@ module.exports = (sequelize, DataTypes) => {
   Experience.init(
     {
       candidate_id: DataTypes.INTEGER,
-      company_name: DataTypes.STRING,
-      role: DataTypes.STRING,
+      company_names: DataTypes.ARRAY(DataTypes.STRING), // Changed from company_name
+      job_titles: DataTypes.ARRAY(DataTypes.STRING), // Changed from role
       start_date: DataTypes.DATE,
       end_date: DataTypes.DATE,
       is_deleted: DataTypes.BOOLEAN,
