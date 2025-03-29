@@ -9,6 +9,7 @@ const rcdRoutes = require("./rcdRoutes.js");
 const jobRoutes = require("./jobRoutes.js");
 // hellli
 const candidateRoutes = require("./candidateRoutes");
+const screeningRoutes = require("./screenRoutes");
 
 router.get("/", homeRoutes);
 router.use("/auth", authRoutes);
@@ -17,5 +18,6 @@ router.use("/job", jobRoutes);
 router.use("/user", userRoutes);
 router.use("/rcd", rcdRoutes);
 router.use("/candidates", candidateRoutes);
+router.use("/screening", screeningRoutes);
 
 module.exports = router;
