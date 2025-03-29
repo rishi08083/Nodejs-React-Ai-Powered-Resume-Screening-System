@@ -60,7 +60,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }
   useEffect(() => {
     checkAuth();
-  }, [checkAuth]);
+  }, []);
   const login = async (credentials: { email: string; password: string }) => {
     const res = await fetch(`${BASE_URL}/api/auth/login`, {
       method: "POST",
@@ -80,7 +80,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (errorData.message === "Validation failed") {
           throw new Error(errorData.error.details[0].msg);
         }
-        if(errorData.message === "Internal Server Error"){
+        if (errorData.message === "Internal Server Error") {
           throw new Error("Internal Server Error");
         }
       } else {
