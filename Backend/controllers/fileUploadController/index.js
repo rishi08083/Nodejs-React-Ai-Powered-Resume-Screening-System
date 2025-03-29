@@ -1,5 +1,6 @@
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 
+const axios = require("axios");
 const path = require("path");
 const crypto = require("crypto");
 const db = require("../../models");
@@ -20,6 +21,7 @@ const generateFileName = (originalName) => {
   return `${crypto.randomBytes(10).toString("hex")}${ext}`;
 };
 
+// Upload Multiple Resumes API
 exports.uploadResumes = async (req, res) => {
   try {
     if (!req.files || req.files.length === 0) {
@@ -57,6 +59,7 @@ exports.uploadResumes = async (req, res) => {
 
     const unparsedResumes = uploadedFiles.map((file) => ({
       user_id: req.user.id,
+      job_id: req.body.job.id,
       resume_url: file.fileUrl,
       status: "uploaded",
       is_deleted: false,
@@ -67,8 +70,10 @@ exports.uploadResumes = async (req, res) => {
     res.status(200).json({
       status: "success",
       message: "Files uploaded successfully",
-      data: { documents: uploadedFiles },
+      data: { files: uploadedFiles },
     });
+
+    parseResumes(uploadedFiles);
   } catch (error) {
     console.error("Error uploading files:", error);
     res.status(500).json({
@@ -76,5 +81,49 @@ exports.uploadResumes = async (req, res) => {
       message: "File upload failed",
       error: { details: error.message },
     });
+  }
+};
+
+const parseResumes = async (uploadedFiles) => {
+  try {
+    for (let i = 0; i < uploadedFiles.length; i++) {
+      const aiResponse = await axios.post(
+        `${process.env.AI_BACKEND_URL}?file_key=${uploadedFiles[i].fileName}`,
+        {
+          // file_key :uploadedFiles[0].fileName
+          // user_id: req.user.id,
+        }
+      );
+      console.log(JSON.stringify(aiResponse.data, null, 2), "    " + i);
+
+      const candidate = await db.Candidates.create({
+        name: aiResponse.data.data.name,
+        email: aiResponse.data.data.email,
+        phone_number: aiResponse.data.data.phone,
+        resume_url: uploadedFiles[i].fileUrl,
+        status: "parsed",
+      });
+
+      await candidate.createSkill({
+        skill_names: aiResponse.data.data.skills,
+      });
+
+      for (let i = 0; i < aiResponse.data.data.experience.length; i++) {
+        await candidate.createExperience({
+          company_name: aiResponse.data.data.experience[i].company,
+          role: aiResponse.data.data.experience[i].job_title,
+          start_date: aiResponse.data.data.experience[i].start_date,
+          end_date: aiResponse.data.data.experience[i].end_date,
+        });
+      }
+
+      for (let i = 0; i < aiResponse.data.data.education.length; i++) {
+        await candidate.createEducation({
+          institution_name: aiResponse.data.data.education[i],
+        });
+      }
+    }
+  } catch (error) {
+    console.log(`Error during parsing: ${error}`);
   }
 };
