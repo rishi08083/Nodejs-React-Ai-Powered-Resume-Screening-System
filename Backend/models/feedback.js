@@ -7,7 +7,7 @@ module.exports = (sequelize, DataTypes) => {
       // Many-to-One: Feedback → Candidates
       Feedback.belongsTo(models.Candidates, {
         foreignKey: "candidate_id",
-        as: "candidate",
+        as: "candidates",
       });
     }
   }

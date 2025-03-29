@@ -5,9 +5,11 @@ exports.authMiddleware = (req, res, next) => {
   const token = req.header("Authorization");
 
   if (!token) {
-    return res
-      .status(401)
-      .json({ message: "Access Denied: No token provided" });
+    return res.status(401).json({
+      status: "error",
+      message: "Access Denied: No token provided",
+      error: { details: "Authorization token is missing" },
+    });
   }
 
   try {
@@ -18,6 +20,10 @@ exports.authMiddleware = (req, res, next) => {
     req.user = verified; // Attach user data to request
     next();
   } catch (err) {
-    res.status(401).json({ message: "Invalid or Expired Token" });
+    res.status(401).json({
+      status: "error",
+      message: "Invalid or Expired Token",
+      error: { details: err.message },
+    });
   }
 };

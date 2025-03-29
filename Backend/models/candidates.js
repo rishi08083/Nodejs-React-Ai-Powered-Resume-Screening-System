@@ -5,10 +5,13 @@ module.exports = (sequelize, DataTypes) => {
   class Candidates extends Model {
     static associate(models) {
       // One-to-One: Candidates → Users
-      Candidates.belongsTo(models.Users, { foreignKey: "user_id", as: "user" });
+      Candidates.belongsTo(models.Users, {
+        foreignKey: "user_id",
+        as: "users",
+      });
 
       // Many-to-One: Candidates → Jobs
-      Candidates.belongsTo(models.Jobs, { foreignKey: "job_id", as: "job" });
+      Candidates.belongsTo(models.Jobs, { foreignKey: "job_id", as: "jobs" });
 
       // One-to-Many: Candidates → Skills
       Candidates.hasMany(models.Skills, {
@@ -19,7 +22,7 @@ module.exports = (sequelize, DataTypes) => {
       // One-to-One: Candidates → ScreeningResults
       Candidates.hasOne(models.ScreeningResults, {
         foreignKey: "candidate_id",
-        as: "screening_result",
+        as: "screening_results",
       });
 
       // One-to-Many: Candidates → Feedback

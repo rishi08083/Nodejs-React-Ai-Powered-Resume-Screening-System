@@ -76,7 +76,18 @@ export default function RecruiterRegister() {
   return (
     <div className="flex min-h-screen bg-gray-50 font-sans">
       {/* Left side decorative panel */}
-
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-r from-yellow-400 to-yellow-300 items-center justify-center">
+        <div className="max-w-md text-center">
+          <h1 className="text-4xl font-bold text-white mb-6">
+            Join ATS System
+          </h1>
+          <p className="text-white text-lg">
+            Register as a recruiter to access powerful hiring tools and find the
+            best talent.
+          </p>
+          <div className="mt-12"></div>
+        </div>
+      </div>
       {/* Right side registration form */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
         <div className="w-full max-w-md">
@@ -326,18 +337,7 @@ export default function RecruiterRegister() {
           </div>
         </div>
       </div>
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-r from-yellow-400 to-yellow-300 items-center justify-center">
-        <div className="max-w-md text-center">
-          <h1 className="text-4xl font-bold text-white mb-6">
-            Join ATS System
-          </h1>
-          <p className="text-white text-lg">
-            Register as a recruiter to access powerful hiring tools and find the
-            best talent.
-          </p>
-          <div className="mt-12"></div>
-        </div>
-      </div>
+    
     </div>
   );
 }

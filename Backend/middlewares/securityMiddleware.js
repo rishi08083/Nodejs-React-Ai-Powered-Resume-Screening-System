@@ -64,7 +64,7 @@ module.exports = (app) => {
   // General API Rate Limiting
   const apiLimiter = rateLimit({
     windowMs: 10 * 60 * 1000, // 10 minutes
-    max: 5,
+    max: 100,
     standardHeaders: true,
     legacyHeaders: false,
     message: {

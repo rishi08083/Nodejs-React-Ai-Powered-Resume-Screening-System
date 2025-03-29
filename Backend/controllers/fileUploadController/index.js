@@ -1,5 +1,6 @@
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 
+const axios = require("axios");
 const path = require("path");
 const crypto = require("crypto");
 const db = require("../../models");
@@ -64,12 +65,16 @@ exports.uploadResumes = async (req, res) => {
     }));
 
     await db.UnparsedResume.bulkCreate(unparsedResumes);
-
+    console.log(req.user);
+    const job_id = req.body.job_id;
+    const user_id = req.user.user.id;
     res.status(200).json({
       status: "success",
       message: "Files uploaded successfully",
       data: { files: uploadedFiles },
     });
+
+    parseResumes(uploadedFiles, job_id, user_id);
   } catch (error) {
     console.error("Error uploading files:", error);
     res.status(500).json({
@@ -77,5 +82,66 @@ exports.uploadResumes = async (req, res) => {
       message: "File upload failed",
       error: { details: error.message },
     });
+  }
+};
+
+const parseResumes = async (uploadedFiles, job_id, user_id) => {
+  try {
+    for (let i = 0; i < uploadedFiles.length; i++) {
+      const aiResponse = await axios.post(
+        `${process.env.AI_BACKEND_URL}?file_key=${uploadedFiles[i].fileName}`,
+        {
+          // file_key :uploadedFiles[0].fileName
+          // user_id: req.user.id,
+        }
+      );
+      console.log(JSON.stringify(aiResponse.data, null, 2), "    " + i);
+
+      const candidate = await db.Candidates.create({
+        name: aiResponse.data.data.name,
+        email: aiResponse.data.data.email,
+        phone_number: aiResponse.data.data.phone,
+        resume_url: uploadedFiles[i].fileUrl,
+        status: "parsed",
+        job_id: job_id,
+        user_id: user_id,
+      });
+
+      await candidate.createSkill({
+        skill_names: aiResponse.data.data.skills,
+      });
+
+      for (let i = 0; i < aiResponse.data.data.experience.length; i++) {
+        const experience = aiResponse.data.data.experience[i];
+
+        console.log(experience.company, "---------------------------------");
+
+        // Ensure valid dates
+        const startDate = experience.start_date
+          ? new Date(experience.start_date)
+          : null;
+        const endDate = experience.end_date
+          ? new Date(experience.end_date)
+          : null;
+
+        // Check if the date conversion failed (Invalid Date)
+        const isValidDate = (date) => date instanceof Date && !isNaN(date);
+
+        await candidate.createExperience({
+          company_names: experience.company,
+          job_titles: experience.job_title,
+          start_date: isValidDate(startDate) ? startDate : null, // Use null if invalid
+          end_date: isValidDate(endDate) ? endDate : null, // Use null if invalid
+        });
+      }
+
+      for (let i = 0; i < aiResponse.data.data.education.length; i++) {
+        await candidate.createEducation({
+          institution_name: aiResponse.data.data.education[i],
+        });
+      }
+    }
+  } catch (error) {
+    console.log(`Error during parsing: ${error}`);
   }
 };

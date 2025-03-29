@@ -7,7 +7,7 @@ module.exports = (sequelize, DataTypes) => {
       // Many-to-One: Experience → Candidates
       Experience.belongsTo(models.Candidates, {
         foreignKey: "candidate_id",
-        as: "candidate",
+        as: "candidates",
       });
     }
   }
@@ -15,8 +15,8 @@ module.exports = (sequelize, DataTypes) => {
   Experience.init(
     {
       candidate_id: DataTypes.INTEGER,
-      company_name: DataTypes.STRING,
-      role: DataTypes.STRING,
+      company_names: DataTypes.STRING, // Changed from company_name
+      job_titles: DataTypes.STRING, // Changed from role
       start_date: DataTypes.DATE,
       end_date: DataTypes.DATE,
       is_deleted: DataTypes.BOOLEAN,

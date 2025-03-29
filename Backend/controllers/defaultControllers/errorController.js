@@ -1,7 +1,10 @@
 exports.error404 = (req, res) => {
     const response = {
-        message: 'Resource not found',
-        type: "error"
+        status: "error",
+        message: "Resource not found",
+        error: {
+            details: "The requested resource could not be located on the server."
+        }
     };
     res.status(404).json(response);
-}
+};

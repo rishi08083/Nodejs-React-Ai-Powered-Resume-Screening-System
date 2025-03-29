@@ -7,7 +7,7 @@ module.exports = (sequelize, DataTypes) => {
       // Many-to-One: UnparsedResume → Users
       UnparsedResume.belongsTo(models.Users, {
         foreignKey: "user_id",
-        as: "user",
+        as: "users",
       });
     }
   }
