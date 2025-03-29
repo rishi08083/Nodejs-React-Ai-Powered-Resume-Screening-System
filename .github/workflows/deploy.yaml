@@ -1,96 +1,3 @@
-# name: Deployment
-
-# on:
-#   push:
-#     branches:
-#       - dev
-
-# jobs:
-#   deploy-backend:
-#     runs-on: ubuntu-latest
-
-#     steps:
-#       - name: Checkout code
-#         uses: actions/checkout@v3
-
-#       - name: Set up SSH
-#         uses: webfactory/ssh-agent@v0.7.0
-#         with:
-#           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-#       - name: Add known hosts
-#         run: |
-#           mkdir -p ~/.ssh
-#           echo "${{ secrets.SSH_KNOWN_HOSTS }}" >> ~/.ssh/known_hosts
-
-#       - name: Fetch Backend Variables and Create .env
-#         env:
-#           VARS_JSON: ${{ toJSON(vars) }}
-#         run: |
-#           echo "Fetching backend environment variables..."
-#           echo "$VARS_JSON" | jq -r 'to_entries[] | "\(.key)=\(.value)"' > backend.env
-#           echo "This is the content of the backend.env file:"
-#           cat backend.env
-
-#       - name: Transfer Backend Files
-#         run: |
-#           scp -r ./Backend ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/Backend
-
-#       - name: Deploy Backend to Server
-#         run: |
-#           ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
-#             cd ~/Backend
-#             cp ~/backend.env .env
-
-#             # Stop existing containers
-#             docker-compose down
-
-#             # Build and start the containers
-#             docker-compose up -d --build
-#           EOF
-
-#   deploy-frontend:
-#     runs-on: ubuntu-latest
-
-#     steps:
-#       - name: Checkout code
-#         uses: actions/checkout@v3
-
-#       - name: Set up SSH
-#         uses: webfactory/ssh-agent@v0.7.0
-#         with:
-#           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-#       - name: Add known hosts
-#         run: |
-#           mkdir -p ~/.ssh
-#           echo "${{ secrets.SSH_KNOWN_HOSTS }}" >> ~/.ssh/known_hosts
-
-#       - name: Fetch Frontend Variables and Create .env
-#         env:
-#           VARS_JSON: ${{ toJSON(vars) }}
-#         run: |
-#           echo "Fetching frontend environment variables..."
-#           echo "$VARS_JSON" | jq -r 'to_entries[] | "\(.key)=\(.value)"' > frontend.env
-#           echo "This is the content of the frontend.env file:"
-#           cat frontend.env
-
-#       - name: Transfer Frontend Files
-#         run: |
-#           scp -r ./Frontend ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/Frontend
-
-#       - name: Deploy Frontend to Server
-#         run: |
-#           ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
-#             cd ~/Frontend
-#             cp ~/frontend.env .env
-
-#             # Install dependencies and start the frontend
-#             npm install
-#             npm run build
-#             npm start
-#           EOF
-
 name: Full Deployment
 
 on:
@@ -104,87 +11,75 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.7.0
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-      - name: Add known hosts
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_KNOWN_HOSTS }}" >> ~/.ssh/known_hosts
+        uses: actions/checkout@v4
 
       - name: Fetch Backend Variables and Create .env
-        env:
-          VARS_JSON: ${{ toJSON(vars) }}
         run: |
           echo "Fetching backend environment variables..."
-          echo "$VARS_JSON" | jq -r 'to_entries[] | "\(.key)=\(.value)"' > backend.env
+          echo "${{ vars.BACKEND_ENV }}" > backend.env
           echo "This is the content of the backend.env file:"
           cat backend.env
 
-      - name: Transfer Backend Files
-        run: |
-          scp -r ./Backend docker-compose.yml backend.env ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/Backend
+          echo "Fetching docker database environment variables..."
+          echo "${{ vars.DATABASE_ENV }}" > database.env
+          echo "This is the content of the database.env file:"
+          cat database.env
 
-      - name: Deploy Backend to Server
-        run: |
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
-            cd ~/Backend
 
-            # Move the environment file to the right place
-            mv ~/Backend/backend.env .env
+      - name: SCP
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.IP }}
+          username: ${{ secrets.USER }}
+          key: ${{ secrets.PRIVATE_KEY }}
+          source: "."
+          target: "Internship-2025/Resume-Screening-App/"
 
-            # Stop existing containers
-            docker-compose down
+      - name: SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.IP }}
+          username: ${{ secrets.USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd Internship-2025/Resume-Screening-App
+            docker compose up -d db
+            docker compose --build backend
+            docker compose up -d --force-recreate backend
+            docker system prune -af
 
-            # Build and start the containers
-            docker-compose up -d --build
-          EOF
 
   deploy-frontend:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.7.0
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-      - name: Add known hosts
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_KNOWN_HOSTS }}" >> ~/.ssh/known_hosts
+        uses: actions/checkout@v4
 
       - name: Fetch Frontend Variables and Create .env
-        env:
-          VARS_JSON: ${{ toJSON(vars) }}
         run: |
           echo "Fetching frontend environment variables..."
-          echo "$VARS_JSON" | jq -r 'to_entries[] | "\(.key)=\(.value)"' > frontend.env
+          echo "${{ vars.FRONTEND_ENV }}" > frontend.env
           echo "This is the content of the frontend.env file:"
           cat frontend.env
 
-      - name: Transfer Frontend Files
-        run: |
-          scp -r ./Frontend docker-compose.yml frontend.env ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/Frontend
+      - name: SCP
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.IP }}
+          username: ${{ secrets.USER }}
+          key: ${{ secrets.PRIVATE_KEY }}
+          source: "."
+          target: "Internship-2025/Resume-Screening-App/"
 
-      - name: Deploy Frontend to Server
-        run: |
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
-            cd ~/Frontend
-
-            # Move the environment file to the right place
-            mv ~/Frontend/frontend.env .env
-
-            # Stop existing containers
-            docker-compose down
-
-            # Build and start the containers
-            docker-compose up -d --build
-          EOF
+      - name: SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.IP }}
+          username: ${{ secrets.USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd Internship-2025/Resume-Screening-App
+            docker compose --build backend
+            docker compose up -d --force-recreate backend
+            docker system prune -af

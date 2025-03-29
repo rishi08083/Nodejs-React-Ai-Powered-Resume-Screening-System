@@ -1,60 +1,4 @@
-# name: Build
-
-# on:
-#   pull_request:
-#     branches:
-#       - dev
-
-# jobs:
-#   build-backend:
-#     runs-on: ubuntu-latest
-
-#     steps:
-#       - name: Checkout code
-#         uses: actions/checkout@v3
-
-#       - name: Set up Node.js
-#         uses: actions/setup-node@v3
-#         with:
-#           node-version: '18'
-
-#       - name: Install dependencies for Backend
-#         working-directory: ./Backend
-#         run: npm install
-
-#       - name: Run Backend Tests
-#         working-directory: ./Backend
-#         run: npm test
-
-#       - name: Build Backend
-#         working-directory: ./Backend
-#         run: npm run build
-
-#   build-frontend:
-#     runs-on: ubuntu-latest
-
-#     steps:
-#       - name: Checkout code
-#         uses: actions/checkout@v3
-
-#       - name: Set up Node.js
-#         uses: actions/setup-node@v3
-#         with:
-#           node-version: '18'
-
-#       - name: Install dependencies for Frontend
-#         working-directory: ./Frontend
-#         run: npm install
-
-#       - name: Run Frontend Tests
-#         working-directory: ./Frontend
-#         run: npm test
-
-#       - name: Build Frontend
-#         working-directory: ./Frontend
-#         run: npm run build
-
-name: Build
+name: Build Check
 
 on:
   pull_request:
@@ -67,53 +11,62 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '22'
 
       - name: Install dependencies for Backend
-        working-directory: ./Backend
-        run: npm install
+        run: |
+          cd ./Backend
+          npm install
 
       - name: Lint Backend Code
-        working-directory: ./Backend
-        run: npm run lint
+        run: |
+          cd ./Backend 
+          npm run lint
 
       - name: Format Check for Backend
-        working-directory: ./Backend
-        run: npm run format:check
+        run: |
+          cd ./Backend 
+          npm run format:check
   
       - name: Build Backend
-        working-directory: ./Backend
-        run: npm run build
+        run: |
+          cd ./Backend 
+          npm run build
+
 
   build-frontend:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '22'
 
       - name: Install dependencies for Frontend
-        working-directory: ./Frontend
-        run: npm install
+        run: |
+          cd ./Frontend
+          npm install
 
       - name: Lint Frontend Code
-        working-directory: ./Frontend
-        run: npm run lint
+        run: |
+          cd ./Frontend
+          npm run lint
 
       - name: Format Check for Frontend
-        working-directory: ./Frontend
-        run: npm run format:check
+        run: |
+          cd ./Frontend
+          npm run format:check
 
       - name: Build Frontend
-        working-directory: ./Frontend
-        run: npm run build
+        run: |
+          cd ./Frontend
+          npm run build

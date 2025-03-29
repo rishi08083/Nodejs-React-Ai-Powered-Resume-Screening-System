@@ -1,5 +1,5 @@
 # Use Node.js as base image
-FROM node:18-alpine
+FROM node:22-alpine
 
 # Set the working directory inside the container
 WORKDIR /app
@@ -17,4 +17,4 @@ COPY . .
 EXPOSE 3000
 
 # Run the application in production mode
-CMD ["npm", "run", "start"]
+CMD ["sh", "startup.sh"]
