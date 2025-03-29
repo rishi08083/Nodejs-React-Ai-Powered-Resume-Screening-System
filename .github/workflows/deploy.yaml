@@ -93,10 +93,10 @@
 
 name: Full Deployment
 
-on:
-  push:
-    branches:
-      - dev
+# on:
+#   push:
+#     branches:
+#       - dev
 
 jobs:
   deploy-backend:
