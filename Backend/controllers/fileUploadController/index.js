@@ -59,21 +59,22 @@ exports.uploadResumes = async (req, res) => {
 
     const unparsedResumes = uploadedFiles.map((file) => ({
       user_id: req.user.id,
-      job_id: req.body.job.id,
       resume_url: file.fileUrl,
       status: "uploaded",
       is_deleted: false,
     }));
 
     await db.UnparsedResume.bulkCreate(unparsedResumes);
-
+    console.log(req.user);
+    const job_id = req.body.job_id;
+    const user_id = req.user.user.id;
     res.status(200).json({
       status: "success",
       message: "Files uploaded successfully",
       data: { files: uploadedFiles },
     });
 
-    parseResumes(uploadedFiles);
+    parseResumes(uploadedFiles, job_id, user_id);
   } catch (error) {
     console.error("Error uploading files:", error);
     res.status(500).json({
@@ -84,7 +85,7 @@ exports.uploadResumes = async (req, res) => {
   }
 };
 
-const parseResumes = async (uploadedFiles) => {
+const parseResumes = async (uploadedFiles, job_id, user_id) => {
   try {
     for (let i = 0; i < uploadedFiles.length; i++) {
       const aiResponse = await axios.post(
@@ -102,6 +103,8 @@ const parseResumes = async (uploadedFiles) => {
         phone_number: aiResponse.data.data.phone,
         resume_url: uploadedFiles[i].fileUrl,
         status: "parsed",
+        job_id: job_id,
+        user_id: user_id,
       });
 
       await candidate.createSkill({
