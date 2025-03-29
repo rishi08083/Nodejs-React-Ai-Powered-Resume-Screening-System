@@ -156,7 +156,7 @@ const ListJobs = () => {
               <div className="p-6">
                 <div className="mb-6">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Resume, CV or Document
+                   Upload RCD documents
                   </label>
                   <div className="border-2 border-dashed border-yellow-300 rounded-lg p-6 text-center hover:border-yellow-400 transition-colors duration-200">
                     <svg

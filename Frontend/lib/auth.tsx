@@ -80,6 +80,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (errorData.message === "Validation failed") {
           throw new Error(errorData.error.details[0].msg);
         }
+        if(errorData.message === "Internal Server Error"){
+          throw new Error("Internal Server Error");
+        }
       } else {
         throw new Error(errorData.message || "Some error occurred");
       }
