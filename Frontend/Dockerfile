@@ -1,5 +1,5 @@
 # Use the official Node.js image as the base image
-FROM node:18-alpine
+FROM node:22-alpine
 
 # Set the working directory inside the container
 WORKDIR /app
@@ -13,9 +13,11 @@ RUN npm install
 # Copy the rest of the application files
 COPY . .
 
+# Build the frontend for production
+RUN npm run build
+
 # Expose the port that the app will run on
 EXPOSE 3001
 
-# Command to run the app in development mode with hot reloading
-CMD ["npm", "run", "dev"]
-
+# Start the frontend server in production mode
+CMD ["npm", "start"]

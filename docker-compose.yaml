@@ -1,0 +1,42 @@
+services:
+  backend:
+    build:
+      context: ./Backend
+    container_name: resume-backend
+    ports:
+      - "3000:3000"
+    env_file: backend.env
+    depends_on:
+      - db
+    networks:
+      - resume-screening-network
+    restart: always
+
+  frontend:
+    build:
+      context: ./Frontend
+    container_name: resume-frontend
+    restart: always
+    ports:
+      - "3001:3000"
+    env_file: frontend.env
+    networks:
+      - resume-screening-network
+
+  db:
+    image: postgres:17
+    container_name: resume-db
+    restart: always
+    env_file: database.env
+    ports:
+      - "54323:5432"
+    volumes:
+      - resume_screening_data:/var/lib/postgresql/data
+    networks:
+      - resume-screening-network
+
+volumes:
+  resume_screening_data:
+
+networks:
+  resume-screening-network:
