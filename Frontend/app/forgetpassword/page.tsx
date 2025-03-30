@@ -59,7 +59,7 @@ const ForgetPassword = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ email }),
-        }
+        },
       );
 
       const data = await response.json();
@@ -93,7 +93,7 @@ const ForgetPassword = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ email, otp: otpValue }),
-        }
+        },
       );
 
       const data = await response.json();
@@ -122,7 +122,7 @@ const ForgetPassword = () => {
       return;
     }
     const allValidationsPassed = Object.values(passwordValidation).every(
-      (value) => value
+      (value) => value,
     );
     if (!allValidationsPassed) {
       setMessage("Password does not meet all requirements");
@@ -143,7 +143,7 @@ const ForgetPassword = () => {
             otp: otp.join(""),
             newPassword,
           }),
-        }
+        },
       );
 
       const data = await response.json();

@@ -51,11 +51,11 @@ const ListJobs = () => {
       xhr.open(
         "POST",
         `${process.env.NEXT_PUBLIC_API_URL}/api/rcd/upload-rcd`,
-        true
+        true,
       );
       xhr.setRequestHeader(
         "Authorization",
-        `Bearer ${localStorage.getItem("token")}`
+        `Bearer ${localStorage.getItem("token")}`,
       );
       xhr.upload.onprogress = (event) => {
         if (event.lengthComputable) {
@@ -71,8 +71,8 @@ const ListJobs = () => {
             prevJobs.map((job) =>
               job.id === selectedJob?.id
                 ? { ...job, rcd_url: data.data.documents[0] }
-                : job
-            )
+                : job,
+            ),
           );
           setTimeout(() => {
             setShowModal(false);
@@ -95,7 +95,7 @@ const ListJobs = () => {
     } catch (error) {
       setUploadStatus("error");
       setError(
-        error instanceof Error ? error.message : "An unexpected error occurred"
+        error instanceof Error ? error.message : "An unexpected error occurred",
       );
     }
   };
@@ -110,7 +110,7 @@ const ListJobs = () => {
             "Content-Type": "application/json",
             Authorization: "Bearer " + localStorage.getItem("token"),
           },
-        }
+        },
       );
 
       if (response.ok) {
@@ -123,7 +123,7 @@ const ListJobs = () => {
       }
     } catch (error) {
       setJobError(
-        error instanceof Error ? error.message : "Failed to fetch jobs"
+        error instanceof Error ? error.message : "Failed to fetch jobs",
       );
       setIsLoading(false);
     }
@@ -137,7 +137,7 @@ const ListJobs = () => {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token"),
           },
-        }
+        },
       );
       if (response.ok) {
         const data = await response.json();
