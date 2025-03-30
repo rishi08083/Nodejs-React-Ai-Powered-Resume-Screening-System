@@ -11,6 +11,7 @@ npx sequelize-cli db:migrate:undo --name 20250320091550-create-jobs.js
 npx sequelize-cli db:migrate:undo --name 20250320091538-create-unparsed-resume.js
 npx sequelize-cli db:migrate:undo --name 20250320091458-create-users.js
 
+
 # Re-run migrations in the correct order (parent tables first)
 npx sequelize-cli db:migrate --name 20250320091458-create-users.js
 npx sequelize-cli db:migrate --name 20250320091538-create-unparsed-resume.js
