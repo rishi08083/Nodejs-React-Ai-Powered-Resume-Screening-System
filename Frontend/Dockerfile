@@ -16,6 +16,8 @@ COPY . .
 # Rename and copy environment variables for Next.js production mode
 COPY frontend.env .env.production
 
+# COPY .env .env.production
+
 # Build the Next.js app (now uses the correct environment variables)
 RUN npm run build
 

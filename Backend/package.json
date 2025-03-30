@@ -7,7 +7,10 @@
     "start": "node app.js",
     "dev": "nodemon app.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "docker-build": "docker build -t ats-node-js-backend ."
+    "docker-build": "docker build -t ats-node-js-backend .",
+    "build": "echo 'Building Backend...' && npm run lint && npm run format:check",
+    "lint": "eslint .",
+    "format:check": "prettier --check \"**/*.js\""
   },
   "author": "Vinay Danidhariya",
   "license": "ISC",
@@ -38,6 +41,8 @@
     "xss-clean": "^0.1.4"
   },
   "devDependencies": {
-    "nodemon": "^3.1.9"
+    "eslint": "^8.57.1",
+    "nodemon": "^3.1.9",
+    "prettier": "^3.5.3"
   }
 }
