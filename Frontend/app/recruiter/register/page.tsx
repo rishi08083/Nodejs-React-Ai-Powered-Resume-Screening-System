@@ -53,7 +53,7 @@ export default function RecruiterRegister() {
     try {
       const response = await fetchRecruiterRegister(formData); // Call the API service
       setMessage(
-        "Your request has been sent successfully! Please wait for approval."
+        "Your request has been sent successfully! Please wait for approval.",
       );
       setIsOpen(true);
       setTimeout(() => {
@@ -337,7 +337,6 @@ export default function RecruiterRegister() {
           </div>
         </div>
       </div>
-    
     </div>
   );
 }

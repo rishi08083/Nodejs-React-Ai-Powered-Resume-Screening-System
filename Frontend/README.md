@@ -1,2 +1,1 @@
-## Initial set up done with next js 
-
+## Initial set up done with next js

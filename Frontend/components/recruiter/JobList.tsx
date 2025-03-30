@@ -18,6 +18,7 @@ const ListJobs = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [fileName, setFileName] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const [jobError, setJobError] = useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = useState<number>(0);
@@ -50,11 +51,11 @@ const ListJobs = () => {
       xhr.open(
         "POST",
         `${process.env.NEXT_PUBLIC_API_URL}/api/rcd/upload-rcd`,
-        true
+        true,
       );
       xhr.setRequestHeader(
         "Authorization",
-        `Bearer ${localStorage.getItem("token")}`
+        `Bearer ${localStorage.getItem("token")}`,
       );
       xhr.upload.onprogress = (event) => {
         if (event.lengthComputable) {
@@ -70,8 +71,8 @@ const ListJobs = () => {
             prevJobs.map((job) =>
               job.id === selectedJob?.id
                 ? { ...job, rcd_url: data.data.documents[0] }
-                : job
-            )
+                : job,
+            ),
           );
           setTimeout(() => {
             setShowModal(false);
@@ -94,7 +95,7 @@ const ListJobs = () => {
     } catch (error) {
       setUploadStatus("error");
       setError(
-        error instanceof Error ? error.message : "An unexpected error occurred"
+        error instanceof Error ? error.message : "An unexpected error occurred",
       );
     }
   };
@@ -109,7 +110,7 @@ const ListJobs = () => {
             "Content-Type": "application/json",
             Authorization: "Bearer " + localStorage.getItem("token"),
           },
-        }
+        },
       );
 
       if (response.ok) {
@@ -122,7 +123,7 @@ const ListJobs = () => {
       }
     } catch (error) {
       setJobError(
-        error instanceof Error ? error.message : "Failed to fetch jobs"
+        error instanceof Error ? error.message : "Failed to fetch jobs",
       );
       setIsLoading(false);
     }
@@ -136,7 +137,7 @@ const ListJobs = () => {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token"),
           },
-        }
+        },
       );
       if (response.ok) {
         const data = await response.json();
@@ -184,7 +185,7 @@ const ListJobs = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="bg-white rounded-xl shadow-xl overflow-scroll"
+          className="bg-white rounded-xl shadow-xl overflow-scroll "
         >
           <div className="overflow-scroll">
             <table className="min-w-full table-auto border-collapse">
@@ -317,7 +318,8 @@ const ListJobs = () => {
                         }}
                       >
                         {" "}
-                        browse
+                        browse <br />
+                        {fileName && fileName}
                       </span>
                     </p>
                     <p className="mt-1 text-xs text-gray-500">
@@ -327,6 +329,9 @@ const ListJobs = () => {
                       type="file"
                       className="hidden"
                       ref={inputRef}
+                      onChange={() => {
+                        setFileName(inputRef.current?.files[0].name);
+                      }}
                       accept=".pdf,.doc,.docx"
                     />
                   </div>
