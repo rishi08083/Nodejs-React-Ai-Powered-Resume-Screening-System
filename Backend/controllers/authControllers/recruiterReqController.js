@@ -36,7 +36,9 @@ const approveRecruiterReq = async (req, res) => {
       return res.status(404).json({
         status: "error",
         message: "Recruiter not found or already approved",
-        error: { details: "No matching recruiter found with the provided email" },
+        error: {
+          details: "No matching recruiter found with the provided email",
+        },
       });
     }
 
@@ -66,7 +68,9 @@ const rejectRecruiterReq = async (req, res) => {
       return res.status(404).json({
         status: "error",
         message: "Recruiter not found",
-        error: { details: "No matching recruiter found with the provided email" },
+        error: {
+          details: "No matching recruiter found with the provided email",
+        },
       });
     }
 

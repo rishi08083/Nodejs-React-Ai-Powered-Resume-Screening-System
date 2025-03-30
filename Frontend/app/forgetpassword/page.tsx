@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 const ForgetPassword = () => {
   const [email, setEmail] = useState("");
@@ -8,7 +9,7 @@ const ForgetPassword = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
-  const [currentStep, setCurrentStep] = useState("otp");
+  const [currentStep, setCurrentStep] = useState("email");
   const [passwordValidation, setPasswordValidation] = useState({
     length: false,
     uppercase: false,
@@ -16,16 +17,13 @@ const ForgetPassword = () => {
     number: false,
     special: false,
   });
-
-  // OTP input references
+  const navigator = useRouter();
   const inputRefs = [
     React.useRef(null),
     React.useRef(null),
     React.useRef(null),
     React.useRef(null),
   ];
-
-  // Check for token in URL
   useEffect(() => {
     if (typeof window !== "undefined") {
       const urlParams = new URLSearchParams(window.location.search);
@@ -87,7 +85,6 @@ const ForgetPassword = () => {
     const otpValue = otp.join("");
 
     try {
-      // Replace with your actual OTP verification API endpoint
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/auth/verify-otp`,
         {
@@ -124,8 +121,6 @@ const ForgetPassword = () => {
       setIsError(true);
       return;
     }
-
-    // Check if all password validations pass
     const allValidationsPassed = Object.values(passwordValidation).every(
       (value) => value
     );
@@ -156,6 +151,7 @@ const ForgetPassword = () => {
       if (response.ok) {
         setMessage(data.message || "Password reset successfully");
         setIsError(false);
+        navigator.push("/login");
       } else {
         setMessage(data.message || "Something went wrong");
         setIsError(true);
@@ -170,23 +166,18 @@ const ForgetPassword = () => {
     if (value.length > 1) {
       value = value.slice(-1);
     }
-
     if (!/^\d*$/.test(value) && value !== "") {
       return;
     }
-
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
-
-    // Auto-focus to next input
     if (value !== "" && index < 3) {
       inputRefs[index + 1].current.focus();
     }
   };
 
   const handleKeyDown = (index, e) => {
-    // Move to previous input on backspace if current input is empty
     if (e.key === "Backspace" && index > 0 && otp[index] === "") {
       inputRefs[index - 1].current.focus();
     }
@@ -297,6 +288,7 @@ const ForgetPassword = () => {
               <button
                 type="button"
                 className="text-yellow-600 font-medium hover:underline"
+                onClick={() => setCurrentStep("email")}
               >
                 Resend
               </button>

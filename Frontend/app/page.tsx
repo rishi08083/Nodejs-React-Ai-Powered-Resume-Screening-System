@@ -123,7 +123,6 @@ const Home = () => {
 
   return (
     <div className={styles.container}>
-      {/* Header with improved styling */}
       {isLogoutModalOpen && <LogoutModal />}
       <header className={`${styles.header}`}>
         <div className={`${styles.headerContent}`}>
@@ -153,20 +152,14 @@ const Home = () => {
           </button>
         </div>
       </header>
-
-      {/* Overlay to close sidebar when clicking outside on mobile */}
       <div
         className={`${styles.overlay} ${isSidebarOpen ? styles.active : ""}`}
         onClick={() => setIsSidebarOpen(false)}
       />
-
-      {/* Sidebar */}
       <div className={`${styles.sidebar} ${isSidebarOpen ? styles.open : ""}`}>
         <div className={styles.logoContainer}>
           <Image src="/logo.jpg" alt="Logo" width={200} height={60} priority />
         </div>
-
-        {/* Close button for mobile sidebar */}
         <button
           className="absolute top-4 right-4 text-gray-500 md:hidden"
           onClick={() => setIsSidebarOpen(false)}
@@ -245,8 +238,6 @@ const Home = () => {
           )}
         </nav>
       </div>
-
-      {/* Main Content */}
       <main className={styles.main}>
         {role == "recruiter" && state.activeSection == "jobs" && <ListJobs />}
         {role == "recruiter" && state.activeSection == "upload" && (
