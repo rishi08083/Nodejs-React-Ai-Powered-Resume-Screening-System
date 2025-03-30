@@ -15,7 +15,7 @@ module.exports = (app) => {
         const allowedOrigins = [
           "http://localhost:3000",
           "http://localhost:3001",
-          "http://181.214.44.15:3001",
+          "http://181.214.44.15:3000",
           // Add your production domain when ready
         ];
 
@@ -46,13 +46,13 @@ module.exports = (app) => {
             "https://trusted.cdn.com",
             "http://localhost:3000",
             "http://localhost:3001",
-            "http://181.214.44.15:3001",
+            "http://181.214.44.15:3000",
           ],
           connectSrc: [
             "'self'",
             "http://localhost:3000",
             "http://localhost:3001",
-            "http://181.214.44.15:3001",
+            "http://181.214.44.15:3000",
           ],
           objectSrc: ["'none'"],
           imgSrc: ["'self'", "data:"],
