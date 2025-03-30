@@ -13,7 +13,10 @@ RUN npm install
 # Copy the rest of the application files
 COPY . .
 
-# Build the Next.js app
+# Rename and copy environment variables for Next.js production mode
+COPY frontend.env .env.production
+
+# Build the Next.js app (now uses the correct environment variables)
 RUN npm run build
 
 # Use a smaller production image to serve the built app
@@ -27,10 +30,11 @@ COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
+# Copy environment variables
+COPY --from=builder /app/.env.production ./.env.production
 
 # Expose the port Next.js will run on
 EXPOSE 3001
 
 # Start the Next.js server
 CMD ["npx", "next", "start", "-p", "3001"]
-
