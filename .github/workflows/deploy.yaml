@@ -25,7 +25,6 @@ jobs:
           echo "This is the content of the database.env file:"
           cat database.env
 
-
       - name: SCP
         uses: appleboy/scp-action@master
         with:
@@ -47,7 +46,6 @@ jobs:
             docker compose build backend
             docker compose up -d --force-recreate backend
             docker system prune -af
-
 
   deploy-frontend:
     runs-on: ubuntu-latest
