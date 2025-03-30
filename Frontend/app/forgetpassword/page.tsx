@@ -283,7 +283,7 @@ const ForgetPassword = () => {
                   key={index}
                   ref={inputRefs[index]}
                   type="password"
-                  maxLength="1"
+                  maxLength={1}
                   value={digit}
                   onChange={(e) => handleOtpChange(index, e.target.value)}
                   onKeyDown={(e) => handleKeyDown(index, e)}
