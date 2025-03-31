@@ -5,7 +5,7 @@ import Image from "next/image";
 import ListJobs from "../components/recruiter/JobList";
 import { useRouter } from "next/navigation";
 
-<!-- import UploadForm from "../components/UploadForm"; -->
+//import UploadForm from "../components/UploadForm"; 
 import Candidate from "../components/Candidates";
 import UploadForm from "../components/recruiter/UploadForm";
 import RecruiterRequests from "../components/admin/RecruiterRequests";
@@ -19,6 +19,7 @@ import {
   Users,
   LogOut,
   Menu,
+  User,
   X,
 } from "lucide-react";
 import styles from "../styles/NavBar.module.css";
@@ -185,23 +186,28 @@ const Home = () => {
               </button>
               <button
                 onClick={() => setActiveSection("upload")}
-<!-- <<<<<<< feature-sprint2
-                className={state.activeSection === "upload" ? "font-bold" : ""}
-              >
-                Upload Resume
-              </button>
-              <button
-                onClick={() => setActiveSection("candidate")}
-                className={state.activeSection === "candidate" ? "font-bold" : ""} -->
 
+                //className={state.activeSection === "upload" ? "font-bold" : ""}
                 className={`w-full text-left p-2 rounded flex items-center ${
                   state.activeSection == "upload"
                     ? "bg-yellow-100 text-yellow-700 font-semibold"
                     : "text-gray-600 hover:bg-gray-100"
                 }`}
+              >
+               <FileUp className="mr-3" size={20} /> Upload Resume
+              </button>
+              <button
+                onClick={() => setActiveSection("candidate")}
+               // className={state.activeSection === "candidate" ? "font-bold" : ""} 
+
+                className={`w-full text-left p-2 rounded flex items-center ${
+                  state.activeSection == "candidate"
+                    ? "bg-yellow-100 text-yellow-700 font-semibold"
+                    : "text-gray-600 hover:bg-gray-100"
+                }`}
 
               >
-                Candidate
+              <User  className="mr-3" size={20} /> Candidate
               </button>
               <button
                 onClick={() => setActiveSection("profile")}

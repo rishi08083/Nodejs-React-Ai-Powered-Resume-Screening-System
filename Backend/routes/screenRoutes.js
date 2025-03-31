@@ -31,7 +31,7 @@ router.post("/screen_candidate", async (req, res) => {
         console.log("Prepared Request for AI Screening:", JSON.stringify(requestBody, null, 2));
 
         // Call FastAPI to get AI screening results
-        const aiResponse = await axios.post("http://localhost:8000/api/screen_candidates_2", requestBody);
+        const aiResponse = await axios.post(`${process.env.AI_SERVER_URL}/api/screen_candidates_2`, requestBody);
 
         console.log("AI Screening Response:", JSON.stringify(aiResponse.data, null, 2));
 
