@@ -10,6 +10,7 @@ import styles from "../styles/Home.module.css";
 
 type Job = {
   title: string;
+  id: string;
 };
 
 const UploadForm = () => {
@@ -22,6 +23,7 @@ const UploadForm = () => {
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
   const [uploadProgress, setUploadProgress] = useState<number>(0);
+  const [jobId,setJobId] = useState<string>("");
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -164,7 +166,7 @@ const UploadForm = () => {
 
     const formData = new FormData();
     files.forEach((file) => formData.append("resume-files", file));
-    formData.append("jobTitle", selectedJob); // Add job title to form data
+    formData.append("job_id", jobId); // Add job title to form data
 
     const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/upload/upload-resume`;
     const token = localStorage.getItem("token");
@@ -254,6 +256,7 @@ const UploadForm = () => {
                 className="p-3 hover:bg-yellow-100 cursor-pointer transition-colors duration-200 border-l-4 border-transparent hover:border-yellow-500"
                 onClick={() => {
                   setSelectedJob(job.title);
+                  setJobId(job.id);
                   setIsDropdownOpen(false);
                 }}
               >

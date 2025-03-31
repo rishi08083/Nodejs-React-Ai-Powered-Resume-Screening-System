@@ -323,7 +323,7 @@ const ListJobs = () => {
                       </span>
                     </p>
                     <p className="mt-1 text-xs text-gray-500">
-                      PDF, DOC or DOCX up to 10MB
+                      PDF 10MB
                     </p>
                     <input
                       type="file"
@@ -332,7 +332,7 @@ const ListJobs = () => {
                       onChange={() => {
                         setFileName(inputRef.current?.files[0].name);
                       }}
-                      accept=".pdf,.doc,.docx"
+                      accept=".pdf"
                     />
                   </div>
                 </div>
