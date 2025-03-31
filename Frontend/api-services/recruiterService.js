@@ -2,7 +2,6 @@ const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL; // Get the backend base URL f
 
 console.log(BASE_URL);
 
-
 /**
  * Fetches all recruiter requests.
  * @returns {Promise<Array>} - The list of recruiter requests.
@@ -81,6 +80,7 @@ export const fetchRecruiterRegister = async (formData) => {
       },
       body: JSON.stringify(formData),
     });
+
     // console.log(response.errors.msg,"----------");
       console.log("respm",response);
       
@@ -88,6 +88,7 @@ export const fetchRecruiterRegister = async (formData) => {
     // if (!response.ok) {
     //   throw new Error("Failed to register recruiter.");
     // }
+
 
     return await response.json();
   } catch (error) {

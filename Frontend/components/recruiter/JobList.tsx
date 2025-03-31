@@ -10,8 +10,7 @@ interface Job {
   experience_required: string;
   openings: number;
   rcd_url?: string;
-  is_rcd_uploaded:boolean;
-
+  is_rcd_uploaded: boolean;
 }
 
 const ListJobs = () => {
@@ -19,10 +18,13 @@ const ListJobs = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [fileName, setFileName] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
-  const [jobError,setJobError] = useState<string | null>(null);
+  const [jobError, setJobError] = useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = useState<number>(0);
-  const [uploadStatus, setUploadStatus] = useState<'idle' | 'uploading' | 'success' | 'error'>('idle');
+  const [uploadStatus, setUploadStatus] = useState<
+    "idle" | "uploading" | "success" | "error"
+  >("idle");
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleViewButtonClick = (job: Job) => {
@@ -32,22 +34,29 @@ const ListJobs = () => {
 
   const handleUploadRCD = async () => {
     if (!inputRef.current?.files?.length) {
-      setUploadStatus('error');
-      setError('Please select a file to upload');
+      setUploadStatus("error");
+      setError("Please select a file to upload");
       return;
     }
 
     const file = inputRef.current.files[0];
     const formData = new FormData();
-    formData.append('rcd', file);
-    formData.append('jobId', selectedJob?.id.toString() || '');
+    formData.append("rcd", file);
+    formData.append("jobId", selectedJob?.id.toString() || "");
 
     try {
-      setUploadStatus('uploading');
+      setUploadStatus("uploading");
       setUploadProgress(0);
       const xhr = new XMLHttpRequest();
-      xhr.open('POST', `${process.env.NEXT_PUBLIC_API_URL}/api/rcd/upload-rcd`, true);
-      xhr.setRequestHeader('Authorization', `Bearer ${localStorage.getItem('token')}`);
+      xhr.open(
+        "POST",
+        `${process.env.NEXT_PUBLIC_API_URL}/api/rcd/upload-rcd`,
+        true,
+      );
+      xhr.setRequestHeader(
+        "Authorization",
+        `Bearer ${localStorage.getItem("token")}`,
+      );
       xhr.upload.onprogress = (event) => {
         if (event.lengthComputable) {
           const percentComplete = (event.loaded / event.total) * 100;
@@ -57,47 +66,52 @@ const ListJobs = () => {
       xhr.onload = () => {
         if (xhr.status === 200) {
           const data = JSON.parse(xhr.responseText);
-          setUploadStatus('success');
-          setJobs(prevJobs => 
-            prevJobs.map(job => 
-              job.id === selectedJob?.id 
-                ? {...job, rcd_url: data.data.documents[0]} 
-                : job
-            )
+          setUploadStatus("success");
+          setJobs((prevJobs) =>
+            prevJobs.map((job) =>
+              job.id === selectedJob?.id
+                ? { ...job, rcd_url: data.data.documents[0] }
+                : job,
+            ),
           );
           setTimeout(() => {
             setShowModal(false);
-            setUploadStatus('idle');
+            setUploadStatus("idle");
             setUploadProgress(0);
           }, 2000);
         } else {
           const errorData = JSON.parse(xhr.responseText);
-          setUploadStatus('error');
-          setError(errorData.message || 'Upload failed');
+          setUploadStatus("error");
+          setError(errorData.message || "Upload failed");
         }
       };
 
       xhr.onerror = () => {
-        setUploadStatus('error');
-        setError('Network error. Please try again.');
+        setUploadStatus("error");
+        setError("Network error. Please try again.");
       };
 
       xhr.send(formData);
     } catch (error) {
-      setUploadStatus('error');
-      setError(error instanceof Error ? error.message : 'An unexpected error occurred');
+      setUploadStatus("error");
+      setError(
+        error instanceof Error ? error.message : "An unexpected error occurred",
+      );
     }
   };
 
   const getJobDetails = async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/job/view`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: "Bearer " + localStorage.getItem("token"),
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/job/view`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
         },
-      });
+      );
 
       if (response.ok) {
         const data = await response.json();
@@ -108,11 +122,35 @@ const ListJobs = () => {
         throw new Error(errorData.message);
       }
     } catch (error) {
-      setJobError(error instanceof Error ? error.message : 'Failed to fetch jobs');
+      setJobError(
+        error instanceof Error ? error.message : "Failed to fetch jobs",
+      );
       setIsLoading(false);
     }
   };
-
+  const handlercdRedirect = async (id) => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/rcd/get-rcd/${id}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        },
+      );
+      if (response.ok) {
+        const data = await response.json();
+        // redirect to new web page
+        window.open(data.data.documents);
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.message);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   // Fetch jobs from the API
   useEffect(() => {
@@ -120,7 +158,7 @@ const ListJobs = () => {
   }, []);
 
   return (
-    <div className="w-full p-2 overflow-scroll">
+    <div className="w-full p-2">
       <div className="mb-6">
         <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
           Available Job Positions
@@ -135,7 +173,10 @@ const ListJobs = () => {
           <div className="w-12 h-12 rounded-full border-4 border-yellow-400 border-t-transparent animate-spin"></div>
         </div>
       ) : jobError ? (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+        <div
+          className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
+          role="alert"
+        >
           <strong className="font-bold">Error: </strong>
           <span className="block sm:inline">{jobError}</span>
         </div>
@@ -144,7 +185,7 @@ const ListJobs = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="bg-white rounded-xl shadow-xl overflow-scroll"
+          className="bg-white rounded-xl shadow-xl overflow-scroll "
         >
           <div className="overflow-scroll">
             <table className="min-w-full table-auto border-collapse">
@@ -192,22 +233,24 @@ const ListJobs = () => {
                         onClick={() => handleViewButtonClick(job)}
                       >
                         <Upload className="h-4 w-4" />
-                        {job.is_rcd_uploaded? <span>Update RCD</span>:<span>Upload RCD</span>}
-                        
+                        {job.is_rcd_uploaded ? (
+                          <span>Update RCD</span>
+                        ) : (
+                          <span>Upload RCD</span>
+                        )}
                       </motion.button>
-                      
-                        <motion.a
-                          href={'#'}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          className="px-3 py-2 bg-gray-200 text-black font-medium rounded-lg hover:bg-gray-500 transition-colors duration-200 shadow-md hover:shadow-lg flex items-center space-x-1"
-                        >
-                          <Eye className="h-4 w-4" />
-                          <span>View</span>
-                        </motion.a>
-                      
+
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => {
+                          handlercdRedirect(job.id);
+                        }}
+                        className="px-3 py-2 bg-gray-200 text-black font-medium rounded-lg hover:bg-gray-500 transition-colors duration-200 shadow-md hover:shadow-lg flex items-center space-x-1"
+                      >
+                        <Eye className="h-4 w-4" />
+                        <span>View</span>
+                      </motion.button>
                     </td>
                   </motion.tr>
                 ))}
@@ -242,13 +285,13 @@ const ListJobs = () => {
               </div>
 
               <div className="p-6">
-                {uploadStatus === 'error' && (
+                {uploadStatus === "error" && (
                   <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
                     {error}
                   </div>
                 )}
 
-                {uploadStatus === 'success' && (
+                {uploadStatus === "success" && (
                   <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
                     Document uploaded successfully!
                   </div>
@@ -256,13 +299,13 @@ const ListJobs = () => {
 
                 <div className="mb-6">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                   Upload RCD documents
+                    Upload RCD documents
                   </label>
-                  <div 
+                  <div
                     className={`border-2 ${
-                      uploadStatus === 'error' 
-                        ? 'border-red-300' 
-                        : 'border-dashed border-yellow-300'
+                      uploadStatus === "error"
+                        ? "border-red-300"
+                        : "border-dashed border-yellow-300"
                     } rounded-lg p-6 text-center hover:border-yellow-400 transition-colors duration-200`}
                   >
                     <FileText className="mx-auto h-12 w-12 text-yellow-400" />
@@ -275,25 +318,29 @@ const ListJobs = () => {
                         }}
                       >
                         {" "}
-                        browse
+                        browse <br />
+                        {fileName && fileName}
                       </span>
                     </p>
                     <p className="mt-1 text-xs text-gray-500">
                       PDF, DOC or DOCX up to 10MB
                     </p>
-                    <input 
-                      type="file" 
-                      className="hidden" 
-                      ref={inputRef} 
+                    <input
+                      type="file"
+                      className="hidden"
+                      ref={inputRef}
+                      onChange={() => {
+                        setFileName(inputRef.current?.files[0].name);
+                      }}
                       accept=".pdf,.doc,.docx"
                     />
                   </div>
                 </div>
 
-                {uploadStatus === 'uploading' && (
+                {uploadStatus === "uploading" && (
                   <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4">
-                    <div 
-                      className="bg-yellow-400 h-2.5 rounded-full" 
+                    <div
+                      className="bg-yellow-400 h-2.5 rounded-full"
                       style={{ width: `${uploadProgress}%` }}
                     ></div>
                   </div>
@@ -306,10 +353,10 @@ const ListJobs = () => {
                     className="px-4 py-2 bg-gray-200 text-gray-800 font-medium rounded-lg hover:bg-gray-300 transition-colors duration-200"
                     onClick={() => {
                       setShowModal(false);
-                      setUploadStatus('idle');
+                      setUploadStatus("idle");
                       setUploadProgress(0);
                     }}
-                    disabled={uploadStatus === 'uploading'}
+                    disabled={uploadStatus === "uploading"}
                   >
                     Cancel
                   </motion.button>
@@ -317,14 +364,14 @@ const ListJobs = () => {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     className={`px-4 py-2 text-black font-medium rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg ${
-                      uploadStatus === 'uploading' 
-                        ? 'bg-yellow-300 cursor-not-allowed' 
-                        : 'bg-yellow-400 hover:bg-yellow-500'
+                      uploadStatus === "uploading"
+                        ? "bg-yellow-300 cursor-not-allowed"
+                        : "bg-yellow-400 hover:bg-yellow-500"
                     }`}
                     onClick={handleUploadRCD}
-                    disabled={uploadStatus === 'uploading'}
+                    disabled={uploadStatus === "uploading"}
                   >
-                    {uploadStatus === 'uploading' ? 'Uploading...' : 'Upload'}
+                    {uploadStatus === "uploading" ? "Uploading..." : "Upload"}
                   </motion.button>
                 </div>
               </div>

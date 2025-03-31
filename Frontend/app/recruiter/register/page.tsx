@@ -54,6 +54,8 @@ export default function RecruiterRegister() {
         setMessage(errorMessages || [response?.message || "An error occurred."]);
         setIsError(true);
       }
+
+
     } catch (error) {
       console.error("Error:", error);
       setMessage(["An unexpected error occurred. Please try again."]);

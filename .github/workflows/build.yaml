@@ -1,0 +1,72 @@
+name: Build Check
+
+on:
+  pull_request:
+    branches:
+      - dev
+
+jobs:
+  build-backend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies for Backend
+        run: |
+          cd ./Backend
+          npm install
+
+      - name: Lint Backend Code
+        run: |
+          cd ./Backend 
+          npm run lint
+
+      - name: Format Check for Backend
+        run: |
+          cd ./Backend 
+          npm run format:check
+  
+      - name: Build Backend
+        run: |
+          cd ./Backend 
+          npm run build
+
+
+  build-frontend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies for Frontend
+        run: |
+          cd ./Frontend
+          npm install
+
+      - name: Lint Frontend Code
+        run: |
+          cd ./Frontend
+          npm run lint
+
+      - name: Format Check for Frontend
+        run: |
+          cd ./Frontend
+          npm run format:check
+
+      - name: Build Frontend
+        run: |
+          cd ./Frontend
+          npm run build

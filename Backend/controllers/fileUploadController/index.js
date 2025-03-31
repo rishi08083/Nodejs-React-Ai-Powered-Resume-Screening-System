@@ -112,11 +112,26 @@ const parseResumes = async (uploadedFiles, job_id, user_id) => {
       });
 
       for (let i = 0; i < aiResponse.data.data.experience.length; i++) {
+        const experience = aiResponse.data.data.experience[i];
+
+        console.log(experience.company, "---------------------------------");
+
+        // Ensure valid dates
+        const startDate = experience.start_date
+          ? new Date(experience.start_date)
+          : null;
+        const endDate = experience.end_date
+          ? new Date(experience.end_date)
+          : null;
+
+        // Check if the date conversion failed (Invalid Date)
+        const isValidDate = (date) => date instanceof Date && !isNaN(date);
+
         await candidate.createExperience({
-          company_name: aiResponse.data.data.experience[i].company,
-          role: aiResponse.data.data.experience[i].job_title,
-          start_date: aiResponse.data.data.experience[i].start_date,
-          end_date: aiResponse.data.data.experience[i].end_date,
+          company_names: experience.company,
+          job_titles: experience.job_title,
+          start_date: isValidDate(startDate) ? startDate : null, // Use null if invalid
+          end_date: isValidDate(endDate) ? endDate : null, // Use null if invalid
         });
       }
 

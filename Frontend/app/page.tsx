@@ -2,10 +2,12 @@
 
 import { useReducer, useState, useEffect } from "react";
 import Image from "next/image";
-import ListJobs from "../components/JobList";
+import ListJobs from "../components/recruiter/JobList";
 import { useRouter } from "next/navigation";
-import UploadForm from "../components/UploadForm";
+
+<!-- import UploadForm from "../components/UploadForm"; -->
 import Candidate from "../components/Candidates";
+import UploadForm from "../components/recruiter/UploadForm";
 import RecruiterRequests from "../components/admin/RecruiterRequests";
 import { useAuth } from "../lib/auth";
 import {
@@ -45,7 +47,7 @@ const initialState: State = { activeSection: "jobs" };
 const Home = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [role, setRole] = useState<"admin" | "recruiter">("recruiter");
-  const { user, logout, checkAuth, loading } = useAuth();
+  const { user, logout, loading } = useAuth();
   const router = useRouter();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
@@ -53,19 +55,6 @@ const Home = () => {
     logout();
     setIsLogoutModalOpen(false);
   };
-//   {
-//     title,
-//     description,
-//     location,
-//     experience_required,
-//     job_type,
-//     openings,
-//     company_name,
-//     skills_required,
-//     contact_info,
-//     salary_range,
-//     application_deadline,
-// }
   const LogoutModal = () => (
     <div className="fixed inset-0  bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full">
@@ -137,7 +126,6 @@ const Home = () => {
 
   return (
     <div className={styles.container}>
-      {/* Header with improved styling */}
       {isLogoutModalOpen && <LogoutModal />}
       <header className={`${styles.header}`}>
         <div className={`${styles.headerContent}`}>
@@ -167,20 +155,14 @@ const Home = () => {
           </button>
         </div>
       </header>
-
-      {/* Overlay to close sidebar when clicking outside on mobile */}
       <div
         className={`${styles.overlay} ${isSidebarOpen ? styles.active : ""}`}
         onClick={() => setIsSidebarOpen(false)}
       />
-
-      {/* Sidebar */}
       <div className={`${styles.sidebar} ${isSidebarOpen ? styles.open : ""}`}>
         <div className={styles.logoContainer}>
           <Image src="/logo.jpg" alt="Logo" width={200} height={60} priority />
         </div>
-
-        {/* Close button for mobile sidebar */}
         <button
           className="absolute top-4 right-4 text-gray-500 md:hidden"
           onClick={() => setIsSidebarOpen(false)}
@@ -203,20 +185,28 @@ const Home = () => {
               </button>
               <button
                 onClick={() => setActiveSection("upload")}
+<!-- <<<<<<< feature-sprint2
                 className={state.activeSection === "upload" ? "font-bold" : ""}
               >
                 Upload Resume
               </button>
               <button
                 onClick={() => setActiveSection("candidate")}
-                className={state.activeSection === "candidate" ? "font-bold" : ""}
+                className={state.activeSection === "candidate" ? "font-bold" : ""} -->
+
+                className={`w-full text-left p-2 rounded flex items-center ${
+                  state.activeSection == "upload"
+                    ? "bg-yellow-100 text-yellow-700 font-semibold"
+                    : "text-gray-600 hover:bg-gray-100"
+                }`}
+
               >
                 Candidate
               </button>
               <button
                 onClick={() => setActiveSection("profile")}
                 className={`w-full text-left p-2 rounded flex items-center ${
-                  state.activeSection === "profile"
+                  state.activeSection == "profile"
                     ? "bg-yellow-100 text-yellow-700 font-semibold"
                     : "text-gray-600 hover:bg-gray-100"
                 }`}
@@ -230,7 +220,7 @@ const Home = () => {
               <button
                 onClick={() => setActiveSection("dashboard")}
                 className={`w-full text-left p-2 rounded flex items-center ${
-                  state.activeSection === "dashboard"
+                  state.activeSection == "dashboard"
                     ? "bg-yellow-100 text-yellow-700 font-semibold"
                     : "text-gray-600 hover:bg-gray-100"
                 }`}
@@ -240,7 +230,7 @@ const Home = () => {
               <button
                 onClick={() => setActiveSection("recruiterRequests")}
                 className={`w-full text-left p-2 rounded flex items-center ${
-                  state.activeSection === "recruiterRequests"
+                  state.activeSection == "recruiterRequests"
                     ? "bg-yellow-100 text-yellow-700 font-semibold"
                     : "text-gray-600 hover:bg-gray-100"
                 }`}
@@ -250,7 +240,7 @@ const Home = () => {
               <button
                 onClick={() => setActiveSection("settings")}
                 className={`w-full text-left p-2 rounded flex items-center ${
-                  state.activeSection === "settings"
+                  state.activeSection == "settings"
                     ? "bg-yellow-100 text-yellow-700 font-semibold"
                     : "text-gray-600 hover:bg-gray-100"
                 }`}
@@ -261,26 +251,25 @@ const Home = () => {
           )}
         </nav>
       </div>
-
-      {/* Main Content */}
       <main className={styles.main}>
-        {role === "recruiter" && state.activeSection === "jobs" && <ListJobs />}
-        {role === "recruiter" && state.activeSection === "upload" && (
+        {role == "recruiter" && state.activeSection == "jobs" && <ListJobs />}
+        {role == "recruiter" && state.activeSection == "upload" && (
           <UploadForm />
         )}
          {role === "recruiter" && state.activeSection === "candidate" && (
           <Candidate /> 
+
         )}
-        {role === "recruiter" && state.activeSection === "profile" && (
+        {role == "recruiter" && state.activeSection == "profile" && (
           <div>Profile Content</div>
         )}
-        {role === "admin" && state.activeSection === "dashboard" && (
+        {role == "admin" && state.activeSection == "dashboard" && (
           <div>Admin Dashboard Content</div>
         )}
-        {role === "admin" && state.activeSection === "recruiterRequests" && (
+        {role == "admin" && state.activeSection == "recruiterRequests" && (
           <RecruiterRequests />
         )}
-        {role === "admin" && state.activeSection === "settings" && (
+        {role === "admin" && state.activeSection == "settings" && (
           <div>Settings Content</div>
         )}
       </main>
