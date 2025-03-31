@@ -1,10 +1,8 @@
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
-
 const axios = require("axios");
 const path = require("path");
 const crypto = require("crypto");
 const db = require("../../models");
-
 require("dotenv").config();
 
 // AWS S3 Configuration
@@ -54,7 +52,7 @@ exports.uploadResumes = async (req, res) => {
       await s3.send(new PutObjectCommand(params));
 
       const fileUrl = `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
-      uploadedFiles.push({ fileName, fileUrl });
+      uploadedFiles.push({ fileName, fileUrl, mimeType: file.mimetype }); // Added mimeType
     }
 
     const unparsedResumes = uploadedFiles.map((file) => ({
@@ -65,7 +63,6 @@ exports.uploadResumes = async (req, res) => {
     }));
 
     await db.UnparsedResume.bulkCreate(unparsedResumes);
-    console.log(req.user);
     const job_id = req.body.job_id;
     const user_id = req.user.user.id;
     res.status(200).json({
@@ -88,20 +85,34 @@ exports.uploadResumes = async (req, res) => {
 const parseResumes = async (uploadedFiles, job_id, user_id) => {
   try {
     for (let i = 0; i < uploadedFiles.length; i++) {
+      const file = uploadedFiles[i];
+      let aiEndpoint;
+      const fileExtension = path.extname(file.fileName).toLowerCase();
+
+      // Determine the AI backend endpoint based on file type
+      if (fileExtension === ".pdf") {
+        aiEndpoint = "/parse_pdf_resume";
+      } else if (fileExtension === ".doc" || fileExtension === ".docx") {
+        aiEndpoint = "/parse_doc_resume";
+      } else if ([".jpg", ".jpeg", ".png"].includes(fileExtension)) {
+        aiEndpoint = "/parse_image_resume";
+      } else {
+        console.log(`Unsupported file type: ${fileExtension}`);
+        continue;
+      }
+
+      // AI Parsing Request
       const aiResponse = await axios.post(
-        `${process.env.AI_BACKEND_URL}?file_key=${uploadedFiles[i].fileName}`,
-        {
-          // file_key :uploadedFiles[0].fileName
-          // user_id: req.user.id,
-        }
+        `${process.env.AI_BACKEND_URL}${aiEndpoint}?file_key=${file.fileName}`
       );
+
       console.log(JSON.stringify(aiResponse.data, null, 2), "    " + i);
 
       const candidate = await db.Candidates.create({
         name: aiResponse.data.data.name,
         email: aiResponse.data.data.email,
         phone_number: aiResponse.data.data.phone,
-        resume_url: uploadedFiles[i].fileUrl,
+        resume_url: file.fileUrl,
         status: "parsed",
         job_id: job_id,
         user_id: user_id,
@@ -113,25 +124,16 @@ const parseResumes = async (uploadedFiles, job_id, user_id) => {
 
       for (let i = 0; i < aiResponse.data.data.experience.length; i++) {
         const experience = aiResponse.data.data.experience[i];
-
-        console.log(experience.company, "---------------------------------");
-
-        // Ensure valid dates
-        const startDate = experience.start_date
-          ? new Date(experience.start_date)
-          : null;
-        const endDate = experience.end_date
-          ? new Date(experience.end_date)
-          : null;
-
-        // Check if the date conversion failed (Invalid Date)
+        const startDate = experience.start_date ? new Date(experience.start_date) : null;
+        const endDate = experience.end_date ? new Date(experience.end_date) : null;
+        
         const isValidDate = (date) => date instanceof Date && !isNaN(date);
-
+        
         await candidate.createExperience({
           company_names: experience.company,
           job_titles: experience.job_title,
-          start_date: isValidDate(startDate) ? startDate : null, // Use null if invalid
-          end_date: isValidDate(endDate) ? endDate : null, // Use null if invalid
+          start_date: isValidDate(startDate) ? startDate : null,
+          end_date: isValidDate(endDate) ? endDate : null,
         });
       }
 
