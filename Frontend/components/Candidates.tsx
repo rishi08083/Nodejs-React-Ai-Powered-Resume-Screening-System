@@ -64,8 +64,34 @@ const UploadForm = () => {
     getJobDetails();
   }, []);
 
+  
   useEffect(() => {
-    const getCandidateDetails = async () => {
+    const getJobDetails = async () => {
+      try {
+        const response = await fetch(`${BASE_URL}/job/view`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setJobs(data.data);
+        } else {
+          const errorData = await response.json();
+          throw new Error(errorData.message);
+        }
+      } catch (error) {
+        console.log(error, "error");
+      }
+    };
+    getJobDetails();
+  }, []);
+
+  useEffect(() => {
+    const getFeedback = async () => {
       try {
         const response = await fetch(`${BASE_URL}/candidates/list/${selectedJob}`, {
           method: "GET",
@@ -86,7 +112,7 @@ const UploadForm = () => {
         console.log(error, "error");
       }
     };
-    getCandidateDetails();
+    getFeedback();
   }, [selectedJob]);
 
   const filteredCandidates = useMemo(() => {
@@ -117,11 +143,11 @@ const UploadForm = () => {
         const data = await response.json();
         setCompatibilityResponses((prev) => ({
           ...prev,
-          [candidateId]: data.feedback[0].rating,
+          // [candidateId]: data.feedback[0].rating,
         }));
         setFeedbackData((prev) => ({
           ...prev,
-          [candidateId]: data.feedback[0].feedback_text,
+          // [candidateId]: data.feedback[0].feedback_text,
         }));
         console.log(data.feedback[0].feedback_text[0], "feedback");
         

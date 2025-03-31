@@ -140,6 +140,7 @@ const parseResumes = async (uploadedFiles, job_id, user_id) => {
       for (let i = 0; i < aiResponse.data.data.education.length; i++) {
         await candidate.createEducation({
           institution_name: aiResponse.data.data.education[i],
+          
         });
       }
     }
