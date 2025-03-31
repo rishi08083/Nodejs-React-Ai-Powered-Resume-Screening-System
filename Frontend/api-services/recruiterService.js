@@ -80,15 +80,20 @@ export const fetchRecruiterRegister = async (formData) => {
       },
       body: JSON.stringify(formData),
     });
-    console.log(response);
 
-    if (!response.ok) {
-      throw new Error("Failed to register recruiter.");
-    }
+    // console.log(response.errors.msg,"----------");
+      console.log("respm",response);
+      
+    
+    // if (!response.ok) {
+    //   throw new Error("Failed to register recruiter.");
+    // }
+
 
     return await response.json();
   } catch (error) {
+    // console.log(response.errors.msg,"----------");
     console.error("Error registering recruiter:", error);
-    throw error;
+    // throw error;
   }
 };
