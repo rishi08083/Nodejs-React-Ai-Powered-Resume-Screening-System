@@ -16,10 +16,16 @@ type Candidate = {
   phone_number: string;
   resume_url: string;
   compatibilityScore: number;
-  feedback: string;
+  feedback: {
+    Combined_Score: number;
+    JD_Skill_Match: number;
+    RCD_Skill_Match: number;
+    feedback:{
+      experience_match: boolean;
+      recommendation: string;
+    }
+  };
 };
-
-
 
 const UploadForm = () => {
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -28,62 +34,60 @@ const UploadForm = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [compatibilityResponses, setCompatibilityResponses] = useState<{ [id: string]: string }>({});
+  const [feedbackData, setFeedbackData] = useState<{ [id: string]: Candidate["feedback"] }>({});
+  const [selectedFeedback, setSelectedFeedback] = useState<Candidate["feedback"] | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const candidatesPerPage = 10;
 
-useEffect(() => {
-  const getJobDetails = async () => {
-    try {
-      const response = await fetch(`${BASE_URL}/job/view`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: "Bearer " + localStorage.getItem("token"),
-        },
-      });
-  
-      if (response.ok) {
-        const data = await response.json();
-        setJobs(data.data);
-        // setIsLoading(false);
-      } else {
-        const errorData = await response.json();
-        throw new Error(errorData.message);
-      }
-    } catch (error) {
-      // setJobError(error instanceof Error ? error.message : 'Failed to fetch jobs');
-      // setIsLoading(false);
-    }
-  };
-  getJobDetails();
-},[]);
+  useEffect(() => {
+    const getJobDetails = async () => {
+      try {
+        const response = await fetch(`${BASE_URL}/job/view`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        });
 
-
-useEffect(() => {
-  // log(selectedJob, "selectedJob")
-  const getCandidateDtails = async () => {
-    try {
-      const response = await fetch(`${BASE_URL}/candidates/list/${selectedJob}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: "Bearer " + localStorage.getItem("token"),
-        },
-      });
-  
-      if (response.ok) {
-        const data = await response.json();
-        setCandidates(data.data.candidates);
-        // setIsLoading(false);
-      } else {
-        const errorData = await response.json();
-        throw new Error(errorData.message);
+        if (response.ok) {
+          const data = await response.json();
+          setJobs(data.data);
+        } else {
+          const errorData = await response.json();
+          throw new Error(errorData.message);
+        }
+      } catch (error) {
+        console.log(error, "error");
       }
-    } catch (error) {
-      console.log(error, "error");
-    }
-  };
-  getCandidateDtails();
-},[selectedJob]);
+    };
+    getJobDetails();
+  }, []);
+
+  useEffect(() => {
+    const getCandidateDetails = async () => {
+      try {
+        const response = await fetch(`${BASE_URL}/candidates/list/${selectedJob}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setCandidates(data.data.candidates);
+        } else {
+          const errorData = await response.json();
+          throw new Error(errorData.message);
+        }
+      } catch (error) {
+        console.log(error, "error");
+      }
+    };
+    getCandidateDetails();
+  }, [selectedJob]);
 
   const filteredCandidates = useMemo(() => {
     return candidates.filter(
@@ -100,31 +104,45 @@ useEffect(() => {
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   const handleCheckCompatibility = async (candidateId: string) => {
-  try {
-    const response = await fetch(`${BASE_URL}/screening/get_feedback/${candidateId}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: "Bearer " + localStorage.getItem("token"),
-      },
-    });
+    try {
+      const response = await fetch(`${BASE_URL}/screening/get_feedback/${candidateId}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      });
 
-    if (response.ok) {
-      const data = await response.json();
-      setCompatibilityResponses((prev) => ({
-              ...prev,
-              [candidateId]: data.feedback[0].rating, // Assuming the API returns a "message" field
-            }));
-      console.log(data.feedback[0].rating, "data");
-     
-    } else {
-      const errorData = await response.json();
-      throw new Error(errorData.message);
+      if (response.ok) {
+        const data = await response.json();
+        setCompatibilityResponses((prev) => ({
+          ...prev,
+          [candidateId]: data.feedback[0].rating,
+        }));
+        setFeedbackData((prev) => ({
+          ...prev,
+          [candidateId]: data.feedback[0].feedback_text,
+        }));
+        console.log(data.feedback[0].feedback_text[0], "feedback");
+        
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.message);
+      }
+    } catch (error) {
+      console.log(error, "error");
     }
-  } catch (error) {
-    console.log(error, "error");
-  }
-}
+  };
+
+  const handleShowFeedback = (candidateId: string) => {
+    setSelectedFeedback(feedbackData[candidateId]);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedFeedback(null);
+  };
 
   return (
     <div className="w-full p-4 bg-gray-50">
@@ -208,7 +226,18 @@ useEffect(() => {
                     </button>
                   )}
                 </td>
-                <td className="px-4 py-4 text-sm text-gray-600">{candidate.feedback}</td>
+                <td className="px-4 py-4 text-sm text-gray-600">
+                  {feedbackData[candidate.id] ? (
+                    <button
+                      onClick={() => handleShowFeedback(candidate.id)}
+                      className="px-3 py-1 bg-yellow-400 text-white rounded-lg shadow hover:bg-yellow-500"
+                    >
+                      Show Feedback
+                    </button>
+                  ) : (
+                    <span>No Feedback</span>
+                  )}
+                </td>
               </motion.tr>
             ))}
           </tbody>
@@ -233,8 +262,42 @@ useEffect(() => {
           </motion.button>
         ))}
       </div>
+
+      {/* Feedback Modal */}
+      {isModalOpen && selectedFeedback && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="fixed inset-0 bg-tranparent  bg-opacity-50 flex items-center justify-center z-50"
+        >
+          <div className="bg-white rounded-lg shadow-lg p-6 w-1/2">
+            <h2 className="text-xl font-bold text-gray-800 mb-4">Candidate Feedback</h2>
+            <p className="text-gray-600">
+              <strong>Combined Score:</strong> {selectedFeedback.Combined_Score}
+            </p>
+            <p className="text-gray-600">
+              <strong>JD Skill Match:</strong> {selectedFeedback.JD_Skill_Match}
+            </p>
+            <p className="text-gray-600">
+              <strong>RCD Skill Match:</strong> {selectedFeedback.RCD_Skill_Match}
+            </p>
+            <p className="text-gray-600">
+              <strong>Experience Match:</strong> {selectedFeedback.feedback.experience_match ? "Yes" : "No"}
+            </p>
+            <p className="text-gray-600">
+              <strong>Recommendation:</strong> {selectedFeedback.feedback.recommendation}
+            </p>
+            <button
+              onClick={closeModal}
+              className="mt-4 px-4 py-2 bg-red-400 text-white rounded-lg shadow hover:bg-red-500"
+            >
+              Close
+            </button>
+          </div>
+        </motion.div>
+      )}
     </div>
   );
 };
 
-export default React.memo(UploadForm)
+export default React.memo(UploadForm);
