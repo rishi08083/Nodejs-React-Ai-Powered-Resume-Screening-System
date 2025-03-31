@@ -100,20 +100,31 @@ useEffect(() => {
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   const handleCheckCompatibility = async (candidateId: string) => {
-    try {
-      const data = await checkCandidateCompatibility(candidateId);
+  try {
+    const response = await fetch(`${BASE_URL}/screening/get_feedback/${candidateId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      },
+    });
+
+    if (response.ok) {
+      const data = await response.json();
       setCompatibilityResponses((prev) => ({
-        ...prev,
-        [candidateId]: data.message, // Assuming the API returns a "message" field
-      }));
-    } catch (error) {
-      console.error("Error checking compatibility:", error);
-      setCompatibilityResponses((prev) => ({
-        ...prev,
-        [candidateId]: "Error checking compatibility",
-      }));
+              ...prev,
+              [candidateId]: data.feedback[0].rating, // Assuming the API returns a "message" field
+            }));
+      console.log(data.feedback[0].rating, "data");
+     
+    } else {
+      const errorData = await response.json();
+      throw new Error(errorData.message);
     }
-  };
+  } catch (error) {
+    console.log(error, "error");
+  }
+}
 
   return (
     <div className="w-full p-4 bg-gray-50">
@@ -226,4 +237,4 @@ useEffect(() => {
   );
 };
 
-export default React.memo(UploadForm);
+export default React.memo(UploadForm)

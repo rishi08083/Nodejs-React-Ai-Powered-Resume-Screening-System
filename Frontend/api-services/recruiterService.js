@@ -9,6 +9,10 @@ console.log(BASE_URL);
 export const fetchRecruiterRequests = async () => {
   try {
     const response = await fetch(`${BASE_URL}/auth/view-recruiter-req`, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      },
       method: "GET",
     });
 

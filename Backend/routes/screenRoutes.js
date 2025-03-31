@@ -36,8 +36,8 @@ router.post("/screen_candidate", async (req, res) => {
         }
         
         // Call FastAPI to get AI screening results
+
         const aiResponse = await axios.post(`${FastAPI_server_url}/screen_candidates_2`, requestBody);
-        console.log("AI Screening Response:", JSON.stringify(aiResponse.data, null, 2));
 
         // Check if screening already exists and update it
         const existingScreening = await db.ScreeningResults.findOne({ where: { candidate_id } });
