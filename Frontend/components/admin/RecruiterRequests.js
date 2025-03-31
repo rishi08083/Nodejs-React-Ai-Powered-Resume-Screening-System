@@ -20,7 +20,7 @@ export default function RecruiterRequests() {
       setIsLoading(true);
       try {
         const data = await fetchRecruiterRequests();
-        setRequests(data.users);
+        setRequests(data.data.users);
       } catch (error) {
         console.error("Error fetching recruiter requests:", error);
         setMessage("Failed to fetch recruiter requests.");
