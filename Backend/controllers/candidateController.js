@@ -41,7 +41,7 @@ module.exports.addCandidate = async (req, res) => {
       is_deleted: false,
     });
     console.log("Received institution_name:", req.body.institution_name);
-    await transaction.commit();
+  
 
     return res.status(201).json({
       status: "success",
@@ -67,9 +67,9 @@ module.exports.listCandidate = async (req, res) => {
     }
 
     const candidates = await db.Candidates.findAll({
-      where: { job_id, is_deleted: false },
+      where: { job_id: parseInt(job_id) },
     });
-
+    console.log("Candidates:", candidates);
     if (candidates.length === 0) {
       return res.status(200).json({
         status: "success",
