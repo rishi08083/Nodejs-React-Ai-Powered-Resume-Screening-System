@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
-import { fetchJobs, fetchCandidates, checkCandidateCompatibility } from "../api-services/CandidateServices";
+import {
+  fetchJobs,
+  fetchCandidates,
+  checkCandidateCompatibility,
+} from "../api-services/CandidateServices";
 import { log } from "console";
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
@@ -20,10 +24,10 @@ type Candidate = {
     Combined_Score: number;
     JD_Skill_Match: number;
     RCD_Skill_Match: number;
-    feedback:{
+    feedback: {
       experience_match: boolean;
       recommendation: string;
-    }
+    };
   };
 };
 
@@ -33,9 +37,15 @@ const UploadForm = () => {
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [compatibilityResponses, setCompatibilityResponses] = useState<{ [id: string]: string }>({});
-  const [feedbackData, setFeedbackData] = useState<{ [id: string]: Candidate["feedback"] }>({});
-  const [selectedFeedback, setSelectedFeedback] = useState<Candidate["feedback"] | null>(null);
+  const [compatibilityResponses, setCompatibilityResponses] = useState<{
+    [id: string]: string;
+  }>({});
+  const [feedbackData, setFeedbackData] = useState<{
+    [id: string]: Candidate["feedback"];
+  }>({});
+  const [selectedFeedback, setSelectedFeedback] = useState<
+    Candidate["feedback"] | null
+  >(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const candidatesPerPage = 10;
 
@@ -64,7 +74,6 @@ const UploadForm = () => {
     getJobDetails();
   }, []);
 
-  
   useEffect(() => {
     const getJobDetails = async () => {
       try {
@@ -93,13 +102,16 @@ const UploadForm = () => {
   useEffect(() => {
     const getCandidates = async () => {
       try {
-        const response = await fetch(`${BASE_URL}/candidates/list/${selectedJob}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.getItem("token"),
+        const response = await fetch(
+          `${BASE_URL}/candidates/list/${selectedJob}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + localStorage.getItem("token"),
+            },
           },
-        });
+        );
 
         if (response.ok) {
           const data = await response.json();
@@ -150,13 +162,16 @@ const UploadForm = () => {
     return candidates.filter(
       (candidate) =>
         candidate.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        candidate.id.toString().includes(searchTerm)
+        candidate.id.toString().includes(searchTerm),
     );
   }, [candidates, searchTerm]);
 
   const indexOfLastCandidate = currentPage * candidatesPerPage;
   const indexOfFirstCandidate = indexOfLastCandidate - candidatesPerPage;
-  const currentCandidates = filteredCandidates.slice(indexOfFirstCandidate, indexOfLastCandidate);
+  const currentCandidates = filteredCandidates.slice(
+    indexOfFirstCandidate,
+    indexOfLastCandidate,
+  );
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
@@ -214,8 +229,12 @@ const UploadForm = () => {
   return (
     <div className="w-full p-4 bg-gray-50">
       <div className="mb-6">
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Candidate List</h1>
-        <p className="text-gray-600 mt-2">Search and manage candidates for your job postings.</p>
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
+          Candidate List
+        </h1>
+        <p className="text-gray-600 mt-2">
+          Search and manage candidates for your job postings.
+        </p>
       </div>
 
       {/* Search and Filter */}
@@ -251,12 +270,24 @@ const UploadForm = () => {
         <table className="min-w-full table-auto border-collapse">
           <thead>
             <tr className="bg-yellow-50 border-b border-yellow-100">
-              <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">Candidate Name</th>
-              <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">Email</th>
-              <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">Contact</th>
-              <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">Resume</th>
-              <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">Compatibility</th>
-              <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">Feedback</th>
+              <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">
+                Candidate Name
+              </th>
+              <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">
+                Email
+              </th>
+              <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">
+                Contact
+              </th>
+              <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">
+                Resume
+              </th>
+              <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">
+                Compatibility
+              </th>
+              <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">
+                Feedback
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -268,9 +299,15 @@ const UploadForm = () => {
                 transition={{ delay: index * 0.1 }}
                 className="border-b border-gray-100 hover:bg-yellow-50 transition-colors duration-200"
               >
-                <td className="px-4 py-4 text-sm font-medium text-gray-800">{candidate.name}</td>
-                <td className="px-4 py-4 text-sm text-gray-600">{candidate.email}</td>
-                <td className="px-4 py-4 text-sm text-gray-600">{candidate.phone_number}</td>
+                <td className="px-4 py-4 text-sm font-medium text-gray-800">
+                  {candidate.name}
+                </td>
+                <td className="px-4 py-4 text-sm text-gray-600">
+                  {candidate.email}
+                </td>
+                <td className="px-4 py-4 text-sm text-gray-600">
+                  {candidate.phone_number}
+                </td>
                 <td className="px-4 py-4 text-sm">
                   <a
                     href={candidate.resume_url}
@@ -313,7 +350,11 @@ const UploadForm = () => {
 
       {/* Pagination */}
       <div className="flex justify-center space-x-2 mt-6">
-        {[...Array(Math.ceil(filteredCandidates.length / candidatesPerPage)).keys()].map((number) => (
+        {[
+          ...Array(
+            Math.ceil(filteredCandidates.length / candidatesPerPage),
+          ).keys(),
+        ].map((number) => (
           <motion.button
             key={number + 1}
             onClick={() => paginate(number + 1)}
@@ -338,7 +379,9 @@ const UploadForm = () => {
           className="fixed inset-0 bg-tranparent  bg-opacity-50 flex items-center justify-center z-50"
         >
           <div className="bg-white rounded-lg shadow-lg p-6 w-1/2">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">Candidate Feedback</h2>
+            <h2 className="text-xl font-bold text-gray-800 mb-4">
+              Candidate Feedback
+            </h2>
             <p className="text-gray-600">
               <strong>Combined Score:</strong> {selectedFeedback.Combined_Score}
             </p>
@@ -346,13 +389,16 @@ const UploadForm = () => {
               <strong>JD Skill Match:</strong> {selectedFeedback.JD_Skill_Match}
             </p>
             <p className="text-gray-600">
-              <strong>RCD Skill Match:</strong> {selectedFeedback.RCD_Skill_Match}
+              <strong>RCD Skill Match:</strong>{" "}
+              {selectedFeedback.RCD_Skill_Match}
             </p>
             <p className="text-gray-600">
-              <strong>Experience Match:</strong> {selectedFeedback.feedback.experience_match ? "Yes" : "No"}
+              <strong>Experience Match:</strong>{" "}
+              {selectedFeedback.feedback.experience_match ? "Yes" : "No"}
             </p>
             <p className="text-gray-600">
-              <strong>Recommendation:</strong> {selectedFeedback.feedback.recommendation}
+              <strong>Recommendation:</strong>{" "}
+              {selectedFeedback.feedback.recommendation}
             </p>
             <button
               onClick={closeModal}

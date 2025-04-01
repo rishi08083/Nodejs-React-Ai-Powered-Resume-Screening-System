@@ -322,9 +322,7 @@ const ListJobs = () => {
                         {fileName && fileName}
                       </span>
                     </p>
-                    <p className="mt-1 text-xs text-gray-500">
-                      PDF 10MB
-                    </p>
+                    <p className="mt-1 text-xs text-gray-500">PDF 10MB</p>
                     <input
                       type="file"
                       className="hidden"

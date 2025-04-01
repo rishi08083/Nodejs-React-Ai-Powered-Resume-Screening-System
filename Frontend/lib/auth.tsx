@@ -83,6 +83,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (errorData.message === "Internal Server Error") {
           throw new Error("Internal Server Error");
         }
+        throw new Error(errorData.error.details || "Some error occurred");
       } else {
         throw new Error(errorData.message || "Some error occurred");
       }

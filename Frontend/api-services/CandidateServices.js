@@ -8,7 +8,7 @@ export const fetchJobs = async () => {
   try {
     const response = await fetch(`${BASE_URL}/job/view`);
     console.log("Response:", response); // Log the response for debugging
-    
+
     if (!response.ok) {
       throw new Error("Failed to fetch jobs.");
     }
@@ -44,7 +44,9 @@ export const fetchCandidates = async (jobId) => {
  */
 export const checkCandidateCompatibility = async (candidateId) => {
   try {
-    const response = await fetch(`${BASE_URL}/api/checkCompatibility?candidateId=${candidateId}`);
+    const response = await fetch(
+      `${BASE_URL}/api/checkCompatibility?candidateId=${candidateId}`,
+    );
     if (!response.ok) {
       throw new Error("Failed to check compatibility.");
     }

@@ -33,6 +33,19 @@ const upload = multer({
   limits: { files: 15 }, // Restrict to a maximum of 15 files
 });
 
+Router.get('/get-resume/:candidateId', auth.authMiddleware, async (req, res) => {
+  try {
+    await fileUploadController.getResume(req, res);
+  } catch (err) {
+    console.error("Error in getResume:", err);
+    res.status(500).json({
+      status: "error",
+      message: "Internal server error",
+      error: { details: err.message },
+    });
+  }
+});
+
 // File Upload API
 Router.post(
   "/upload-resume",
