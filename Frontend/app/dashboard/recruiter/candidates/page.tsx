@@ -1,10 +1,11 @@
+"use client";
 import React, { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import {
   fetchJobs,
   fetchCandidates,
   checkCandidateCompatibility,
-} from "../api-services/CandidateServices";
+} from "../../../../api-services/CandidateServices";
 import { log } from "console";
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
@@ -115,7 +116,6 @@ const CandidateList = () => {
 
         if (response.ok) {
           const data = await response.json();
-
           setCandidates(data.data.candidates);
         } else {
           const errorData = await response.json();
@@ -179,21 +179,19 @@ const CandidateList = () => {
 
   const handleCheckCompatibility = async (candidateId: string) => {
     try {
-      // Show loading state for compatibility check
       setCompatibilityResponses((prev) => ({
         ...prev,
-        [candidateId]: "Loading...", // Indicate loading for this candidate
+        [candidateId]: "Loading...",
       }));
 
-      // Call the backend API to check compatibility
       const response = await fetch(`${BASE_URL}/screening/screen_candidate`, {
-        method: "POST", // Assuming it's a POST request
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: "Bearer " + localStorage.getItem("token"),
         },
         body: JSON.stringify({
-          candidate_id: candidateId, // send the candidate_id in the request body
+          candidate_id: candidateId,
         }),
       });
 
@@ -209,10 +207,9 @@ const CandidateList = () => {
     } catch (error) {
       console.error("Error checking compatibility:", error);
 
-      // Handle error state for compatibility check
       setCompatibilityResponses((prev) => ({
         ...prev,
-        [candidateId]: "Error checking compatibility", // Indicate error
+        [candidateId]: "Error checking compatibility",
       }));
     }
   };
@@ -228,12 +225,12 @@ const CandidateList = () => {
   };
 
   return (
-    <div className="w-full p-4 bg-gray-50">
+    <div className="w-full p-4 bg-[#0e151f] min-h-screen mt-17">
       <div className="mb-6">
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
+        <h1 className="text-2xl md:text-3xl font-bold text-[#ffffff]">
           Candidate List
         </h1>
-        <p className="text-gray-600 mt-2">
+        <p className="text-[#8b949e] mt-2">
           Search and manage candidates for your job postings.
         </p>
       </div>
@@ -245,16 +242,22 @@ const CandidateList = () => {
           placeholder="Search by ID or Name"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full md:w-1/2 p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
+          className="w-full md:w-1/2 p-3 border border-[#30363d] rounded-lg bg-[#1b222c] text-[#ffffff] focus:outline-none focus:ring-2 focus:ring-[#ffb300]"
         />
         <select
-          className="w-full md:w-1/4 p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
+          className="w-full md:w-1/4 p-3 border border-[#30363d] rounded-lg bg-[#1b222c] text-[#ffffff] focus:outline-none focus:ring-2 focus:ring-[#ffb300]"
           value={selectedJob}
           onChange={(e) => setSelectedJob(e.target.value)}
         >
-          <option value="">Select a Job</option>
+          <option value="" className="bg-[#1b222c] text-[#ffffff]">
+            Select a Job
+          </option>
           {jobs.map((job) => (
-            <option key={job.id} value={job.id}>
+            <option
+              key={job.id}
+              value={job.id}
+              className="bg-[#1b222c] text-[#ffffff]"
+            >
               {job.title}
             </option>
           ))}
@@ -266,27 +269,27 @@ const CandidateList = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="bg-white rounded-lg shadow-lg overflow-hidden"
+        className="bg-[#1b222c] rounded-lg shadow-lg overflow-hidden border border-[#30363d]"
       >
         <table className="min-w-full table-auto border-collapse">
           <thead>
-            <tr className="bg-yellow-50 border-b border-yellow-100">
-              <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">
+            <tr className="bg-[#252e3a] border-b border-[#30363d]">
+              <th className="px-4 py-4 text-left text-sm font-semibold text-[#ffffff]">
                 Candidate Name
               </th>
-              <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">
+              <th className="px-4 py-4 text-left text-sm font-semibold text-[#ffffff]">
                 Email
               </th>
-              <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">
+              <th className="px-4 py-4 text-left text-sm font-semibold text-[#ffffff]">
                 Contact
               </th>
-              <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">
+              <th className="px-4 py-4 text-left text-sm font-semibold text-[#ffffff]">
                 Resume
               </th>
-              <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">
+              <th className="px-4 py-4 text-left text-sm font-semibold text-[#ffffff]">
                 Compatibility
               </th>
-              <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">
+              <th className="px-4 py-4 text-left text-sm font-semibold text-[#ffffff]">
                 Feedback
               </th>
             </tr>
@@ -298,15 +301,15 @@ const CandidateList = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: index * 0.1 }}
-                className="border-b border-gray-100 hover:bg-yellow-50 transition-colors duration-200"
+                className="border-b border-[#30363d] hover:bg-[#252e3a] transition-colors duration-200"
               >
-                <td className="px-4 py-4 text-sm font-medium text-gray-800">
+                <td className="px-4 py-4 text-sm font-medium text-[#ffffff]">
                   {candidate.name}
                 </td>
-                <td className="px-4 py-4 text-sm text-gray-600">
+                <td className="px-4 py-4 text-sm text-[#8b949e]">
                   {candidate.email}
                 </td>
-                <td className="px-4 py-4 text-sm text-gray-600">
+                <td className="px-4 py-4 text-sm text-[#8b949e]">
                   {candidate.phone_number}
                 </td>
                 <td className="px-4 py-4 text-sm">
@@ -314,28 +317,28 @@ const CandidateList = () => {
                     href={candidate.resume_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-yellow-600 underline hover:text-yellow-800"
+                    className="text-[#ffb300] underline hover:text-[#ffc133]"
                   >
                     View Resume
                   </a>
                 </td>
-                <td className="px-4 py-4 text-sm text-gray-600">
+                <td className="px-4 py-4 text-sm text-[#8b949e]">
                   {compatibilityResponses[candidate.id] ? (
                     <span>{compatibilityResponses[candidate.id]}</span>
                   ) : (
                     <button
                       onClick={() => handleCheckCompatibility(candidate.id)}
-                      className="px-3 py-1 bg-yellow-400 text-white rounded-lg shadow hover:bg-yellow-500"
+                      className="px-3 py-1 bg-[#ffb300] text-[#0e151f] rounded-lg shadow hover:bg-[#ffc133]"
                     >
                       Check Compatibility
                     </button>
                   )}
                 </td>
-                <td className="px-4 py-4 text-sm text-gray-600">
+                <td className="px-4 py-4 text-sm text-[#8b949e]">
                   {feedbackData[candidate.id] ? (
                     <button
                       onClick={() => handleShowFeedback(candidate.id)}
-                      className="px-3 py-1 bg-yellow-400 text-white rounded-lg shadow hover:bg-yellow-500"
+                      className="px-3 py-1 bg-[#ffb300] text-[#0e151f] rounded-lg shadow hover:bg-[#ffc133]"
                     >
                       Show Feedback
                     </button>
@@ -363,8 +366,8 @@ const CandidateList = () => {
             whileTap={{ scale: 0.95 }}
             className={`px-4 py-2 rounded-lg shadow-md ${
               currentPage === number + 1
-                ? "bg-yellow-400 text-white"
-                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                ? "bg-[#ffb300] text-[#0e151f]"
+                : "bg-[#1b222c] text-[#ffffff] hover:bg-[#252e3a]"
             }`}
           >
             {number + 1}
@@ -377,33 +380,35 @@ const CandidateList = () => {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="fixed inset-0 bg-tranparent  bg-opacity-50 flex items-center justify-center z-50"
+          className="fixed inset-0 bg-[#0e151f] bg-opacity-90 flex items-center justify-center z-50"
         >
-          <div className="bg-white rounded-lg shadow-lg p-6 w-1/2">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">
+          <div className="bg-[#1b222c] rounded-lg shadow-lg p-6 w-1/2 border border-[#30363d]">
+            <h2 className="text-xl font-bold text-[#ffffff] mb-4">
               Candidate Feedback
             </h2>
-            <p className="text-gray-600">
-              <strong>Combined Score:</strong> {selectedFeedback.Combined_Score}
+            <p className="text-[#8b949e]">
+              <strong className="text-[#ffffff]">Combined Score:</strong>{" "}
+              {selectedFeedback.Combined_Score}
             </p>
-            <p className="text-gray-600">
-              <strong>JD Skill Match:</strong> {selectedFeedback.JD_Skill_Match}
+            <p className="text-[#8b949e]">
+              <strong className="text-[#ffffff]">JD Skill Match:</strong>{" "}
+              {selectedFeedback.JD_Skill_Match}
             </p>
-            <p className="text-gray-600">
-              <strong>RCD Skill Match:</strong>{" "}
+            <p className="text-[#8b949e]">
+              <strong className="text-[#ffffff]">RCD Skill Match:</strong>{" "}
               {selectedFeedback.RCD_Skill_Match}
             </p>
-            <p className="text-gray-600">
-              <strong>Experience Match:</strong>{" "}
+            <p className="text-[#8b949e]">
+              <strong className="text-[#ffffff]">Experience Match:</strong>{" "}
               {selectedFeedback.feedback.experience_match ? "Yes" : "No"}
             </p>
-            <p className="text-gray-600">
-              <strong>Recommendation:</strong>{" "}
+            <p className="text-[#8b949e]">
+              <strong className="text-[#ffffff]">Recommendation:</strong>{" "}
               {selectedFeedback.feedback.recommendation}
             </p>
             <button
               onClick={closeModal}
-              className="mt-4 px-4 py-2 bg-red-400 text-white rounded-lg shadow hover:bg-red-500"
+              className="mt-4 px-4 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600"
             >
               Close
             </button>
