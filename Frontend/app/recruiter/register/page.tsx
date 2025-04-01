@@ -64,7 +64,7 @@ export default function RecruiterRegister() {
       } else {
         const errorMessages = handleErrors(response?.error?.details);
         setMessage(
-          errorMessages || [response?.message || "An error occurred."]
+          errorMessages || [response?.message || "An error occurred."],
         );
         setIsError(true);
         setIsOpen(true);

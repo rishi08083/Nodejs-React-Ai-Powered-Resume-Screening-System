@@ -23,7 +23,7 @@ const UploadForm = () => {
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
   const [uploadProgress, setUploadProgress] = useState<number>(0);
-  const [jobId,setJobId] = useState<string>("");
+  const [jobId, setJobId] = useState<string>("");
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
