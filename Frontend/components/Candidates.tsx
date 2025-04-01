@@ -34,6 +34,7 @@ type Candidate = {
 const UploadForm = () => {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [selectedJob, setSelectedJob] = useState<string>("");
+  const [resumeUrl, setResumeUrl] = useState<string>("");
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -88,6 +89,10 @@ const UploadForm = () => {
         if (response.ok) {
           const data = await response.json();
           setJobs(data.data);
+          console.log(data.data, "data data");
+          console.log(jobs, "jobs data");
+          
+          
         } else {
           const errorData = await response.json();
           throw new Error(errorData.message);
@@ -115,7 +120,6 @@ const UploadForm = () => {
 
         if (response.ok) {
           const data = await response.json();
-       
           setCandidates(data.data.candidates);
         } else {
           const errorData = await response.json();
@@ -158,6 +162,30 @@ const UploadForm = () => {
         }
   };
 
+  const get_resume = async (candidateId: string,e) => {
+    try {
+      e.preventDefault();
+          const response = await fetch(`${BASE_URL}/upload/get-resume/${candidateId}`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + localStorage.getItem("token"),
+            },
+          });
+    
+          if (response.ok) {
+            const data = await response.json();
+            setResumeUrl(data.data.resume_url);
+            console.log(data.data.resume_url, "resume url data");
+                    
+          } else {
+            const errorData = await response.json();
+            throw new Error(errorData.message);
+          }
+        } catch (error) {
+          console.log(error, "error");
+        }
+  };
   const filteredCandidates = useMemo(() => {
     return candidates.filter(
       (candidate) =>
@@ -283,7 +311,8 @@ const UploadForm = () => {
                 Resume
               </th>
               <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">
-                Compatibility
+                Compatibility (%)
+
               </th>
               <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">
                 Feedback
@@ -309,14 +338,17 @@ const UploadForm = () => {
                   {candidate.phone_number}
                 </td>
                 <td className="px-4 py-4 text-sm">
-                  <a
-                    href={candidate.resume_url}
+                    <a
+                    onClick={(e) => {
+                      get_resume(candidate.id,e);
+                    }}
+                    href={resumeUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-yellow-600 underline hover:text-yellow-800"
-                  >
+                    >
                     View Resume
-                  </a>
+                    </a>
                 </td>
                 <td className="px-4 py-4 text-sm text-gray-600">
                   {compatibilityResponses[candidate.id] ? (
