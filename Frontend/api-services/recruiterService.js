@@ -10,7 +10,7 @@ export const fetchRecruiterRequests = async () => {
   try {
     const response = await fetch(`${BASE_URL}/auth/view-recruiter-req`, {
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         Authorization: "Bearer " + localStorage.getItem("token"),
       },
       method: "GET",
@@ -86,13 +86,11 @@ export const fetchRecruiterRegister = async (formData) => {
     });
 
     // console.log(response.errors.msg,"----------");
-      console.log("respm",response);
-      
-    
+    console.log("respm", response);
+
     // if (!response.ok) {
     //   throw new Error("Failed to register recruiter.");
     // }
-
 
     return await response.json();
   } catch (error) {

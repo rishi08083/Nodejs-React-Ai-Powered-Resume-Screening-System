@@ -107,8 +107,6 @@ const UploadForm = () => {
   useEffect(() => {
     const getCandidates = async () => {
       try {
-        console.log(selectedJob, "selected job id");
-        
         const response = await fetch(
           `${BASE_URL}/candidates/list/${selectedJob}`,
           {
@@ -314,6 +312,7 @@ const UploadForm = () => {
               </th>
               <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">
                 Compatibility (%)
+
               </th>
               <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">
                 Feedback
