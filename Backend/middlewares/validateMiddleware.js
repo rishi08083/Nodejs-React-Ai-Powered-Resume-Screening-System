@@ -72,6 +72,7 @@ exports.validateRegister = [
 
   body("password")
     .isLength({ min: 8 })
+    .trim()
     .withMessage("Password must be at least 8 characters long")
     .matches(
       /^(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])(?=.*[0-9])/
@@ -94,8 +95,8 @@ exports.validateRegister = [
 ];
 
 exports.validateLogin = [
-  body("email").isEmail().withMessage("Valid email is required"),
-  body("password").notEmpty().withMessage("Password is required"),
+  body("email").trim().toLowerCase().isEmail().withMessage("Valid email is required"),
+  body("password").trim().notEmpty().withMessage("Password is required"),
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {

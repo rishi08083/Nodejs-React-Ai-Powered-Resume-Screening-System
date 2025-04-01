@@ -139,10 +139,12 @@ const parseResumes = async (uploadedFiles, job_id, user_id) => {
 
       for (let i = 0; i < aiResponse.data.data.education.length; i++) {
         await candidate.createEducation({
-          institution_name: aiResponse.data.data.education[i],
-          
+            institution_name: aiResponse.data.data.education[i]?.College || "Unknown Institution",
+            degree: aiResponse.data.data.education[i]?.Degree || "Unknown Degree",
+            start_date: aiResponse.data.data.education[i]?.start_date || null,
+            end_date: aiResponse.data.data.education[i]?.end_date || null,
         });
-      }
+    }
     }
   } catch (error) {
     console.log(`Error during parsing: ${error}`);
