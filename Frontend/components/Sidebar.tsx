@@ -17,6 +17,11 @@ import {
 
 const recruiterLinks = [
   {
+    href: "/dashboard/recruiter",
+    label: "Dashboard",
+    icon: <LayoutDashboard className="sidebar-icon" />,
+  },
+  {
     href: "/dashboard/recruiter/jobs",
     label: "Jobs",
     icon: <Briefcase className="sidebar-icon" />,

@@ -215,7 +215,7 @@ const UploadForm = () => {
   };
 
   return (
-    <div className="max-w-lg mt-17 mx-auto p-6 bg-[#1b222c] shadow-lg rounded-lg transition-all duration-300 hover:shadow-xl relative border border-[#30363d]">
+    <div className="max-w-2/3 mt-17 mx-auto p-6 bg-[#1b222c] shadow-lg rounded-lg transition-all duration-300 hover:shadow-xl relative border border-[#30363d]">
       <h1 className="text-2xl font-bold mb-6 text-center text-[#ffb300]">
         <span className="inline-block mr-2">📤</span>
         Upload Bulk Resumes
@@ -365,7 +365,7 @@ const UploadForm = () => {
 
       {/* Full-screen Loading Overlay */}
       {isLoading && (
-        <div className="fixed inset-0 bg-[#0e151f] bg-opacity-90 flex items-center justify-center z-50">
+        <div className="fixed inset-0  bg-opacity-90 flex items-center justify-center z-50">
           <div className="bg-[#1b222c] p-8 rounded-xl shadow-2xl max-w-md w-full transform transition-all duration-300 scale-105 border border-[#30363d]">
             <div className="flex flex-col items-center">
               <div className="text-6xl mb-6 animate-bounce">⏳</div>

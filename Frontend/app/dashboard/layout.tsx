@@ -4,18 +4,25 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../../lib/auth";
 import Sidebar from "../../components/Sidebar";
 import Navbar from "../../components/Navbar";
+import { useRouter } from "next/navigation";
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { user, loading } = useAuth();
+  const { user, loading, logout } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+  const navigate = useRouter();
 
   // Close sidebar when clicking outside on mobile
   useEffect(() => {
+    if (user === null && loading) {
+      navigate.push("/login");
+      return;
+    }
+
     const handleOutsideClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       if (
@@ -31,7 +38,7 @@ export default function DashboardLayout({
     return () => {
       document.removeEventListener("mousedown", handleOutsideClick);
     };
-  }, [isSidebarOpen]);
+  }, [isSidebarOpen, user]);
 
   if (loading) {
     return (
@@ -56,8 +63,9 @@ export default function DashboardLayout({
                 Cancel
               </button>
               <button
-                onClick={() => {
-                  // Add your logout logic here
+                onClick={async () => {
+                  await logout();
+                  navigate.push("/login");
                   setIsLogoutModalOpen(false);
                 }}
                 className="logout-confirm-button"
