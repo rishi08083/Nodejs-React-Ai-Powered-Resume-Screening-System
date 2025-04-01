@@ -40,10 +40,12 @@ module.exports.addCandidate = async (req, res) => {
       status,
       is_deleted: false,
     });
+    console.log("Received institution_name:", req.body.institution_name);
+    await transaction.commit();
 
     return res.status(201).json({
       status: "success",
-      message: "Candiadte Created successfully",
+      message: "Candidate Created successfully",
       data: { candidate },
     });
   } catch (error) {
@@ -53,6 +55,7 @@ module.exports.addCandidate = async (req, res) => {
       .json({ message: "Internal Server Error", error: error.message });
   }
 };
+
 module.exports.listCandidate = async (req, res) => {
   try {
     const { job_id } = req.params;
@@ -62,19 +65,21 @@ module.exports.listCandidate = async (req, res) => {
         message: "Job ID is required",
       });
     }
+
     const candidates = await db.Candidates.findAll({
-      where: { job_id },
+      where: { job_id, is_deleted: false },
     });
-    console.log(candidates);
-    if (candidates.length == 0) {
+
+    if (candidates.length === 0) {
       return res.status(200).json({
         status: "success",
-        message: "No Candiadtes Found",
+        message: "No Candidates Found",
       });
     }
+
     res.status(200).json({
       status: "success",
-      message: "Candiadtes Fetched successfully",
+      message: "Candidates Fetched successfully",
       data: { candidates },
     });
   } catch (error) {
