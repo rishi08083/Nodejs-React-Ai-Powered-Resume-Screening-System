@@ -91,7 +91,7 @@ const UploadForm = () => {
   }, []);
 
   useEffect(() => {
-    const getFeedback = async () => {
+    const getCandidates = async () => {
       try {
         const response = await fetch(`${BASE_URL}/candidates/list/${selectedJob}`, {
           method: "GET",
@@ -103,6 +103,7 @@ const UploadForm = () => {
 
         if (response.ok) {
           const data = await response.json();
+       
           setCandidates(data.data.candidates);
         } else {
           const errorData = await response.json();
@@ -112,8 +113,38 @@ const UploadForm = () => {
         console.log(error, "error");
       }
     };
-    getFeedback();
+    getCandidates();
   }, [selectedJob]);
+
+  const get_feedback = async (candidateId: string) => {
+    try {
+          const response = await fetch(`${BASE_URL}/screening/get_feedback/${candidateId}`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + localStorage.getItem("token"),
+            },
+          });
+    
+          if (response.ok) {
+            const data = await response.json();
+            setCompatibilityResponses((prev) => ({
+              ...prev,
+              [candidateId]: data.data[0].rating,
+            }));
+            setFeedbackData((prev) => ({
+              ...prev,
+              [candidateId]: data.data[0].feedback_text,
+            }));
+        
+          } else {
+            const errorData = await response.json();
+            throw new Error(errorData.message);
+          }
+        } catch (error) {
+          console.log(error, "error");
+        }
+  };
 
   const filteredCandidates = useMemo(() => {
     return candidates.filter(
@@ -131,33 +162,43 @@ const UploadForm = () => {
 
   const handleCheckCompatibility = async (candidateId: string) => {
     try {
-      const response = await fetch(`${BASE_URL}/screening/get_feedback/${candidateId}`, {
-        method: "GET",
+      // Show loading state for compatibility check
+      setCompatibilityResponses((prev) => ({
+        ...prev,
+        [candidateId]: "Loading...", // Indicate loading for this candidate
+      }));
+
+      // Call the backend API to check compatibility
+      const response = await fetch(`${BASE_URL}/screening/screen_candidate`, {
+        method: "POST", // Assuming it's a POST request
         headers: {
           "Content-Type": "application/json",
           Authorization: "Bearer " + localStorage.getItem("token"),
         },
+        body: JSON.stringify({
+          candidate_id: candidateId, // send the candidate_id in the request body
+        }),
       });
 
       if (response.ok) {
         const data = await response.json();
-        setCompatibilityResponses((prev) => ({
-          ...prev,
-          // [candidateId]: data.feedback[0].rating,
-        }));
-        setFeedbackData((prev) => ({
-          ...prev,
-          // [candidateId]: data.feedback[0].feedback_text,
-        }));
-        console.log(data.feedback[0].feedback_text[0], "feedback");
-        
+        console.log(data, "compatibility data");
+       
+        await get_feedback(candidateId);
       } else {
         const errorData = await response.json();
         throw new Error(errorData.message);
       }
     } catch (error) {
-      console.log(error, "error");
+      console.error("Error checking compatibility:", error);
+
+      // Handle error state for compatibility check
+      setCompatibilityResponses((prev) => ({
+        ...prev,
+        [candidateId]: "Error checking compatibility", // Indicate error
+      }));
     }
+
   };
 
   const handleShowFeedback = (candidateId: string) => {
