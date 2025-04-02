@@ -91,7 +91,7 @@ exports.getResume = async (req, res) => {
   try {
     const candidateId = req.params.candidateId; // Assuming candidateId is passed as a route parameter
     const candidate = await db.Candidates.findByPk(candidateId, {
-      attributes: ['resume_url'],
+      attributes: ["resume_url"],
     });
 
     if (!candidate || !candidate.resume_url) {
@@ -126,7 +126,6 @@ exports.getResume = async (req, res) => {
   }
 };
 
-
 const parseResumes = async (uploadedFiles, job_id, user_id) => {
   try {
     for (let i = 0; i < uploadedFiles.length; i++) {
@@ -139,7 +138,11 @@ const parseResumes = async (uploadedFiles, job_id, user_id) => {
         aiEndpoint = "/parse_pdf_resume";
       } else if (fileExtension === ".doc" || fileExtension === ".docx") {
         aiEndpoint = "/parse_doc_resume";
-      } else if ([".jpg", ".jpeg", ".png"].includes(fileExtension)) {
+      } else if (
+        ".png" == fileExtension ||
+        ".jpg" == fileExtension ||
+        ".jpeg" == fileExtension
+      ) {
         aiEndpoint = "/parse_image_resume";
       } else {
         console.log(`Unsupported file type: ${fileExtension}`);
@@ -203,12 +206,13 @@ const parseResumes = async (uploadedFiles, job_id, user_id) => {
 
       for (let i = 0; i < aiResponse.data.data.education.length; i++) {
         await candidate.createEducation({
-            institution_name: aiResponse.data.data.education[i]?.College || "Unknown Institution",
-            degree: aiResponse.data.data.education[i]?.Degree || "Unknown Degree",
-            start_date: aiResponse.data.data.education[i]?.start_date || null,
-            end_date: aiResponse.data.data.education[i]?.end_date || null,
+          institution_name:
+            aiResponse.data.data.education[i]?.College || "Unknown Institution",
+          degree: aiResponse.data.data.education[i]?.Degree || "Unknown Degree",
+          start_date: aiResponse.data.data.education[i]?.start_date || null,
+          end_date: aiResponse.data.data.education[i]?.end_date || null,
         });
-    }
+      }
     }
   } catch (error) {
     console.log(`Error during parsing: ${error}`);
