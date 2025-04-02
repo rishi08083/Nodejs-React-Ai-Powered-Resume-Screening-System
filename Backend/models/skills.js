@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
   Skills.init(
     {
       candidate_id: DataTypes.INTEGER,
-      skill_names: DataTypes.ARRAY(DataTypes.STRING), // Changed from skill_name
+      skill_names: DataTypes.ARRAY(DataTypes.JSONB), // Changed from skill_name
       is_deleted: DataTypes.BOOLEAN,
     },
     {
