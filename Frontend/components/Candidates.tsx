@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
+import { Tooltip } from "react-tooltip";
+import { InformationCircleIcon } from "@heroicons/react/outline";
 import { motion } from "framer-motion";
 import {
   fetchJobs,
@@ -6,9 +8,6 @@ import {
   checkCandidateCompatibility,
 } from "../api-services/CandidateServices";
 import { log } from "console";
-import { Tooltip } from "react-tooltip";
-import { InformationCircleIcon } from "@heroicons/react/24/outline";
-
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 type Job = {
@@ -94,8 +93,6 @@ const UploadForm = () => {
           setJobs(data.data);
           console.log(data.data, "data data");
           console.log(jobs, "jobs data");
-          
-          
         } else {
           const errorData = await response.json();
           throw new Error(errorData.message);
@@ -123,10 +120,6 @@ const UploadForm = () => {
 
         if (response.ok) {
           const data = await response.json();
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
           setCandidates(data.data.candidates);
         } else {
           const errorData = await response.json();
@@ -141,33 +134,6 @@ const UploadForm = () => {
 
   const get_feedback = async (candidateId: string) => {
     try {
-<<<<<<< Updated upstream
-          const response = await fetch(`${BASE_URL}/screening/get_feedback/${candidateId}`, {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: "Bearer " + localStorage.getItem("token"),
-            },
-          });
-    
-          if (response.ok) {
-            const data = await response.json();
-            setCompatibilityResponses((prev) => ({
-              ...prev,
-              [candidateId]: data.data[0].rating || "0",
-            }));
-            setFeedbackData((prev) => ({
-              ...prev,
-              [candidateId]: data.data[0].feedback_text,
-            }));
-        
-          } else {
-            const errorData = await response.json();
-            throw new Error(errorData.message);
-          }
-        } catch (error) {
-          console.log(error, "error");
-=======
       const response = await fetch(
         `${BASE_URL}/screening/get_feedback/${candidateId}`,
         {
@@ -176,7 +142,6 @@ const UploadForm = () => {
             "Content-Type": "application/json",
             Authorization: "Bearer " + localStorage.getItem("token"),
           },
->>>>>>> Stashed changes
         }
       );
 
@@ -184,7 +149,7 @@ const UploadForm = () => {
         const data = await response.json();
         setCompatibilityResponses((prev) => ({
           ...prev,
-          [candidateId]: data.data[0].rating,
+          [candidateId]: data.data[0].rating || "0",
         }));
         setFeedbackData((prev) => ({
           ...prev,
@@ -199,29 +164,31 @@ const UploadForm = () => {
     }
   };
 
-  const get_resume = async (candidateId: string,e) => {
+  const get_resume = async (candidateId: string, e) => {
     try {
       e.preventDefault();
-          const response = await fetch(`${BASE_URL}/upload/get-resume/${candidateId}`, {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: "Bearer " + localStorage.getItem("token"),
-            },
-          });
-    
-          if (response.ok) {
-            const data = await response.json();
-            setResumeUrl(data.data.resume_url);
-            console.log(data.data.resume_url, "resume url data");
-                    
-          } else {
-            const errorData = await response.json();
-            throw new Error(errorData.message);
-          }
-        } catch (error) {
-          console.log(error, "error");
+      const response = await fetch(
+        `${BASE_URL}/upload/get-resume/${candidateId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
         }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        setResumeUrl(data.data.resume_url);
+        console.log(data.data.resume_url, "resume url data");
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.message);
+      }
+    } catch (error) {
+      console.log(error, "error");
+    }
   };
   const filteredCandidates = useMemo(() => {
     return candidates.filter(
@@ -275,7 +242,7 @@ const UploadForm = () => {
       // Handle error state for compatibility check
       setCompatibilityResponses((prev) => ({
         ...prev,
-        [candidateId]: "Error checking compatibility", // Indicate error
+        [candidateId]: "Error checking compatibility",
       }));
     }
   };
@@ -283,13 +250,11 @@ const UploadForm = () => {
   const handleShowFeedback = (candidateId: string) => {
     setSelectedFeedback(feedbackData[candidateId]);
     setIsModalOpen(true);
-    document.body.style.overflow = "hidden";
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedFeedback(null);
-    document.body.style.overflow = "auto";
   };
 
   return (
@@ -350,7 +315,6 @@ const UploadForm = () => {
               </th>
               <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">
                 Compatibility (%)
-
               </th>
               <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">
                 Feedback
@@ -376,17 +340,17 @@ const UploadForm = () => {
                   {candidate.phone_number}
                 </td>
                 <td className="px-4 py-4 text-sm">
-                    <a
+                  <a
                     onClick={(e) => {
-                      get_resume(candidate.id,e);
+                      get_resume(candidate.id, e);
                     }}
                     href={resumeUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-yellow-600 underline hover:text-yellow-800"
-                    >
+                  >
                     View Resume
-                    </a>
+                  </a>
                 </td>
                 <td className="px-4 py-4 text-sm text-gray-600">
                   {compatibilityResponses[candidate.id] ? (
