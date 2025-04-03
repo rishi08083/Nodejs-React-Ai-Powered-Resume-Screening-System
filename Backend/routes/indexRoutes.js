@@ -7,9 +7,8 @@ const homeRoutes = require("../routes/homeRoutes");
 const userRoutes = require("../routes/userRoutes");
 const rcdRoutes = require("./rcdRoutes.js");
 const jobRoutes = require("./jobRoutes.js");
-// hellli
 const candidateRoutes = require("./candidateRoutes");
-const screeningRoutes = require("./screenRoutes");
+const screeningRoutes = require("../controllers/screeningController");
 
 router.get("/", homeRoutes);
 router.use("/auth", authRoutes);

@@ -6,6 +6,9 @@ import {
   checkCandidateCompatibility,
 } from "../api-services/CandidateServices";
 import { log } from "console";
+import { Tooltip } from "react-tooltip";
+import { InformationCircleIcon } from "@heroicons/react/24/outline";
+
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 type Job = {
@@ -115,11 +118,15 @@ const UploadForm = () => {
               "Content-Type": "application/json",
               Authorization: "Bearer " + localStorage.getItem("token"),
             },
-          },
+          }
         );
 
         if (response.ok) {
           const data = await response.json();
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
           setCandidates(data.data.candidates);
         } else {
           const errorData = await response.json();
@@ -134,6 +141,7 @@ const UploadForm = () => {
 
   const get_feedback = async (candidateId: string) => {
     try {
+<<<<<<< Updated upstream
           const response = await fetch(`${BASE_URL}/screening/get_feedback/${candidateId}`, {
             method: "GET",
             headers: {
@@ -159,7 +167,36 @@ const UploadForm = () => {
           }
         } catch (error) {
           console.log(error, "error");
+=======
+      const response = await fetch(
+        `${BASE_URL}/screening/get_feedback/${candidateId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+>>>>>>> Stashed changes
         }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        setCompatibilityResponses((prev) => ({
+          ...prev,
+          [candidateId]: data.data[0].rating,
+        }));
+        setFeedbackData((prev) => ({
+          ...prev,
+          [candidateId]: data.data[0].feedback_text,
+        }));
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.message);
+      }
+    } catch (error) {
+      console.log(error, "error");
+    }
   };
 
   const get_resume = async (candidateId: string,e) => {
@@ -190,7 +227,7 @@ const UploadForm = () => {
     return candidates.filter(
       (candidate) =>
         candidate.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        candidate.id.toString().includes(searchTerm),
+        candidate.id.toString().includes(searchTerm)
     );
   }, [candidates, searchTerm]);
 
@@ -198,7 +235,7 @@ const UploadForm = () => {
   const indexOfFirstCandidate = indexOfLastCandidate - candidatesPerPage;
   const currentCandidates = filteredCandidates.slice(
     indexOfFirstCandidate,
-    indexOfLastCandidate,
+    indexOfLastCandidate
   );
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
@@ -226,7 +263,7 @@ const UploadForm = () => {
       if (response.ok) {
         const data = await response.json();
         console.log(data, "compatibility data");
-       
+
         await get_feedback(candidateId);
       } else {
         const errorData = await response.json();
@@ -241,17 +278,18 @@ const UploadForm = () => {
         [candidateId]: "Error checking compatibility", // Indicate error
       }));
     }
-
   };
 
   const handleShowFeedback = (candidateId: string) => {
     setSelectedFeedback(feedbackData[candidateId]);
     setIsModalOpen(true);
+    document.body.style.overflow = "hidden";
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedFeedback(null);
+    document.body.style.overflow = "auto";
   };
 
   return (
@@ -384,7 +422,7 @@ const UploadForm = () => {
       <div className="flex justify-center space-x-2 mt-6">
         {[
           ...Array(
-            Math.ceil(filteredCandidates.length / candidatesPerPage),
+            Math.ceil(filteredCandidates.length / candidatesPerPage)
           ).keys(),
         ].map((number) => (
           <motion.button
@@ -406,35 +444,127 @@ const UploadForm = () => {
       {/* Feedback Modal */}
       {isModalOpen && selectedFeedback && (
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="fixed inset-0 bg-tranparent  bg-opacity-50 flex items-center justify-center z-50"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.95 }}
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
         >
-          <div className="bg-white rounded-lg shadow-lg p-6 w-1/2">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">
-              Candidate Feedback
-            </h2>
-            <p className="text-gray-600">
-              <strong>Combined Score:</strong> {selectedFeedback.Combined_Score}
-            </p>
-            <p className="text-gray-600">
-              <strong>JD Skill Match:</strong> {selectedFeedback.JD_Skill_Match}
-            </p>
-            <p className="text-gray-600">
-              <strong>RCD Skill Match:</strong>{" "}
-              {selectedFeedback.RCD_Skill_Match}
-            </p>
-            <p className="text-gray-600">
-              <strong>Experience Match:</strong>{" "}
-              {selectedFeedback.feedback.experience_match ? "Yes" : "No"}
-            </p>
-            <p className="text-gray-600">
-              <strong>Recommendation:</strong>{" "}
-              {selectedFeedback.feedback.recommendation}
-            </p>
+          <div className="bg-[#f9fafb] shadow-lg rounded-lg p-6 w-[90%] md:w-1/2 max-h-[80vh] overflow-y-auto relative border border-gray-300">
+            {/* Close Button */}
             <button
               onClick={closeModal}
-              className="mt-4 px-4 py-2 bg-red-400 text-white rounded-lg shadow hover:bg-red-500"
+              className="absolute top-3 right-3 text-gray-600 hover:text-red-500 text-lg"
+            >
+              ✖
+            </button>
+
+            <h2 className="text-xl font-semibold text-gray-900 mb-4 text-center">
+              Candidate Feedback
+            </h2>
+
+            <div className="space-y-3">
+              {/* Final Decision */}
+              <div className="flex justify-center mt-4">
+                {selectedFeedback.Combined_Score > 40 ? (
+                  <span className="text-green-700 font-medium text-lg bg-green-100 px-3 py-1 rounded-md border border-green-400">
+                    Recommended
+                  </span>
+                ) : (
+                  <span className="text-red-700 font-medium text-lg bg-red-100 px-3 py-1 rounded-md border border-red-400">
+                    Not Recommended
+                  </span>
+                )}
+              </div>
+
+              {/* Compatibility Score */}
+              <div className="p-3 bg-[#fefce8] rounded-md flex justify-between items-center border">
+                <span className="text-gray-800 font-medium">
+                  Overall Compatibility:
+                </span>
+                <span className="text-lg font-bold text-[#e3b964] flex items-center">
+                  {selectedFeedback.Combined_Score.toFixed(2)} / 100
+                  <InformationCircleIcon
+                    className="w-5 h-5 text-gray-500 cursor-pointer ml-2"
+                    data-tooltip-id="combined-tooltip"
+                  />
+                </span>
+              </div>
+
+              {/* Job Skill Alignment */}
+              <div className="p-3 bg-[#fefce8] rounded-md flex justify-between items-center border">
+                <span className="text-gray-800 font-medium">
+                  Job Skill Alignment:
+                </span>
+                <span className="text-lg font-bold text-blue-600 flex items-center">
+                  {selectedFeedback.JD_Skill_Match.toFixed(2)} %
+                  <InformationCircleIcon
+                    className="w-5 h-5 text-gray-500 cursor-pointer ml-2"
+                    data-tooltip-id="jd-tooltip"
+                  />
+                </span>
+              </div>
+
+              {/* Role Clarity Match */}
+              <div className="p-3 bg-[#fefce8] rounded-md flex justify-between items-center border">
+                <span className="text-gray-800 font-medium">
+                  Role Clarity Match:
+                </span>
+                <span className="text-lg font-bold text-green-600 flex items-center">
+                  {selectedFeedback.RCD_Skill_Match.toFixed(2)} %
+                  <InformationCircleIcon
+                    className="w-5 h-5 text-gray-500 cursor-pointer ml-2"
+                    data-tooltip-id="rcd-tooltip"
+                  />
+                </span>
+              </div>
+
+              {/* Experience Match */}
+              <div
+                className={`p-3 rounded-md flex justify-between items-center border ${selectedFeedback.feedback.experience_match ? "bg-green-100" : "bg-red-100"}`}
+              >
+                <span className="text-gray-800 font-medium">
+                  Experience Fit:
+                </span>
+                <span
+                  className={`text-lg font-bold ${selectedFeedback.feedback.experience_match ? "text-green-600" : "text-red-600"} flex items-center`}
+                >
+                  {selectedFeedback.feedback.experience_match ? "Yes" : "No"}
+                  <InformationCircleIcon
+                    className="w-5 h-5 text-gray-500 cursor-pointer ml-2"
+                    data-tooltip-id="experience-tooltip"
+                  />
+                </span>
+              </div>
+
+              {/* Recommendation */}
+              <div className="mt-3 p-3 bg-white rounded-md border border-gray-300 max-h-[200px] overflow-y-auto">
+                <strong className="text-gray-800">Recommendation:</strong>
+                <p className="text-gray-700 mt-1">
+                  {selectedFeedback.feedback.recommendation}
+                </p>
+              </div>
+            </div>
+
+            {/* Tooltip Elements */}
+            <Tooltip id="combined-tooltip" place="top">
+              Overall compatibility score of the candidate
+            </Tooltip>
+            <Tooltip id="jd-tooltip" place="top">
+              Percentage of job description skills matched with the candidate's
+              skills.
+            </Tooltip>
+            <Tooltip id="rcd-tooltip" place="top">
+              Percentage of role clarity document-based skills matched with the
+              candidate's skills.
+            </Tooltip>
+            <Tooltip id="experience-tooltip" place="top">
+              Does the candidate's experience match the job requirements?
+            </Tooltip>
+
+            {/* Close Button */}
+            <button
+              onClick={closeModal}
+              className="mt-5 w-full py-2 bg-[#fdc700] text-black rounded-md font-medium hover:bg-[#e3b964]"
             >
               Close
             </button>
