@@ -146,7 +146,7 @@ const UploadForm = () => {
             const data = await response.json();
             setCompatibilityResponses((prev) => ({
               ...prev,
-              [candidateId]: data.data[0].rating,
+              [candidateId]: data.data[0].rating || "0",
             }));
             setFeedbackData((prev) => ({
               ...prev,
