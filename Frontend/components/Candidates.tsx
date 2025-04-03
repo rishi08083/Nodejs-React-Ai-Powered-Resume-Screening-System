@@ -176,8 +176,7 @@ const UploadForm = () => {
           if (response.ok) {
             const data = await response.json();
             setResumeUrl(data.data.resume_url);
-            console.log(data.data.resume_url, "resume url data");
-                    
+            window.open(data.data.resume_url, "_blank", "noopener,noreferrer");
           } else {
             const errorData = await response.json();
             throw new Error(errorData.message);
