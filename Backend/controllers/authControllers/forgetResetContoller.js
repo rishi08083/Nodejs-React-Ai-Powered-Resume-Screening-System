@@ -32,6 +32,7 @@ const forgetPassword = async (req, res) => {
     const resetToken = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
     user.resetToken = resetToken;
     user.resetTokenExpires = tokenExpiry;
+    user.is_verified = false;
     await user.save();
 
     //const resetUrl = `http://localhost:3000/reset-password?token=${resetToken}`;
@@ -111,6 +112,7 @@ const verifyOtp = async (req, res) => {
         reset_token_expires: { [Op.gt]: Date.now() },
       },
     });
+
     if (!user) {
       return res.status(400).json({
         status: "error",
@@ -122,6 +124,12 @@ const verifyOtp = async (req, res) => {
       message: "OTP verified successfully",
       data: { email: user.email },
     });
+
+    user.reset_token = null;
+    user.reset_token_expires = null;
+    user.is_verified = true;
+    await user.save();
+
   } catch (error) {
     res.status(500).json({
       status: "error",
