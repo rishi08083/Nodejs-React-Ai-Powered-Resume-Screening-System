@@ -7,6 +7,8 @@ import Link from "next/link";
 import { useAuth } from "../../../lib/auth";
 import Image from "next/image";
 import { ToastContainer, toast } from "react-toastify";
+import { GoogleLogin } from "@react-oauth/google";
+import GoogleSignIn from "../../../components/auth/GoogleAuth";
 
 const Login = () => {
   const [email, setEmail] = useState<string>("");
@@ -188,10 +190,11 @@ const Login = () => {
               </div>
               <button
                 type="submit"
-                className="w-full bg-[#ffb300] text-[#0e151f] font-medium py-3 rounded-lg hover:bg-[#ffc133] transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-lg"
+                className="w-full bg-[#ffb300] text-[#0e151f] font-medium py-3 rounded-lg hover:bg-[#ffc133] transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-lg mb-10"
               >
                 Sign In
               </button>
+              <GoogleSignIn onSuccess={() => {}} onError={() => {}} />
             </form>
 
             <div className="mt-6 flex flex-col items-center space-y-4">

@@ -6,6 +6,8 @@ import Link from "next/link";
 import { fetchRecruiterRegister } from "../../../api-services/recruiterService";
 import { ToastContainer, toast } from "react-toastify";
 import { error } from "console";
+import { GoogleLogin } from "@react-oauth/google";
+import GoogleSignIn from "../../../components/auth/GoogleAuth";
 interface FormData {
   name: string;
   email: string;
@@ -365,10 +367,11 @@ export default function RecruiterRegister() {
 
               <button
                 type="submit"
-                className="w-full bg-[#ffb300] text-[#0e151f] font-medium py-3 rounded-lg hover:bg-[#ffc133] transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-lg"
+                className="w-full bg-[#ffb300] text-[#0e151f] font-medium py-3 rounded-lg hover:bg-[#ffc133] transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-lg mb-10"
               >
                 Register
               </button>
+              <GoogleSignIn onSuccess={() => {}} onError={() => {}} />
             </form>
 
             <div className="mt-6 flex flex-col items-center space-y-4">
