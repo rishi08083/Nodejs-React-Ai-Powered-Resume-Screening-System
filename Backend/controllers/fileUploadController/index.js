@@ -57,7 +57,7 @@ exports.uploadResumes = async (req, res) => {
       await s3.send(new PutObjectCommand(params));
 
       const fileUrl = `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
-      uploadedFiles.push({ fileName, fileUrl, mimeType: file.mimetype }); // Added mimeType
+      uploadedFiles.push({ fileName, fileUrl, mimeType: file.mimetype });
     }
 
     const unparsedResumes = uploadedFiles.map((file) => ({
@@ -69,14 +69,26 @@ exports.uploadResumes = async (req, res) => {
 
     await db.UnparsedResume.bulkCreate(unparsedResumes);
     const job_id = req.body.job_id;
-    const user_id = req.user.user.id;
+    const user_id = req.user.id;
+
+    // Wait for AI parsing and get errors
+    const parsingErrors = await parseResumes(uploadedFiles, job_id, user_id);
+
+    if (parsingErrors.length > 0) {
+      return res.status(207).json({
+        status: "partial_success",
+        message: "Some files uploaded, but errors occurred during parsing",
+        data: { files: uploadedFiles },
+        errors: parsingErrors,
+      });
+    }
+
     res.status(200).json({
       status: "success",
-      message: "Files uploaded successfully",
+      message: "Files uploaded and parsed successfully",
       data: { files: uploadedFiles },
     });
 
-    parseResumes(uploadedFiles, job_id, user_id);
   } catch (error) {
     console.error("Error uploading files:", error);
     res.status(500).json({
@@ -86,6 +98,7 @@ exports.uploadResumes = async (req, res) => {
     });
   }
 };
+
 
 exports.getResume = async (req, res) => {
   try {
@@ -128,6 +141,8 @@ exports.getResume = async (req, res) => {
 
 const parseResumes = async (uploadedFiles, job_id, user_id) => {
   try {
+    const errors = [];
+    
     for (let i = 0; i < uploadedFiles.length; i++) {
       const file = uploadedFiles[i];
       let aiEndpoint;
@@ -136,85 +151,64 @@ const parseResumes = async (uploadedFiles, job_id, user_id) => {
       // Determine the AI backend endpoint based on file type
       if (fileExtension === ".pdf") {
         aiEndpoint = "/parse_pdf_resume";
-      } else if (fileExtension === ".doc" || fileExtension === ".docx") {
+      } else if ([".doc", ".docx"].includes(fileExtension)) {
         aiEndpoint = "/parse_doc_resume";
-      } else if (
-        ".png" == fileExtension ||
-        ".jpg" == fileExtension ||
-        ".jpeg" == fileExtension
-      ) {
+      } else if ([".png", ".jpg", ".jpeg"].includes(fileExtension)) {
         aiEndpoint = "/parse_image_resume";
       } else {
-        console.log(`Unsupported file type: ${fileExtension}`);
+        errors.push({ file: file.fileName, error: "Unsupported file type" });
         continue;
       }
-      let flag = false;
-      // AI Parsing Request
-      const aiResponse = await axios
-        .post(
+
+      try {
+        const aiResponse = await axios.post(
           `${process.env.AI_BACKEND_URL}${aiEndpoint}?file_key=${file.fileName}`
-        )
-        .catch(function (error) {
-          flag = true;
-          if (error.response) {
-            console.log(error.response.status);
-            console.log(error.response.data.detail);
-          } else if (error.request) {
-            console.log(error.request);
-          } else {
-            console.log("Error", error.message);
-          }
-          return;
+        );
+
+        const candidate = await db.Candidates.create({
+          name: aiResponse.data.data.name,
+          email: aiResponse.data.data.email,
+          phone_number: aiResponse.data.data.phone,
+          resume_url: file.fileUrl,
+
+          status: "parsed",
+          job_id: job_id,
+          user_id: user_id,
         });
-      if (flag) {
-        return;
-      }
-      console.log(JSON.stringify(aiResponse.data, null, 2), "    " + i);
 
-      const candidate = await db.Candidates.create({
-        name: aiResponse.data.data.name,
-        email: aiResponse.data.data.email,
-        phone_number: aiResponse.data.data.phone,
-        resume_url: file.fileUrl,
-        status: "parsed",
-        job_id: job_id,
-        user_id: user_id,
-      });
+        await candidate.createSkill({ skill_names: aiResponse.data.data.skills });
 
-      await candidate.createSkill({
-        skill_names: aiResponse.data.data.skills,
-      });
+        for (let exp of aiResponse.data.data.experience) {
+          const startDate = exp.start_date ? new Date(exp.start_date) : null;
+          const endDate = exp.end_date ? new Date(exp.end_date) : null;
+          const isValidDate = (date) => date instanceof Date && !isNaN(date);
 
-      for (let i = 0; i < aiResponse.data.data.experience.length; i++) {
-        const experience = aiResponse.data.data.experience[i];
-        const startDate = experience.start_date
-          ? new Date(experience.start_date)
-          : null;
-        const endDate = experience.end_date
-          ? new Date(experience.end_date)
-          : null;
+          await candidate.createExperience({
+            company_names: exp.company,
+            job_titles: exp.job_title,
+            start_date: isValidDate(startDate) ? startDate : null,
+            end_date: isValidDate(endDate) ? endDate : null,
+          });
+        }
 
-        const isValidDate = (date) => date instanceof Date && !isNaN(date);
-
-        await candidate.createExperience({
-          company_names: experience.company,
-          job_titles: experience.job_title,
-          start_date: isValidDate(startDate) ? startDate : null,
-          end_date: isValidDate(endDate) ? endDate : null,
-        });
-      }
-
-      for (let i = 0; i < aiResponse.data.data.education.length; i++) {
-        await candidate.createEducation({
-          institution_name:
-            aiResponse.data.data.education[i]?.College || "Unknown Institution",
-          degree: aiResponse.data.data.education[i]?.Degree || "Unknown Degree",
-          start_date: aiResponse.data.data.education[i]?.start_date || null,
-          end_date: aiResponse.data.data.education[i]?.end_date || null,
-        });
+        for (let edu of aiResponse.data.data.education) {
+          await candidate.createEducation({
+            institution_name: edu?.College || "Unknown Institution",
+            degree: edu?.Degree || "Unknown Degree",
+            start_date: edu?.start_date || null,
+            end_date: edu?.end_date || null,
+          });
+        }
+      } catch (error) {
+        console.error(`Error parsing file ${file.fileName}:`, error.message);
+        errors.push({ file: file.fileName, error: error.message });
       }
     }
+
+    return errors;
   } catch (error) {
     console.log(`Error during parsing: ${error}`);
+    return [{ error: "An unexpected error occurred during parsing." }];
   }
 };
+
