@@ -4,7 +4,8 @@ import { useState, ChangeEvent, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { fetchRecruiterRegister } from "../../../api-services/recruiterService";
-
+import { ToastContainer, toast } from "react-toastify";
+import { error } from "console";
 interface FormData {
   name: string;
   email: string;
@@ -42,6 +43,7 @@ export default function RecruiterRegister() {
 
     if (formData.password !== formData.confirmPassword) {
       setMessage(["Passwords do not match!"]);
+      toast.error("Passwords do not match!");
       setIsError(true);
       setIsOpen(true);
       setTimeout(() => {
@@ -56,6 +58,7 @@ export default function RecruiterRegister() {
 
       if (response?.status === "success") {
         setMessage([response.message || "Recruiter Request successful!"]);
+        toast(response.message || "Recruiter Request successful!");
         setIsError(false);
         setIsOpen(true);
         setTimeout(() => {
@@ -66,6 +69,7 @@ export default function RecruiterRegister() {
         setMessage(
           errorMessages || [response?.message || "An error occurred."]
         );
+        toast.error(errorMessages || response?.message || "An error occurred");
         setIsError(true);
         setIsOpen(true);
         setTimeout(() => {
@@ -75,6 +79,7 @@ export default function RecruiterRegister() {
     } catch (error) {
       console.error("Error:", error);
       setMessage(["An unexpected error occurred. Please try again."]);
+      toast.error("An unexpected error occurred. Please try again.");
       setIsError(true);
       setIsOpen(true);
       setTimeout(() => {
@@ -85,7 +90,10 @@ export default function RecruiterRegister() {
 
   const handleErrors = (errors: { msg: string }[] | undefined): string[] => {
     if (Array.isArray(errors) && errors.length > 0) {
-      return errors.map((error) => error.msg);
+      return errors.map((error) => {
+        toast.error(error.msg);
+        return error.msg;
+      });
     }
     return ["An unknown error occurred."];
   };
@@ -97,6 +105,7 @@ export default function RecruiterRegister() {
   return (
     <div className="flex min-h-screen bg-[#0e151f] font-sans">
       {/* Left side decorative panel */}
+      <ToastContainer theme="dark" />
       <div className="hidden lg:flex lg:w-1/2 bg-[#1b222c] items-center justify-center">
         <div className="max-w-md text-center">
           <h1 className="text-4xl font-bold text-white mb-6">
@@ -130,7 +139,7 @@ export default function RecruiterRegister() {
             </h1>
 
             {/* Message Alert */}
-            <div
+            {/* <div
               className={`transition-all duration-500 ease-in-out ${
                 isOpen && message
                   ? "opacity-100 max-h-40 mb-6"
@@ -208,7 +217,7 @@ export default function RecruiterRegister() {
                   </button>
                 </div>
               </div>
-            </div>
+            </div> */}
 
             <form onSubmit={handleSubmit}>
               <div className="mb-6 relative">

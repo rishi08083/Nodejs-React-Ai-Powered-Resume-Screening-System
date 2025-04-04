@@ -105,13 +105,14 @@ const resetPassword = async (req, res) => {
 const verifyOtp = async (req, res) => {
   try {
     const { email, otp } = req.body;
-    const user = db.Users.findOne({
+    const user = await db.Users.findOne({
       where: {
         email: email,
         resetToken: otp,
         resetTokenExpires: { [Op.gt]: Date.now() },
       },
     });
+
     if (!user) {
       return res.status(400).json({
         status: "error",

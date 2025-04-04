@@ -104,6 +104,9 @@ const ForgetPassword = () => {
       } else {
         setMessage(data.message || "Invalid OTP");
         setIsError(true);
+        inputRefs.map((iref, index) => {
+          inputRefs[index].current.value = "";
+        });
       }
     } catch (error) {
       setMessage("Failed to connect to server");

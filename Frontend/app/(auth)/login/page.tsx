@@ -6,6 +6,7 @@ import React from "react";
 import Link from "next/link";
 import { useAuth } from "../../../lib/auth";
 import Image from "next/image";
+import { ToastContainer, toast } from "react-toastify";
 
 const Login = () => {
   const [email, setEmail] = useState<string>("");
@@ -27,7 +28,8 @@ const Login = () => {
       router.push("/dashboard");
     } catch (err) {
       console.log(err);
-      setError(err.message);
+      //setError(err.message);
+      toast.error(err.message);
       setIsOpen(true);
       setTimeout(() => {
         setIsOpen(false);
@@ -42,6 +44,7 @@ const Login = () => {
   return (
     <div className="flex min-h-screen bg-[#0e151f] font-sans">
       {/* Left side decorative panel */}
+      <ToastContainer theme="dark" />
       <div className="hidden lg:flex lg:w-1/2  bg-[#1b222c]  items-center justify-center">
         <div className="max-w-md text-center">
           <h1 className="text-4xl font-bold text-white mb-6">Welcome Back</h1>
@@ -73,7 +76,7 @@ const Login = () => {
             </h1>
 
             {/* Error Alert */}
-            <div
+            {/* <div
               className={`transition-all duration-500 ease-in-out ${
                 isOpen
                   ? "opacity-100 max-h-20 mb-6"
@@ -118,7 +121,7 @@ const Login = () => {
                   </button>
                 </div>
               </div>
-            </div>
+            </div> */}
 
             <form onSubmit={handleSubmit}>
               <div className="mb-6 relative">
