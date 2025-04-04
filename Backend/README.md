@@ -52,6 +52,10 @@ PROD_DB_SSL=true
 ```
 npx sequelize-cli db:migrate:undo:all
 npx sequelize-cli db:migrate
+
+
+create migration --name create_users_table
+example: `npx sequelize-cli migration:generate --name create_users_table`
 ```
  
 
