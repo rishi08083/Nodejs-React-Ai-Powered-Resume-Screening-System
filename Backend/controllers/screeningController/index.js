@@ -4,7 +4,7 @@ const axios = require("axios");
 const screenCandidate = async (req, res) => {
     try {
         const { candidate_id } = req.body;
-        console.log("Received Request:", req.body);
+        // console.log("Received Request:", req.body);
 
         if (!candidate_id) {
             return res.status(400).json({ status: "error", message: "Missing candidate_id" });
@@ -16,7 +16,7 @@ const screenCandidate = async (req, res) => {
             return res.status(404).json({ status: "error", message: "Candidate not found" });
         }
 
-        console.log("Candidate Details Response:", JSON.stringify(candidateDetails, null, 2));
+        // console.log("Candidate Details Response:", JSON.stringify(candidateDetails, null, 2));
 
         // Prepare request for AI screening
         const requestBody = {
@@ -25,7 +25,7 @@ const screenCandidate = async (req, res) => {
             candidate: candidateDetails.candidate,
         };
 
-        console.log("Prepared Request for AI Screening:", JSON.stringify(requestBody, null, 2));
+        // console.log("Prepared Request for AI Screening:", JSON.stringify(requestBody, null, 2));
         const FastAPI_server_url = process.env.AI_BACKEND_URL;
         if (!FastAPI_server_url) {
             return res.json({ status: "error", message: "env FastAPI_server_url not present" });
@@ -63,7 +63,7 @@ const screenCandidate = async (req, res) => {
 
         res.json({ status: "success", message: "AI Screening completed and data updated successfully!" });
     } catch (error) {
-        console.error("Error in AI Screening:", error);
+        // console.error("Error in AI Screening:", error);
         res.status(500).json({ status: "error", message: "Internal Server Error" });
     }
 }
@@ -71,7 +71,7 @@ const screenCandidate = async (req, res) => {
 const getFeedback = async (req, res) => {
     try {
         const { candidate_id } = req.params;
-        console.log("Fetching feedback for candidate_id:", candidate_id);
+        // console.log("Fetching feedback for candidate_id:", candidate_id);
 
         const feedback = await getFeedbackByCandidateId(candidate_id);
 
@@ -81,7 +81,7 @@ const getFeedback = async (req, res) => {
 
         res.json({ status: "success", message: "Feedback retrieved successfully.", data: feedback });
     } catch (error) {
-        console.error("Error fetching feedback:", error);
+        // console.error("Error fetching feedback:", error);
         res.status(500).json({ status: "error", message: "Internal Server Error" });
     }
 }
