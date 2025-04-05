@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo,useRef } from "react";
 import { motion } from "framer-motion";
 import {
   fetchJobs,
@@ -34,6 +34,7 @@ type Candidate = {
 const CandidateList = () => {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [selectedJob, setSelectedJob] = useState<string>("");
+  const [resumeUrl, setResumeUrl] = useState<string>("");
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -88,6 +89,8 @@ const CandidateList = () => {
         if (response.ok) {
           const data = await response.json();
           setJobs(data.data);
+          console.log(data.data, "data data");
+          console.log(jobs, "jobs data");
         } else {
           const errorData = await response.json();
           throw new Error(errorData.message);
@@ -115,7 +118,6 @@ const CandidateList = () => {
 
         if (response.ok) {
           const data = await response.json();
-
           setCandidates(data.data.candidates);
         } else {
           const errorData = await response.json();
@@ -145,7 +147,7 @@ const CandidateList = () => {
         const data = await response.json();
         setCompatibilityResponses((prev) => ({
           ...prev,
-          [candidateId]: data.data[0].rating,
+          [candidateId]: data.data[0].rating || "0",
         }));
         setFeedbackData((prev) => ({
           ...prev,
@@ -157,6 +159,61 @@ const CandidateList = () => {
       }
     } catch (error) {
       console.log(error, "error");
+    }
+  };
+
+  const get_resume = async (candidateId: string, e) => {
+    try {
+      e.preventDefault();
+      const response = await fetch(
+        `${BASE_URL}/upload/get-resume/${candidateId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        setResumeUrl(data.data.resume_url);
+        window.open(data.data.resume_url, "_blank", "noopener,noreferrer");
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.message);
+      }
+    } catch (error) {
+      console.log(error, "error");
+    }
+  };
+
+  const handleDeleteCandidate = async (candidateId: string) => {
+    try {
+      const response = await fetch(
+        `${BASE_URL}/candidates/delete/${candidateId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        }
+      );
+
+      if (response.ok) {
+        // Remove the deleted candidate from the state
+        setCandidates((prevCandidates) =>
+          prevCandidates.filter((candidate) => candidate.id !== candidateId)
+        );
+        console.log("Candidate deleted successfully");
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.message);
+      }
+    } catch (error) {
+      console.error("Error deleting candidate:", error);
     }
   };
 
@@ -227,6 +284,32 @@ const CandidateList = () => {
     setSelectedFeedback(null);
   };
 
+
+  const [isOpen, setIsOpen] = useState<string | null>(null);
+  const dropdownRef = useRef(null);
+
+  // Close dropdown when clicked outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target)
+      ) {
+        setIsOpen(null);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen]);
+
   return (
     <div className="w-full p-4 bg-gray-50">
       <div className="mb-6">
@@ -284,10 +367,13 @@ const CandidateList = () => {
                 Resume
               </th>
               <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">
-                Compatibility
+                Compatibility (%)
               </th>
               <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">
                 Feedback
+              </th>
+              <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700">
+                Actions
               </th>
             </tr>
           </thead>
@@ -311,7 +397,10 @@ const CandidateList = () => {
                 </td>
                 <td className="px-4 py-4 text-sm">
                   <a
-                    href={candidate.resume_url}
+                    onClick={(e) => {
+                      get_resume(candidate.id, e);
+                    }}
+                    href={resumeUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-yellow-600 underline hover:text-yellow-800"
@@ -342,6 +431,48 @@ const CandidateList = () => {
                   ) : (
                     <span>No Feedback</span>
                   )}
+                </td>
+                <td className="px-4 py-4 text-sm text-gray-600 relative">
+                  <div
+                  ref={dropdownRef}
+                  className="relative inline-block text-left"
+                  >
+                  <button
+                    onClick={() => setIsOpen((prev) => (prev === candidate.id ? null : candidate.id))}
+                    className="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-3 py-1 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none"
+                    aria-haspopup="true"
+                    aria-expanded={isOpen === candidate.id}
+                  >
+                    &#x22EE;
+                  </button>
+
+                    {isOpen === candidate.id && (
+                    <div
+                      className="absolute right-10 top-[-10px] mt-2 w-32 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-1000"
+                      tabIndex={-1}
+                      onClick={(e) => e.stopPropagation()}
+                      style={{ zIndex: 1000 }}
+                    >
+                      <div
+                      className="py-1"
+                      role="menu"
+                      aria-orientation="vertical"
+                      aria-labelledby="options-menu"
+                      >
+                      <button
+                        onClick={() => {
+                        handleDeleteCandidate(candidate.id);
+                        setIsOpen(null);
+                        }}
+                        className="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 w-full text-left"
+                        role="menuitem"
+                      >
+                        Delete
+                      </button>
+                      </div>
+                    </div>
+                    )}
+                  </div>
                 </td>
               </motion.tr>
             ))}

@@ -29,8 +29,7 @@ const forgetPassword = async (req, res) => {
     //const resetToken = crypto.randomBytes(32).toString("hex");
     const tokenExpiry = Date.now() + 3600000;
     // 4 digit random number in string
-    const resetToken = Math.floor(Math.random() * 10000).toString();
-    console.log(resetToken);
+    const resetToken = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
     user.resetToken = resetToken;
     user.resetTokenExpires = tokenExpiry;
     await user.save();
@@ -108,8 +107,8 @@ const verifyOtp = async (req, res) => {
     const user = await db.Users.findOne({
       where: {
         email: email,
-        resetToken: otp,
-        resetTokenExpires: { [Op.gt]: Date.now() },
+        reset_token: otp,
+        reset_token_expires: { [Op.gt]: Date.now() },
       },
     });
 

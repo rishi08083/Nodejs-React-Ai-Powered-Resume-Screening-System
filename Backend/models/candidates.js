@@ -64,7 +64,10 @@ module.exports = (sequelize, DataTypes) => {
       is_screen_call_done: DataTypes.BOOLEAN,
       hiring_bull_status: DataTypes.BOOLEAN,
       status: DataTypes.STRING,
-      is_deleted: DataTypes.BOOLEAN,
+      is_deleted: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
     },
     {
       sequelize,
