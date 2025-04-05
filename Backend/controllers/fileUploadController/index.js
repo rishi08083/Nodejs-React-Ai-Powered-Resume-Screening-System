@@ -9,6 +9,7 @@ const path = require("path");
 const crypto = require("crypto");
 const db = require("../../models");
 require("dotenv").config();
+const { generateToken } = require("../../utils/tokenGenration");
 
 // AWS S3 Configuration
 const s3 = new S3Client({
@@ -88,7 +89,6 @@ exports.uploadResumes = async (req, res) => {
       message: "Files uploaded and parsed successfully",
       data: { files: uploadedFiles },
     });
-
   } catch (error) {
     console.error("Error uploading files:", error);
     res.status(500).json({
@@ -98,7 +98,6 @@ exports.uploadResumes = async (req, res) => {
     });
   }
 };
-
 
 exports.getResume = async (req, res) => {
   try {
@@ -142,7 +141,6 @@ exports.getResume = async (req, res) => {
 const parseResumes = async (uploadedFiles, job_id, user_id) => {
   try {
     const errors = [];
-    
     for (let i = 0; i < uploadedFiles.length; i++) {
       const file = uploadedFiles[i];
       let aiEndpoint;
@@ -161,8 +159,17 @@ const parseResumes = async (uploadedFiles, job_id, user_id) => {
       }
 
       try {
+        // Generate a token for authentication
+        const token = await generateToken();
         const aiResponse = await axios.post(
-          `${process.env.AI_BACKEND_URL}${aiEndpoint}?file_key=${file.fileName}`
+          `${process.env.AI_BACKEND_URL}${aiEndpoint}?file_key=${file.fileName}`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
         );
 
         const candidate = await db.Candidates.create({
@@ -176,7 +183,9 @@ const parseResumes = async (uploadedFiles, job_id, user_id) => {
           user_id: user_id,
         });
 
-        await candidate.createSkill({ skill_names: aiResponse.data.data.skills });
+        await candidate.createSkill({
+          skill_names: aiResponse.data.data.skills,
+        });
 
         for (let exp of aiResponse.data.data.experience) {
           const startDate = exp.start_date ? new Date(exp.start_date) : null;
@@ -211,4 +220,3 @@ const parseResumes = async (uploadedFiles, job_id, user_id) => {
     return [{ error: "An unexpected error occurred during parsing." }];
   }
 };
-
