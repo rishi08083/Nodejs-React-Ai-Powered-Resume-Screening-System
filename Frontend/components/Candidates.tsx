@@ -1,11 +1,5 @@
 import React, { useState, useEffect, useMemo,useRef } from "react";
 import { motion } from "framer-motion";
-import {
-  fetchJobs,
-  fetchCandidates,
-  checkCandidateCompatibility,
-} from "../api-services/CandidateServices";
-import { log } from "console";
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 type Job = {
@@ -160,23 +154,13 @@ const UploadForm = () => {
         } catch (error) {
           console.log(error, "error");
         }
-      );
+  }
 
-      if (response.ok) {
-        const data = await response.json();
-        setResumeUrl(data.data.resume_url);
-        window.open(data.data.resume_url, "_blank", "noopener,noreferrer");
-      } else {
-        const errorData = await response.json();
-        throw new Error(errorData.message);
-      }
-    } catch (error) {
-      console.log(error, "error");
-    }
-  };
 
   const handleDeleteCandidate = async (candidateId: string) => {
     try {
+      console.log(candidateId, "candidate id to delete");
+      
       const response = await fetch(
         `${BASE_URL}/candidates/delete/${candidateId}`,
         {
@@ -193,7 +177,7 @@ const UploadForm = () => {
         setCandidates((prevCandidates) =>
           prevCandidates.filter((candidate) => candidate.id !== candidateId)
         );
-        console.log("Candidate deleted successfully");
+       
       } else {
         const errorData = await response.json();
         throw new Error(errorData.message);
