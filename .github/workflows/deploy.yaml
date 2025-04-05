@@ -79,18 +79,8 @@ jobs:
           key: ${{ secrets.PRIVATE_KEY }}
           script: |
             cd Internship-2025/Resume-Screening-App
-            # Stop and remove existing frontend
-            docker compose stop frontend || true
-            docker compose rm -f frontend || true
-            
-            # Build fresh frontend image
-            docker compose build --no-cache frontend
-            
-            # Deploy frontend
+            docker compose build frontend
             docker compose up -d --force-recreate frontend
-            
-            # Cleanup
-            docker image prune -af
             docker system prune -af 
 
-
+            
