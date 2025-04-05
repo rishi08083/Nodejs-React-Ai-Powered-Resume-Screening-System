@@ -221,15 +221,15 @@ const ListJobs = () => {
                       {job.experience_required}
                     </td>
                     <td className="px-4 py-4 text-sm">
-                      <span className="px-2 py-1 bg-[var(--accent)] bg-opacity-20 text-[var(--dark-bg)] rounded-full text-xs font-medium">
-                        {job.openings} positions
+                      <span className="px-2 py-1  bg-opacity-20 text-[var(--dark-bg)] rounded-full text-xs font-medium">
+                        {job.openings}
                       </span>
                     </td>
                     <td className="px-4 py-4 text-sm flex space-x-2">
                       <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        className="px-3 py-2 bg-[var(--accent)] text-[var(--dark-bg)] font-medium rounded-lg hover:bg-[var(--accent-hover)] transition-colors duration-200 shadow-md hover:shadow-lg flex items-center space-x-1"
+                        className="px-3 py-2 bg-[var(--accent)] font-medium rounded-lg hover:bg-[var(--accent-hover)] text-[var(--text-primary)] transition-colors duration-200 shadow-md hover:shadow-lg flex items-center space-x-1"
                         onClick={() => handleViewButtonClick(job)}
                       >
                         <Upload className="h-4 w-4" />

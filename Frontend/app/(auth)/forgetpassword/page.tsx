@@ -1,14 +1,15 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
+import ThemeToggle from "../../../components/theme/ThemeToggle";
 
 const ForgetPassword = () => {
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState(["", "", "", ""]);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [message, setMessage] = useState("");
-  const [isError, setIsError] = useState(false);
   const [currentStep, setCurrentStep] = useState("email");
   const [passwordValidation, setPasswordValidation] = useState({
     length: false,
@@ -17,7 +18,7 @@ const ForgetPassword = () => {
     number: false,
     special: false,
   });
-  const navigator = useRouter();
+  const router = useRouter();
   const inputRefs = [
     React.useRef(null),
     React.useRef(null),
@@ -47,8 +48,6 @@ const ForgetPassword = () => {
 
   const handleForgetPassword = async (e) => {
     e.preventDefault();
-    setMessage("");
-    setIsError(false);
 
     try {
       const response = await fetch(
@@ -65,23 +64,18 @@ const ForgetPassword = () => {
       const data = await response.json();
 
       if (response.ok) {
-        setMessage(data.message || "OTP has been sent to your email");
+        toast.success(data.message || "OTP has been sent to your email");
         setCurrentStep("otp");
       } else {
-        setMessage(data.message || "Something went wrong");
-        setIsError(true);
+        toast.error(data.message || "Something went wrong");
       }
     } catch (error) {
-      setMessage("Failed to connect to server");
-      setIsError(true);
+      toast.error("Failed to connect to server");
     }
   };
 
   const handleOtpVerification = async (e) => {
     e.preventDefault();
-    setMessage("");
-    setIsError(false);
-
     const otpValue = otp.join("");
 
     try {
@@ -99,37 +93,32 @@ const ForgetPassword = () => {
       const data = await response.json();
 
       if (response.ok) {
-        setMessage("OTP verified successfully");
+        toast.success("OTP verified successfully");
         setCurrentStep("password");
       } else {
-        setMessage(data.message || "Invalid OTP");
-        setIsError(true);
-        inputRefs.map((iref, index) => {
+        toast.error(data.message || "Invalid OTP");
+        inputRefs.forEach((iref, index) => {
           inputRefs[index].current.value = "";
         });
+        setOtp(["", "", "", ""]);
       }
     } catch (error) {
-      setMessage("Failed to connect to server");
-      setIsError(true);
+      toast.error("Failed to connect to server");
     }
   };
 
   const handleResetPassword = async (e) => {
     e.preventDefault();
-    setMessage("");
-    setIsError(false);
 
     if (newPassword !== confirmPassword) {
-      setMessage("Passwords do not match");
-      setIsError(true);
+      toast.error("Passwords do not match");
       return;
     }
     const allValidationsPassed = Object.values(passwordValidation).every(
       (value) => value
     );
     if (!allValidationsPassed) {
-      setMessage("Password does not meet all requirements");
-      setIsError(true);
+      toast.error("Password does not meet all requirements");
       return;
     }
 
@@ -152,16 +141,13 @@ const ForgetPassword = () => {
       const data = await response.json();
 
       if (response.ok) {
-        setMessage(data.message || "Password reset successfully");
-        setIsError(false);
-        navigator.push("/login");
+        toast.success(data.message || "Password reset successfully");
+        router.push("/login");
       } else {
-        setMessage(data.message || "Something went wrong");
-        setIsError(true);
+        toast.error(data.message || "Something went wrong");
       }
     } catch (error) {
-      setMessage("Failed to connect to server");
-      setIsError(true);
+      toast.error("Failed to connect to server");
     }
   };
 
@@ -214,32 +200,17 @@ const ForgetPassword = () => {
 
   return (
     <div className="min-h-screen flex justify-center items-center p-4 bg-[var(--bg)]">
-      <div className="bg-[var(--bg)] w-full max-w-md rounded-xl shadow-lg p-8 transition-all duration-300 border border-[var(--surface-lighter)]">
+      <div className="w-full max-w-md rounded-xl shadow-lg p-8 transition-all duration-300 border border-[var(--surface-lighter)] relative">
+        <div className="absolute top-4 right-4">
+          <ThemeToggle />
+        </div>
+        <ToastContainer />
         <div className="mb-6 text-center">
           <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-2">
             {getStepTitle()}
           </h2>
-          <p className="text-[var(--text-primary)]">{getStepDescription()}</p>
+          <p className="text-[var(--text-secondary)]">{getStepDescription()}</p>
         </div>
-
-        {message && (
-          <div
-            className={`p-4 mb-6 rounded-lg flex items-center ${
-              isError
-                ? "bg-red-900 bg-opacity-20 text-red-400 border border-red-500"
-                : "bg-green-900 bg-opacity-20 text-green-400 border border-green-500"
-            }`}
-          >
-            <span
-              className={`mr-2 text-xl ${
-                isError ? "text-red-400" : "text-green-400"
-              }`}
-            >
-              {isError ? "⚠️" : "✓"}
-            </span>
-            {message}
-          </div>
-        )}
 
         {currentStep === "email" && (
           <form onSubmit={handleForgetPassword} className="space-y-4">
@@ -253,7 +224,7 @@ const ForgetPassword = () => {
               <input
                 id="email"
                 type="email"
-                className="w-full p-3 border border-[#30363d] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ffb300] focus:border-transparent bg-[var(--surface)] text-[var(--text-primary)]"
+                className="w-full p-3 border border-[var(--border)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:border-transparent bg-[var(--surface)] text-[var(--text-primary)]"
                 placeholder="your@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -262,7 +233,7 @@ const ForgetPassword = () => {
             </div>
             <button
               type="submit"
-              className="w-full bg-[#ffb300] p-3 rounded-lg font-medium hover:bg-[#ffc133] transition-colors text-[#0e151f] shadow-md hover:shadow-lg"
+              className="w-full bg-[var(--accent)] p-3 rounded-lg font-medium hover:bg-[var(--accent-hover)] transition-colors text-[var(--bg)] shadow-md hover:shadow-lg"
             >
               Send Verification Code
             </button>
@@ -276,21 +247,23 @@ const ForgetPassword = () => {
                 <input
                   key={index}
                   ref={inputRefs[index]}
-                  type="password"
+                  type="text"
+                  inputMode="numeric"
                   maxLength={1}
                   value={digit}
                   onChange={(e) => handleOtpChange(index, e.target.value)}
                   onKeyDown={(e) => handleKeyDown(index, e)}
-                  className="w-14 h-14 text-center text-2xl font-bold border border-[#30363d] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ffb300] focus:border-transparent bg-[#1b222c] text-[#ffffff]"
+                  className="w-14 h-14 text-center text-2xl font-bold border border-[var(--border)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:border-transparent bg-[var(--surface)] text-[var(--text-primary)]"
                   required
+                  autoFocus={index === 0}
                 />
               ))}
             </div>
-            <div className="text-center text-sm text-[#8b949e]">
+            <div className="text-center text-sm text-[var(--text-secondary)]">
               Didn't receive the code?{" "}
               <button
                 type="button"
-                className="text-[#ffb300] font-medium hover:underline"
+                className="text-[var(--accent)] font-medium hover:underline"
                 onClick={() => setCurrentStep("email")}
               >
                 Resend
@@ -298,7 +271,7 @@ const ForgetPassword = () => {
             </div>
             <button
               type="submit"
-              className="w-full bg-[#ffb300] p-3 rounded-lg font-medium hover:bg-[#ffc133] transition-colors text-[#0e151f] shadow-md hover:shadow-lg"
+              className="w-full bg-[var(--accent)] p-3 rounded-lg font-medium hover:bg-[var(--accent-hover)] transition-colors text-[var(--bg)] shadow-md hover:shadow-lg"
             >
               Verify Code
             </button>
@@ -310,14 +283,14 @@ const ForgetPassword = () => {
             <div>
               <label
                 htmlFor="newPassword"
-                className="text-sm font-medium text-[#8b949e] block mb-1"
+                className="text-sm font-medium text-[var(--text-secondary)] block mb-1"
               >
                 New Password
               </label>
               <input
                 id="newPassword"
                 type="password"
-                className="w-full p-3 border border-[#30363d] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ffb300] focus:border-transparent bg-[#1b222c] text-[#ffffff]"
+                className="w-full p-3 border border-[var(--border)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:border-transparent bg-[var(--surface)] text-[var(--text-primary)]"
                 placeholder="Enter new password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
@@ -325,8 +298,8 @@ const ForgetPassword = () => {
               />
             </div>
 
-            <div className="bg-[#252e3a] p-3 rounded-lg">
-              <p className="text-sm font-medium text-[#8b949e] mb-2">
+            <div className="bg-[var(--surface-lighter)] p-3 rounded-lg">
+              <p className="text-sm font-medium text-[var(--text-secondary)] mb-2">
                 Password must have:
               </p>
               <ul className="space-y-1 text-xs">
@@ -334,7 +307,7 @@ const ForgetPassword = () => {
                   className={`flex items-center ${
                     passwordValidation.length
                       ? "text-green-400"
-                      : "text-[#6e7681]"
+                      : "text-[var(--text-secondary)]"
                   }`}
                 >
                   <span className="mr-1">
@@ -346,7 +319,7 @@ const ForgetPassword = () => {
                   className={`flex items-center ${
                     passwordValidation.uppercase
                       ? "text-green-400"
-                      : "text-[#6e7681]"
+                      : "text-[var(--text-secondary)]"
                   }`}
                 >
                   <span className="mr-1">
@@ -358,7 +331,7 @@ const ForgetPassword = () => {
                   className={`flex items-center ${
                     passwordValidation.lowercase
                       ? "text-green-400"
-                      : "text-[#6e7681]"
+                      : "text-[var(--text-secondary)]"
                   }`}
                 >
                   <span className="mr-1">
@@ -370,7 +343,7 @@ const ForgetPassword = () => {
                   className={`flex items-center ${
                     passwordValidation.number
                       ? "text-green-400"
-                      : "text-[#6e7681]"
+                      : "text-[var(--text-secondary)]"
                   }`}
                 >
                   <span className="mr-1">
@@ -382,7 +355,7 @@ const ForgetPassword = () => {
                   className={`flex items-center ${
                     passwordValidation.special
                       ? "text-green-400"
-                      : "text-[#6e7681]"
+                      : "text-[var(--text-secondary)]"
                   }`}
                 >
                   <span className="mr-1">
@@ -396,14 +369,14 @@ const ForgetPassword = () => {
             <div>
               <label
                 htmlFor="confirmPassword"
-                className="text-sm font-medium text-[#8b949e] block mb-1"
+                className="text-sm font-medium text-[var(--text-secondary)] block mb-1"
               >
                 Confirm Password
               </label>
               <input
                 id="confirmPassword"
                 type="password"
-                className="w-full p-3 border border-[#30363d] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ffb300] focus:border-transparent bg-[#1b222c] text-[#ffffff]"
+                className="w-full p-3 border border-[var(--border)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:border-transparent bg-[var(--surface)] text-[var(--text-primary)]"
                 placeholder="Confirm your password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
@@ -418,7 +391,7 @@ const ForgetPassword = () => {
 
             <button
               type="submit"
-              className="w-full bg-[#ffb300] p-3 rounded-lg font-medium hover:bg-[#ffc133] transition-colors text-[#0e151f] shadow-md hover:shadow-lg mt-2"
+              className="w-full bg-[var(--accent)] p-3 rounded-lg font-medium hover:bg-[var(--accent-hover)] transition-colors text-[var(--bg)] shadow-md hover:shadow-lg mt-2"
             >
               Reset Password
             </button>
@@ -428,7 +401,7 @@ const ForgetPassword = () => {
         <div className="mt-6 text-center">
           <a
             href="/login"
-            className="text-sm text-[#ffb300] hover:underline font-medium"
+            className="text-sm text-[var(--accent)] hover:underline font-medium"
           >
             Back to Login
           </a>

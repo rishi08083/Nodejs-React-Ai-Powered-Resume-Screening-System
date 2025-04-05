@@ -422,7 +422,7 @@ const CandidateList = () => {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.05, duration: 0.4 }}
-                  className="border-b border-[var(--border)] hover:bg-[var(--accent-hover)] transition-all duration-300"
+                  className="border-b border-[var(--border)]  transition-all duration-300"
                 >
                   <td className="px-6 py-4 text-sm font-medium text-[var(--text-primary)]">
                     {candidate.name}
