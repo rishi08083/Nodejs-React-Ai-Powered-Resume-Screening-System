@@ -25,7 +25,7 @@ type Candidate = {
   };
 };
 
-const UploadForm = () => {
+const CandidateList = () => {
   const fileTypes = ["pdf", "docx", "jpg", "jpeg"];
   const [jobs, setJobs] = useState<Job[]>([]);
   const [selectedJob, setSelectedJob] = useState<string>("");
