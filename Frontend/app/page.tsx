@@ -52,6 +52,7 @@ const Home = () => {
   const router = useRouter();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+
   const handleLogout = () => {
     logout();
     setIsLogoutModalOpen(false);
@@ -84,10 +85,10 @@ const Home = () => {
       return;
     }
     if (user != null && user.role === "admin") {
-      setRole("admin");
+      router.push("/dashboard");
     }
     if (user != null && user.role === "recruiter") {
-      setRole("recruiter");
+      router.push("/dashboard");
     }
   }, [user, loading, router]);
 

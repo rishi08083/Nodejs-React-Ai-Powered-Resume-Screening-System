@@ -24,6 +24,7 @@ const ForgetPassword = () => {
     React.useRef(null),
     React.useRef(null),
   ];
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       const urlParams = new URLSearchParams(window.location.search);
@@ -34,7 +35,6 @@ const ForgetPassword = () => {
     }
   }, []);
 
-  // Password validation
   useEffect(() => {
     setPasswordValidation({
       length: newPassword.length >= 8,
@@ -59,7 +59,7 @@ const ForgetPassword = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ email }),
-        },
+        }
       );
 
       const data = await response.json();
@@ -93,7 +93,7 @@ const ForgetPassword = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ email, otp: otpValue }),
-        },
+        }
       );
 
       const data = await response.json();
@@ -104,6 +104,9 @@ const ForgetPassword = () => {
       } else {
         setMessage(data.message || "Invalid OTP");
         setIsError(true);
+        inputRefs.map((iref, index) => {
+          inputRefs[index].current.value = "";
+        });
       }
     } catch (error) {
       setMessage("Failed to connect to server");
@@ -122,7 +125,7 @@ const ForgetPassword = () => {
       return;
     }
     const allValidationsPassed = Object.values(passwordValidation).every(
-      (value) => value,
+      (value) => value
     );
     if (!allValidationsPassed) {
       setMessage("Password does not meet all requirements");
@@ -143,7 +146,7 @@ const ForgetPassword = () => {
             otp: otp.join(""),
             newPassword,
           }),
-        },
+        }
       );
 
       const data = await response.json();
@@ -210,26 +213,26 @@ const ForgetPassword = () => {
   };
 
   return (
-    <div className="min-h-screen flex justify-center items-center p-4">
-      <div className="bg-white w-full max-w-md rounded-xl shadow-lg p-8 transition-all duration-300">
+    <div className="min-h-screen flex justify-center items-center p-4 bg-[var(--bg)]">
+      <div className="bg-[var(--bg)] w-full max-w-md rounded-xl shadow-lg p-8 transition-all duration-300 border border-[var(--surface-lighter)]">
         <div className="mb-6 text-center">
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">
+          <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-2">
             {getStepTitle()}
           </h2>
-          <p className="text-gray-600">{getStepDescription()}</p>
+          <p className="text-[var(--text-primary)]">{getStepDescription()}</p>
         </div>
 
         {message && (
           <div
             className={`p-4 mb-6 rounded-lg flex items-center ${
               isError
-                ? "bg-red-50 text-red-700 border border-red-200"
-                : "bg-green-50 text-green-700 border border-green-200"
+                ? "bg-red-900 bg-opacity-20 text-red-400 border border-red-500"
+                : "bg-green-900 bg-opacity-20 text-green-400 border border-green-500"
             }`}
           >
             <span
               className={`mr-2 text-xl ${
-                isError ? "text-red-500" : "text-green-500"
+                isError ? "text-red-400" : "text-green-400"
               }`}
             >
               {isError ? "⚠️" : "✓"}
@@ -243,14 +246,14 @@ const ForgetPassword = () => {
             <div className="relative">
               <label
                 htmlFor="email"
-                className="text-sm font-medium text-gray-700 block mb-1"
+                className="text-sm font-medium text-[var(--text-secondary)] block mb-1"
               >
                 Email Address
               </label>
               <input
                 id="email"
                 type="email"
-                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
+                className="w-full p-3 border border-[#30363d] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ffb300] focus:border-transparent bg-[var(--surface)] text-[var(--text-primary)]"
                 placeholder="your@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -259,7 +262,7 @@ const ForgetPassword = () => {
             </div>
             <button
               type="submit"
-              className="w-full bg-yellow-400 p-3 rounded-lg font-medium hover:bg-yellow-500 transition-colors text-gray-800 shadow-md hover:shadow-lg"
+              className="w-full bg-[#ffb300] p-3 rounded-lg font-medium hover:bg-[#ffc133] transition-colors text-[#0e151f] shadow-md hover:shadow-lg"
             >
               Send Verification Code
             </button>
@@ -278,16 +281,16 @@ const ForgetPassword = () => {
                   value={digit}
                   onChange={(e) => handleOtpChange(index, e.target.value)}
                   onKeyDown={(e) => handleKeyDown(index, e)}
-                  className="w-14 h-14 text-center text-2xl font-bold border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
+                  className="w-14 h-14 text-center text-2xl font-bold border border-[#30363d] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ffb300] focus:border-transparent bg-[#1b222c] text-[#ffffff]"
                   required
                 />
               ))}
             </div>
-            <div className="text-center text-sm text-gray-600">
+            <div className="text-center text-sm text-[#8b949e]">
               Didn't receive the code?{" "}
               <button
                 type="button"
-                className="text-yellow-600 font-medium hover:underline"
+                className="text-[#ffb300] font-medium hover:underline"
                 onClick={() => setCurrentStep("email")}
               >
                 Resend
@@ -295,7 +298,7 @@ const ForgetPassword = () => {
             </div>
             <button
               type="submit"
-              className="w-full bg-yellow-400 p-3 rounded-lg font-medium hover:bg-yellow-500 transition-colors text-gray-800 shadow-md hover:shadow-lg"
+              className="w-full bg-[#ffb300] p-3 rounded-lg font-medium hover:bg-[#ffc133] transition-colors text-[#0e151f] shadow-md hover:shadow-lg"
             >
               Verify Code
             </button>
@@ -307,14 +310,14 @@ const ForgetPassword = () => {
             <div>
               <label
                 htmlFor="newPassword"
-                className="text-sm font-medium text-gray-700 block mb-1"
+                className="text-sm font-medium text-[#8b949e] block mb-1"
               >
                 New Password
               </label>
               <input
                 id="newPassword"
                 type="password"
-                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
+                className="w-full p-3 border border-[#30363d] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ffb300] focus:border-transparent bg-[#1b222c] text-[#ffffff]"
                 placeholder="Enter new password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
@@ -322,16 +325,16 @@ const ForgetPassword = () => {
               />
             </div>
 
-            <div className="bg-gray-50 p-3 rounded-lg">
-              <p className="text-sm font-medium text-gray-700 mb-2">
+            <div className="bg-[#252e3a] p-3 rounded-lg">
+              <p className="text-sm font-medium text-[#8b949e] mb-2">
                 Password must have:
               </p>
               <ul className="space-y-1 text-xs">
                 <li
                   className={`flex items-center ${
                     passwordValidation.length
-                      ? "text-green-600"
-                      : "text-gray-500"
+                      ? "text-green-400"
+                      : "text-[#6e7681]"
                   }`}
                 >
                   <span className="mr-1">
@@ -342,8 +345,8 @@ const ForgetPassword = () => {
                 <li
                   className={`flex items-center ${
                     passwordValidation.uppercase
-                      ? "text-green-600"
-                      : "text-gray-500"
+                      ? "text-green-400"
+                      : "text-[#6e7681]"
                   }`}
                 >
                   <span className="mr-1">
@@ -354,8 +357,8 @@ const ForgetPassword = () => {
                 <li
                   className={`flex items-center ${
                     passwordValidation.lowercase
-                      ? "text-green-600"
-                      : "text-gray-500"
+                      ? "text-green-400"
+                      : "text-[#6e7681]"
                   }`}
                 >
                   <span className="mr-1">
@@ -366,8 +369,8 @@ const ForgetPassword = () => {
                 <li
                   className={`flex items-center ${
                     passwordValidation.number
-                      ? "text-green-600"
-                      : "text-gray-500"
+                      ? "text-green-400"
+                      : "text-[#6e7681]"
                   }`}
                 >
                   <span className="mr-1">
@@ -378,8 +381,8 @@ const ForgetPassword = () => {
                 <li
                   className={`flex items-center ${
                     passwordValidation.special
-                      ? "text-green-600"
-                      : "text-gray-500"
+                      ? "text-green-400"
+                      : "text-[#6e7681]"
                   }`}
                 >
                   <span className="mr-1">
@@ -393,21 +396,21 @@ const ForgetPassword = () => {
             <div>
               <label
                 htmlFor="confirmPassword"
-                className="text-sm font-medium text-gray-700 block mb-1"
+                className="text-sm font-medium text-[#8b949e] block mb-1"
               >
                 Confirm Password
               </label>
               <input
                 id="confirmPassword"
                 type="password"
-                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
+                className="w-full p-3 border border-[#30363d] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ffb300] focus:border-transparent bg-[#1b222c] text-[#ffffff]"
                 placeholder="Confirm your password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
               />
               {confirmPassword && newPassword !== confirmPassword && (
-                <p className="mt-1 text-sm text-red-600">
+                <p className="mt-1 text-sm text-red-400">
                   Passwords do not match
                 </p>
               )}
@@ -415,7 +418,7 @@ const ForgetPassword = () => {
 
             <button
               type="submit"
-              className="w-full bg-yellow-400 p-3 rounded-lg font-medium hover:bg-yellow-500 transition-colors text-gray-800 shadow-md hover:shadow-lg mt-2"
+              className="w-full bg-[#ffb300] p-3 rounded-lg font-medium hover:bg-[#ffc133] transition-colors text-[#0e151f] shadow-md hover:shadow-lg mt-2"
             >
               Reset Password
             </button>
@@ -425,7 +428,7 @@ const ForgetPassword = () => {
         <div className="mt-6 text-center">
           <a
             href="/login"
-            className="text-sm text-yellow-600 hover:underline font-medium"
+            className="text-sm text-[#ffb300] hover:underline font-medium"
           >
             Back to Login
           </a>

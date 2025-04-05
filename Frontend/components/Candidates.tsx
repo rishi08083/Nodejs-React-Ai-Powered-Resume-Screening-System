@@ -31,7 +31,7 @@ type Candidate = {
   };
 };
 
-const UploadForm = () => {
+const CandidateList = () => {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [selectedJob, setSelectedJob] = useState<string>("");
   const [candidates, setCandidates] = useState<Candidate[]>([]);
@@ -516,4 +516,4 @@ const UploadForm = () => {
   );
 };
 
-export default React.memo(UploadForm);
+export default React.memo(CandidateList);

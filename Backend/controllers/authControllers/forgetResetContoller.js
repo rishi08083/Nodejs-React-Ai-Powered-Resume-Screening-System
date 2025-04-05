@@ -111,6 +111,7 @@ const verifyOtp = async (req, res) => {
         reset_token_expires: { [Op.gt]: Date.now() },
       },
     });
+
     if (!user) {
       return res.status(400).json({
         status: "error",
