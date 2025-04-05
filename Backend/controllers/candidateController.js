@@ -69,7 +69,6 @@ module.exports.listCandidate = async (req, res) => {
     const candidates = await db.Candidates.findAll({
       where: { job_id: parseInt(job_id), is_deleted: false },
     });
-    console.log("Candidates:", candidates);
     if (candidates.length === 0) {
       return res.status(200).json({
         status: "success",
