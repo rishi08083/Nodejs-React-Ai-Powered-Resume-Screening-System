@@ -34,7 +34,6 @@ type Candidate = {
 const CandidateList = () => {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [selectedJob, setSelectedJob] = useState<string>("");
-  const [resumeUrl, setResumeUrl] = useState<string>("");
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -49,31 +48,6 @@ const CandidateList = () => {
   >(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const candidatesPerPage = 10;
-
-  useEffect(() => {
-    const getJobDetails = async () => {
-      try {
-        const response = await fetch(`${BASE_URL}/job/view`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.getItem("token"),
-          },
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setJobs(data.data);
-        } else {
-          const errorData = await response.json();
-          throw new Error(errorData.message);
-        }
-      } catch (error) {
-        console.log(error, "error");
-      }
-    };
-    getJobDetails();
-  }, []);
 
   useEffect(() => {
     const getJobDetails = async () => {
@@ -165,28 +139,26 @@ const CandidateList = () => {
   const get_resume = async (candidateId: string, e) => {
     try {
       e.preventDefault();
-      const response = await fetch(
-        `${BASE_URL}/upload/get-resume/${candidateId}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.getItem("token"),
-          },
+          const response = await fetch(`${BASE_URL}/upload/get-resume/${candidateId}`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + localStorage.getItem("token"),
+            },
+          });
+    
+          if (response.ok) {
+            const data = await response.json();
+            // setResumeUrl(data.data.resume_url);
+            console.log(data.data.resume_url, "resume url data");
+                    
+          } else {
+            const errorData = await response.json();
+            throw new Error(errorData.message);
+          }
+        } catch (error) {
+          console.log(error, "error");
         }
-      );
-
-      if (response.ok) {
-        const data = await response.json();
-        setResumeUrl(data.data.resume_url);
-        window.open(data.data.resume_url, "_blank", "noopener,noreferrer");
-      } else {
-        const errorData = await response.json();
-        throw new Error(errorData.message);
-      }
-    } catch (error) {
-      console.log(error, "error");
-    }
   };
 
   const handleDeleteCandidate = async (candidateId: string) => {
@@ -244,7 +216,7 @@ const CandidateList = () => {
 
       // Call the backend API to check compatibility
       const response = await fetch(`${BASE_URL}/screening/screen_candidate`, {
-        method: "POST", // Assuming it's a POST request
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: "Bearer " + localStorage.getItem("token"),
@@ -400,11 +372,10 @@ const CandidateList = () => {
                     onClick={(e) => {
                       get_resume(candidate.id, e);
                     }}
-                    href={resumeUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-yellow-600 underline hover:text-yellow-800"
-                  >
+                    >
                     View Resume
                   </a>
                 </td>
