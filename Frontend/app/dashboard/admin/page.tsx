@@ -63,7 +63,13 @@ const timeToHireData = [
   { name: "Jun", time: 10 },
 ];
 
-const COLORS = ["#ffb300", "#ffc133", "#ffd066", "#ffde99", "#ffeccc"];
+const COLORS = [
+  "var(--accent)",
+  "var(--accent-hover)",
+  "#ffd066",
+  "#ffde99",
+  "#ffeccc",
+];
 
 // Type definitions
 type StatCardProps = {
@@ -87,14 +93,14 @@ export default function AdminDashboard() {
     change,
     changeDirection,
   }: StatCardProps) => (
-    <div className="bg-gray-900 p-6 rounded-lg  shadow-lg">
+    <div className="bg-[var(--surface)] p-6 rounded-lg shadow-lg border border-[var(--border)]">
       <div className="flex justify-between items-start">
         <div>
-          <h3 className="text-dark-text-secondary text-sm font-medium mb-1">
+          <h3 className="text-[var(--text-secondary)] text-sm font-medium mb-1">
             {title}
           </h3>
           <div className="flex items-baseline">
-            <h2 className="text-dark-text-primary text-2xl font-bold">
+            <h2 className="text-[var(--text-primary)] text-2xl font-bold">
               {value}
             </h2>
             {change !== undefined && (
@@ -111,68 +117,68 @@ export default function AdminDashboard() {
             )}
           </div>
         </div>
-        <div className="p-2 bg-dark-blue-highlight rounded-lg">{icon}</div>
+        <div className="p-2 bg-[var(--blue-highlight)] rounded-lg">{icon}</div>
       </div>
     </div>
   );
 
   // Chart titles style
-  const chartTitle = "text-dark-text-primary font-medium text-lg mb-4";
+  const chartTitle = "text-[var(--text-primary)] font-medium text-lg mb-4";
 
   return (
-    <div className="bg-dark-bg min-h-screen text-dark-text-primary">
-      <main className="container mx-auto">
+    <div className="bg-[var(--bg)] min-h-screen text-[var(--text-primary)]">
+      <main className="container mx-auto px-4 py-6">
         {/* Stats Row */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-6">
           <StatCard
             title="Total Job Listings"
             value="248"
-            icon={<Briefcase size={24} className="text-dark-accent" />}
+            icon={<Briefcase size={24} className="text-[var(--accent)]" />}
             change={5.8}
             changeDirection="up"
           />
           <StatCard
             title="Total Applications Received"
             value="3,845"
-            icon={<FileText size={24} className="text-dark-accent" />}
+            icon={<FileText size={24} className="text-[var(--accent)]" />}
             change={12.4}
             changeDirection="up"
           />
           <StatCard
             title="Total Hires"
             value="124"
-            icon={<CheckCircle size={24} className="text-dark-accent" />}
+            icon={<CheckCircle size={24} className="text-[var(--accent)]" />}
             change={3.2}
             changeDirection="up"
           />
           <StatCard
             title="Recruiters Registered"
             value="86"
-            icon={<Users size={24} className="text-dark-accent" />}
+            icon={<Users size={24} className="text-[var(--accent)]" />}
             change={8.1}
             changeDirection="up"
           />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
-          <div className="lg:col-span-2 bg-gray-900 p-6 rounded-lg shadow-lg">
+          <div className="lg:col-span-2 bg-[var(--surface)] p-6 rounded-lg shadow-lg border border-[var(--border)]">
             <div className="flex justify-between items-center mb-4">
               <h2 className={chartTitle}>Application Trends</h2>
-              <div className="flex bg-dark-surface-lighter rounded-lg overflow-hidden ">
+              <div className="flex bg-[var(--surface-lighter)] rounded-lg overflow-hidden">
                 <button
-                  className={`px-3 py-1 text-sm ${timeframe === "day" ? "bg-dark-accent text-dark-bg" : "text-dark-text-secondary"}`}
+                  className={`px-3 py-1 text-sm ${timeframe === "day" ? "bg-[var(--accent)] text-[var(--dark-bg)]" : "text-[var(--text-secondary)]"}`}
                   onClick={() => setTimeframe("day")}
                 >
                   Day
                 </button>
                 <button
-                  className={`px-3 py-1 text-sm ${timeframe === "week" ? "bg-dark-accent text-dark-bg" : "text-dark-text-secondary"}`}
+                  className={`px-3 py-1 text-sm ${timeframe === "week" ? "bg-[var(--accent)] text-[var(--dark-bg)]" : "text-[var(--text-secondary)]"}`}
                   onClick={() => setTimeframe("week")}
                 >
                   Week
                 </button>
                 <button
-                  className={`px-3 py-1 text-sm ${timeframe === "month" ? "bg-dark-accent text-dark-bg" : "text-dark-text-secondary"}`}
+                  className={`px-3 py-1 text-sm ${timeframe === "month" ? "bg-[var(--accent)] text-[var(--dark-bg)]" : "text-[var(--text-secondary)]"}`}
                   onClick={() => setTimeframe("month")}
                 >
                   Month
@@ -190,24 +196,32 @@ export default function AdminDashboard() {
                       x2="0"
                       y2="1"
                     >
-                      <stop offset="5%" stopColor="#ffb300" stopOpacity={0.8} />
-                      <stop offset="95%" stopColor="#ffb300" stopOpacity={0} />
+                      <stop
+                        offset="5%"
+                        stopColor="var(--accent)"
+                        stopOpacity={0.8}
+                      />
+                      <stop
+                        offset="95%"
+                        stopColor="var(--accent)"
+                        stopOpacity={0}
+                      />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#30363d" />
-                  <XAxis dataKey="name" stroke="#8b949e" />
-                  <YAxis stroke="#8b949e" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                  <XAxis dataKey="name" stroke="var(--text-secondary)" />
+                  <YAxis stroke="var(--text-secondary)" />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "#161b22",
-                      borderColor: "#30363d",
+                      backgroundColor: "var(--surface)",
+                      borderColor: "var(--border)",
                     }}
-                    labelStyle={{ color: "#ffffff" }}
+                    labelStyle={{ color: "var(--text-primary)" }}
                   />
                   <Area
                     type="monotone"
                     dataKey="applications"
-                    stroke="#ffb300"
+                    stroke="var(--accent)"
                     fillOpacity={1}
                     fill="url(#colorApplications)"
                   />
@@ -216,7 +230,7 @@ export default function AdminDashboard() {
             </div>
           </div>
 
-          <div className="bg-gray-900 p-6 rounded-lg  shadow-lg">
+          <div className="bg-[var(--surface)] p-6 rounded-lg shadow-lg border border-[var(--border)]">
             <h2 className={chartTitle}>Job Categories</h2>
             <div className="h-72">
               <ResponsiveContainer width="100%" height="100%">
@@ -243,10 +257,10 @@ export default function AdminDashboard() {
                   </Pie>
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "#161b22",
-                      borderColor: "#30363d",
+                      backgroundColor: "var(--surface)",
+                      borderColor: "var(--border)",
                     }}
-                    labelStyle={{ color: "#ffffff" }}
+                    labelStyle={{ color: "var(--text-primary)" }}
                   />
                 </PieChart>
               </ResponsiveContainer>
@@ -255,58 +269,58 @@ export default function AdminDashboard() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <div className="bg-gray-900 p-6 rounded-lg shadow-lg">
+          <div className="bg-[var(--surface)] p-6 rounded-lg shadow-lg border border-[var(--border)]">
             <h2 className={chartTitle}>
               Average Time to Hire{" "}
-              <span className="text-dark-accent">(Days)</span>
+              <span className="text-[var(--accent)]">(Days)</span>
             </h2>
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={timeToHireData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#30363d" />
-                  <XAxis dataKey="name" stroke="#8b949e" />
-                  <YAxis stroke="#8b949e" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                  <XAxis dataKey="name" stroke="var(--text-secondary)" />
+                  <YAxis stroke="var(--text-secondary)" />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "#161b22",
-                      borderColor: "#30363d",
+                      backgroundColor: "var(--surface)",
+                      borderColor: "var(--border)",
                     }}
-                    labelStyle={{ color: "#ffffff" }}
+                    labelStyle={{ color: "var(--text-primary)" }}
                   />
                   <Line
                     type="monotone"
                     dataKey="time"
-                    stroke="#ffb300"
+                    stroke="var(--accent)"
                     strokeWidth={2}
-                    dot={{ fill: "#ffb300", strokeWidth: 2 }}
+                    dot={{ fill: "var(--accent)", strokeWidth: 2 }}
                   />
                 </LineChart>
               </ResponsiveContainer>
             </div>
           </div>
 
-          <div className="lg:col-span-2 bg-gray-900 p-6 rounded-lg shadow-lg">
+          <div className="lg:col-span-2 bg-[var(--surface)] p-6 rounded-lg shadow-lg border border-[var(--border)]">
             <div className="flex justify-between items-center mb-4">
               <h2 className={chartTitle}>
                 Pending Recruiter Requests{" "}
-                <span className="text-dark-accent">(12)</span>
+                <span className="text-[var(--accent)]">(12)</span>
               </h2>
-              <button className="px-3 py-1 bg-dark-accent hover:bg-dark-accent-hover text-dark-bg rounded text-sm transition-colors duration-300">
+              <button className="px-3 py-1 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--dark-bg)] rounded text-sm transition-colors duration-300">
                 View All
               </button>
             </div>
-            <div className="divide-y divide-dark-border">
+            <div className="divide-y divide-[var(--border)]">
               {[1, 2, 3, 4].map((item) => (
                 <div
                   key={item}
                   className="py-3 flex justify-between items-center"
                 >
                   <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-dark-surface-lighter rounded-full flex items-center justify-center text-dark-accent">
+                    <div className="w-10 h-10 bg-[var(--surface-lighter)] rounded-full flex items-center justify-center text-[var(--accent)]">
                       {["JM", "SK", "RD", "PT"][item - 1]}
                     </div>
                     <div>
-                      <h3 className="text-sm font-medium">
+                      <h3 className="text-sm font-medium text-[var(--text-primary)]">
                         {
                           [
                             "Jane Morgan",
@@ -316,7 +330,7 @@ export default function AdminDashboard() {
                           ][item - 1]
                         }
                       </h3>
-                      <p className="text-xs text-dark-text-secondary">
+                      <p className="text-xs text-[var(--text-secondary)]">
                         {
                           [
                             "TechCorp Inc.",
@@ -329,10 +343,10 @@ export default function AdminDashboard() {
                     </div>
                   </div>
                   <div className="flex space-x-2">
-                    <button className="p-1 px-3 bg-yellow-600 hover:bg-gray-700 rounded text-xs transition-colors duration-300">
+                    <button className="p-1 px-3 bg-yellow-600 hover:bg-[var(--border)] rounded text-xs transition-colors duration-300">
                       Approve
                     </button>
-                    <button className="p-1 px-3 bg-gray-600 hover:bg-gray-700 rounded text-xs transition-colors duration-300">
+                    <button className="p-1 px-3 bg-[var(--border)] hover:bg-[var(--surface-lighter)] rounded text-xs transition-colors duration-300">
                       Deny
                     </button>
                   </div>

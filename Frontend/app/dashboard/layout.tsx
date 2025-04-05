@@ -18,9 +18,12 @@ export default function DashboardLayout({
 
   // Close sidebar when clicking outside on mobile
   useEffect(() => {
-    if (user === null && loading) {
-      navigate.push("/login");
-      return;
+    if (user === null) {
+      if (loading === false) {
+        navigate.push("/login");
+      } else {
+        return;
+      }
     }
 
     const handleOutsideClick = (e: MouseEvent) => {
@@ -38,7 +41,7 @@ export default function DashboardLayout({
     return () => {
       document.removeEventListener("mousedown", handleOutsideClick);
     };
-  }, [isSidebarOpen, user]);
+  }, [isSidebarOpen, user, loading, navigate]);
 
   if (loading) {
     return (

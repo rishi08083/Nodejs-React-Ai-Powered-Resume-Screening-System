@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { motion } from "framer-motion";
 import {
@@ -205,7 +204,6 @@ const CandidateList = () => {
       );
 
       if (response.ok) {
-        // Remove the deleted candidate from the state
         setCandidates((prevCandidates) =>
           prevCandidates.filter((candidate) => candidate.id !== candidateId)
         );
@@ -238,21 +236,19 @@ const CandidateList = () => {
 
   const handleCheckCompatibility = async (candidateId: string) => {
     try {
-      // Show loading state for compatibility check
       setCompatibilityResponses((prev) => ({
         ...prev,
-        [candidateId]: "Loading...", // Indicate loading for this candidate
+        [candidateId]: "Loading...",
       }));
 
-      // Call the backend API to check compatibility
       const response = await fetch(`${BASE_URL}/screening/screen_candidate`, {
-        method: "POST", // Assuming it's a POST request
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: "Bearer " + localStorage.getItem("token"),
         },
         body: JSON.stringify({
-          candidate_id: candidateId, // send the candidate_id in the request body
+          candidate_id: candidateId,
         }),
       });
 
@@ -268,10 +264,9 @@ const CandidateList = () => {
     } catch (error) {
       console.error("Error checking compatibility:", error);
 
-      // Handle error state for compatibility check
       setCompatibilityResponses((prev) => ({
         ...prev,
-        [candidateId]: "Error checking compatibility", // Indicate error
+        [candidateId]: "Error checking compatibility",
       }));
     }
   };
@@ -289,7 +284,6 @@ const CandidateList = () => {
   const [isOpen, setIsOpen] = useState<string | null>(null);
   const dropdownRef = useRef(null);
 
-  // Close dropdown when clicked outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -309,18 +303,18 @@ const CandidateList = () => {
   }, [isOpen]);
 
   return (
-    <div className="w-full p-6 bg-[#0e151f] mt-14 min-h-screen text-[#ffffff] transition-all duration-300">
+    <div className="w-full p-6 bg-[var(--bg)] mt-14 min-h-screen text-[var(--text-primary)] transition-all duration-300">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         className="mb-8"
       >
-        <h1 className="text-3xl md:text-4xl font-bold text-[#ffffff] mb-2">
+        <h1 className="text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-2">
           Candidate List
         </h1>
-        <div className="h-1 w-24 bg-[#ffb300] rounded-full mb-4"></div>
-        <p className="text-[#8b949e] mt-2">
+        <div className="h-1 w-24 bg-[var(--accent)] rounded-full mb-4"></div>
+        <p className="text-[var(--text-secondary)] mt-2">
           Search and manage candidates for your job postings.
         </p>
       </motion.div>
@@ -338,10 +332,10 @@ const CandidateList = () => {
             placeholder="Search by ID or Name"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full p-3 pl-10 border rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-[#ffb300] bg-[#1b222c] border-[#30363d] text-[#ffffff] transition-all duration-300"
+            className="w-full p-3 pl-10 border rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)] bg-[var(--surface)] border-[var(--border)] text-[var(--text-primary)] transition-all duration-300"
           />
           <svg
-            className="absolute left-3 top-3.5 h-5 w-5 text-[#8b949e] group-hover:text-[#ffb300] transition-colors duration-300"
+            className="absolute left-3 top-3.5 h-5 w-5 text-[var(--text-secondary)] group-hover:text-[var(--accent)] transition-colors duration-300"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -357,7 +351,7 @@ const CandidateList = () => {
         </div>
         <div className="relative w-full md:w-1/3">
           <select
-            className="w-full p-3 pl-4 border rounded-lg shadow-md appearance-none focus:outline-none focus:ring-2 focus:ring-[#ffb300] bg-[#1b222c] border-[#30363d] text-[#ffffff] transition-all duration-300"
+            className="w-full p-3 pl-4 border rounded-lg shadow-md appearance-none focus:outline-none focus:ring-2 focus:ring-[var(--accent)] bg-[var(--surface)] border-[var(--border)] text-[var(--text-primary)] transition-all duration-300"
             value={selectedJob}
             onChange={(e) => setSelectedJob(e.target.value)}
           >
@@ -368,7 +362,7 @@ const CandidateList = () => {
               </option>
             ))}
           </select>
-          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[#8b949e]">
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[var(--text-secondary)]">
             <svg
               className="h-5 w-5"
               fill="none"
@@ -392,31 +386,31 @@ const CandidateList = () => {
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.3 }}
-        className="bg-[#1b222c] rounded-xl shadow-lg overflow-hidden border border-[#30363d]"
+        className="bg-[var(--surface)] rounded-xl shadow-lg overflow-hidden border border-[var(--border)]"
       >
         <div className="overflow-x-auto">
           <table className="min-w-full table-auto border-collapse">
             <thead>
-              <tr className="bg-[#1f6feb33] border-b border-[#30363d]">
-                <th className="px-6 py-4 text-left text-sm font-semibold text-[#ffffff]">
+              <tr className="bg-[var(--accent)] border-b border-[var(--border)]">
+                <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
                   Candidate Name
                 </th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-[#ffffff]">
+                <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
                   Email
                 </th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-[#ffffff]">
+                <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
                   Contact
                 </th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-[#ffffff]">
+                <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
                   Resume
                 </th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-[#ffffff]">
+                <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
                   Compatibility (%)
                 </th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-[#ffffff]">
+                <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
                   Feedback
                 </th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-[#ffffff]">
+                <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
                   Actions
                 </th>
               </tr>
@@ -428,15 +422,15 @@ const CandidateList = () => {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.05, duration: 0.4 }}
-                  className="border-b border-[#30363d] hover:bg-[#1f6feb33] transition-all duration-300"
+                  className="border-b border-[var(--border)] hover:bg-[var(--accent-hover)] transition-all duration-300"
                 >
-                  <td className="px-6 py-4 text-sm font-medium text-[#ffffff]">
+                  <td className="px-6 py-4 text-sm font-medium text-[var(--text-primary)]">
                     {candidate.name}
                   </td>
-                  <td className="px-6 py-4 text-sm text-[#8b949e]">
+                  <td className="px-6 py-4 text-sm text-[var(--text-secondary)]">
                     {candidate.email}
                   </td>
-                  <td className="px-6 py-4 text-sm text-[#8b949e]">
+                  <td className="px-6 py-4 text-sm text-[var(--text-secondary)]">
                     {candidate.phone_number}
                   </td>
                   <td className="px-6 py-4 text-sm">
@@ -449,7 +443,7 @@ const CandidateList = () => {
                       href={resumeUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-[#ffb300] hover:text-[#ffc133] transition-colors duration-300 flex items-center gap-1"
+                      className="text-[var(--accent)] hover:text-[var(--accent-hover)] transition-colors duration-300 flex items-center gap-1"
                     >
                       <svg
                         className="h-4 w-4"
@@ -470,7 +464,7 @@ const CandidateList = () => {
                   </td>
                   <td className="px-6 py-4 text-sm">
                     {compatibilityResponses[candidate.id] ? (
-                      <span className="bg-[#1f6feb33] text-[#ffffff] py-1 px-3 rounded-full">
+                      <span className="bg-[var(--accent)] text-[var(--text-primary)] py-1 px-3 rounded-full">
                         {compatibilityResponses[candidate.id]}
                       </span>
                     ) : (
@@ -478,7 +472,7 @@ const CandidateList = () => {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={() => handleCheckCompatibility(candidate.id)}
-                        className="px-4 py-2 bg-[#ffb300] text-[#0e151f] font-medium rounded-lg shadow hover:bg-[#ffc133] transition-colors duration-300"
+                        className="px-4 py-2 bg-[var(--accent)] text-[var(--dark-bg)] font-medium rounded-lg shadow hover:bg-[var(--accent-hover)] transition-colors duration-300"
                       >
                         Check Compatibility
                       </motion.button>
@@ -490,12 +484,14 @@ const CandidateList = () => {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={() => handleShowFeedback(candidate.id)}
-                        className="px-4 py-2 border border-[#ffb300] text-[#ffb300] font-medium rounded-lg shadow hover:bg-[#ffb300] hover:text-[#0e151f] transition-all duration-300"
+                        className="px-4 py-2 border border-[var(--accent)] text-[var(--accent)] font-medium rounded-lg shadow hover:bg-[var(--accent)] hover:text-[var(--dark-bg)] transition-all duration-300"
                       >
                         Show Feedback
                       </motion.button>
                     ) : (
-                      <span className="text-[#8b949e]">No Feedback</span>
+                      <span className="text-[var(--text-secondary)]">
+                        No Feedback
+                      </span>
                     )}
                   </td>
                   <td className="px-6 py-4 text-sm relative">
@@ -511,7 +507,7 @@ const CandidateList = () => {
                             prev === candidate.id ? null : candidate.id
                           )
                         }
-                        className="inline-flex justify-center rounded-md border border-[#30363d] shadow-sm px-3 py-1 bg-[#1b222c] text-sm font-medium text-[#ffffff] hover:bg-[#30363d] focus:outline-none transition-all duration-300"
+                        className="inline-flex justify-center rounded-md border border-[var(--border)] shadow-sm px-3 py-1 bg-[var(--surface)] text-sm font-medium text-[var(--text-primary)] hover:bg-[var(--border)] focus:outline-none transition-all duration-300"
                         aria-haspopup="true"
                         aria-expanded={isOpen === candidate.id}
                       >
@@ -523,7 +519,7 @@ const CandidateList = () => {
                           initial={{ opacity: 0, scale: 0.95 }}
                           animate={{ opacity: 1, scale: 1 }}
                           transition={{ duration: 0.2 }}
-                          className="absolute right-0 mt-2 w-36 rounded-md shadow-lg bg-[#1b222c] ring-1 ring-[#30363d] focus:outline-none z-50"
+                          className="absolute right-0 mt-2 w-36 rounded-md shadow-lg bg-[var(--surface)] ring-1 ring-[var(--border)] focus:outline-none z-50"
                           tabIndex={-1}
                           onClick={(e) => e.stopPropagation()}
                         >
@@ -538,7 +534,7 @@ const CandidateList = () => {
                                 handleDeleteCandidate(candidate.id);
                                 setIsOpen(null);
                               }}
-                              className="block w-full px-4 py-2 text-sm text-red-400 hover:bg-[#30363d] hover:text-red-300 transition-colors duration-300 text-left"
+                              className="block w-full px-4 py-2 text-sm text-red-400 hover:bg-[var(--border)] hover:text-red-300 transition-colors duration-300 text-left"
                               role="menuitem"
                             >
                               <div className="flex items-center">
@@ -590,8 +586,8 @@ const CandidateList = () => {
             whileTap={{ scale: 0.9 }}
             className={`px-4 py-2 rounded-lg shadow-md transition-all duration-300 ${
               currentPage === number + 1
-                ? "bg-[#ffb300] text-[#0e151f] font-medium"
-                : "bg-[#1b222c] text-[#8b949e] border border-[#30363d] hover:border-[#ffb300] hover:text-[#ffb300]"
+                ? "bg-[var(--accent)] text-[var(--dark-bg)] font-medium"
+                : "bg-[var(--surface)] text-[var(--text-secondary)] border border-[var(--border)] hover:border-[var(--accent)] hover:text-[var(--accent)]"
             }`}
           >
             {number + 1}
@@ -605,23 +601,23 @@ const CandidateList = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0  bg-opacity-70 flex items-center justify-center z-50 backdrop-blur-sm"
+          className="fixed inset-0  flex items-center justify-center z-50 backdrop-blur-sm"
         >
           <motion.div
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ type: "spring", duration: 0.5 }}
-            className="bg-[#1b222c] rounded-xl shadow-2xl p-8 w-full max-w-lg border border-[#30363d]"
+            className="bg-[var(--surface)] rounded-xl shadow-2xl p-8 w-full max-w-lg border border-[var(--border)]"
           >
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-[#ffffff]">
+              <h2 className="text-2xl font-bold text-[var(--text-primary)]">
                 Candidate Feedback
               </h2>
               <motion.button
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={closeModal}
-                className="text-[#8b949e] hover:text-[#ffb300] transition-colors duration-300"
+                className="text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors duration-300"
               >
                 <svg
                   className="h-6 w-6"
@@ -641,31 +637,37 @@ const CandidateList = () => {
             </div>
 
             <div className="space-y-4">
-              <div className="p-3 bg-[#1f6feb33] rounded-lg">
-                <p className="text-[#ffffff] font-medium">
-                  <span className="text-[#ffb300]">Combined Score:</span>{" "}
+              <div className="p-3 bg-[var(--blue-highlight)] rounded-lg">
+                <p className="text-[var(--text-primary)] font-medium">
+                  <span className="text-[var(--accent)]">Combined Score:</span>{" "}
                   {selectedFeedback.Combined_Score}
                 </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="p-3 bg-[#0e151f] rounded-lg border border-[#30363d]">
-                  <p className="text-[#ffffff]">
-                    <span className="text-[#8b949e]">JD Skill Match:</span>{" "}
+                <div className="p-3 bg-[var(--dark-bg)] rounded-lg border border-[var(--border)]">
+                  <p className="text-[var(--text-primary)]">
+                    <span className="text-[var(--text-secondary)]">
+                      JD Skill Match:
+                    </span>{" "}
                     {selectedFeedback.JD_Skill_Match}
                   </p>
                 </div>
-                <div className="p-3 bg-[#0e151f] rounded-lg border border-[#30363d]">
-                  <p className="text-[#ffffff]">
-                    <span className="text-[#8b949e]">RCD Skill Match:</span>{" "}
+                <div className="p-3 bg-[var(--dark-bg)] rounded-lg border border-[var(--border)]">
+                  <p className="text-[var(--text-primary)]">
+                    <span className="text-[var(--text-secondary)]">
+                      RCD Skill Match:
+                    </span>{" "}
                     {selectedFeedback.RCD_Skill_Match}
                   </p>
                 </div>
               </div>
 
-              <div className="p-3 bg-[#0e151f] rounded-lg border border-[#30363d]">
-                <p className="text-[#ffffff]">
-                  <span className="text-[#8b949e]">Experience Match:</span>{" "}
+              <div className="p-3 bg-[var(--dark-bg)] rounded-lg border border-[var(--border)]">
+                <p className="text-[var(--text-primary)]">
+                  <span className="text-[var(--text-secondary)]">
+                    Experience Match:
+                  </span>{" "}
                   <span
                     className={
                       selectedFeedback.feedback.experience_match
@@ -678,9 +680,11 @@ const CandidateList = () => {
                 </p>
               </div>
 
-              <div className="p-4 bg-[#0e151f] rounded-lg border border-[#30363d]">
-                <p className="text-[#8b949e] mb-1">Recommendation:</p>
-                <p className="text-[#ffffff]">
+              <div className="p-4 bg-[var(--dark-bg)] rounded-lg border border-[var(--border)]">
+                <p className="text-[var(--text-secondary)] mb-1">
+                  Recommendation:
+                </p>
+                <p className="text-[var(--text-primary)]">
                   {selectedFeedback.feedback.recommendation}
                 </p>
               </div>
@@ -691,7 +695,7 @@ const CandidateList = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={closeModal}
-                className="px-6 py-2 bg-[#ffb300] text-[#0e151f] font-medium rounded-lg shadow hover:bg-[#ffc133] transition-all duration-300"
+                className="px-6 py-2 bg-[var(--accent)] text-[var(--dark-bg)] font-medium rounded-lg shadow hover:bg-[var(--accent-hover)] transition-all duration-300"
               >
                 Close
               </motion.button>

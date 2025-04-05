@@ -213,13 +213,13 @@ const ForgetPassword = () => {
   };
 
   return (
-    <div className="min-h-screen flex justify-center items-center p-4 bg-[#0e151f]">
-      <div className="bg-[#1b222c] w-full max-w-md rounded-xl shadow-lg p-8 transition-all duration-300 border border-[#30363d]">
+    <div className="min-h-screen flex justify-center items-center p-4 bg-[var(--bg)]">
+      <div className="bg-[var(--bg)] w-full max-w-md rounded-xl shadow-lg p-8 transition-all duration-300 border border-[var(--surface-lighter)]">
         <div className="mb-6 text-center">
-          <h2 className="text-2xl font-bold text-[#ffffff] mb-2">
+          <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-2">
             {getStepTitle()}
           </h2>
-          <p className="text-[#8b949e]">{getStepDescription()}</p>
+          <p className="text-[var(--text-primary)]">{getStepDescription()}</p>
         </div>
 
         {message && (
@@ -246,14 +246,14 @@ const ForgetPassword = () => {
             <div className="relative">
               <label
                 htmlFor="email"
-                className="text-sm font-medium text-[#8b949e] block mb-1"
+                className="text-sm font-medium text-[var(--text-secondary)] block mb-1"
               >
                 Email Address
               </label>
               <input
                 id="email"
                 type="email"
-                className="w-full p-3 border border-[#30363d] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ffb300] focus:border-transparent bg-[#1b222c] text-[#ffffff]"
+                className="w-full p-3 border border-[#30363d] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ffb300] focus:border-transparent bg-[var(--surface)] text-[var(--text-primary)]"
                 placeholder="your@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}

@@ -61,7 +61,13 @@ const screeningStatusData = [
   { name: "Rescheduled", count: 25 },
 ];
 
-const COLORS = ["#ffb300", "#ffc133", "#ffd066", "#ffde99", "#ffeccc"];
+const COLORS = [
+  "var(--accent)",
+  "var(--accent-hover)",
+  "#ffd066",
+  "#ffde99",
+  "#ffeccc",
+];
 const SCREENING_COLORS = ["#4ade80", "#ef4444", "#8b5cf6", "#3b82f6"];
 
 // Type definitions
@@ -86,19 +92,21 @@ export default function RecruiterDashboard() {
     change,
     changeDirection,
   }: StatCardProps) => (
-    <div className="bg-gray-900 p-6 rounded-lg shadow-lg">
+    <div className="bg-[var(--surface)] p-6 rounded-lg shadow-lg border border-[var(--border)]">
       <div className="flex justify-between items-start">
         <div>
-          <h3 className="text-dark-text-secondary text-sm font-medium mb-1">
+          <h3 className="text-[var(--text-secondary)] text-sm font-medium mb-1">
             {title}
           </h3>
           <div className="flex items-baseline">
-            <h2 className="text-dark-text-primary text-2xl font-bold">
+            <h2 className="text-[var(--text-primary)] text-2xl font-bold">
               {value}
             </h2>
             {change !== undefined && (
               <span
-                className={`ml-2 text-sm ${changeDirection === "up" ? "text-yellow-400" : "text-red-400"} flex items-center`}
+                className={`ml-2 text-sm ${
+                  changeDirection === "up" ? "text-green-400" : "text-red-400"
+                } flex items-center`}
               >
                 {changeDirection === "up" ? (
                   <ChevronUp size={16} />
@@ -110,68 +118,80 @@ export default function RecruiterDashboard() {
             )}
           </div>
         </div>
-        <div className="p-2 bg-dark-blue-highlight rounded-lg">{icon}</div>
+        <div className="p-2 bg-[var(--blue-highlight)] rounded-lg">{icon}</div>
       </div>
     </div>
   );
 
   // Chart titles style
-  const chartTitle = "text-dark-text-primary font-medium text-lg mb-4";
+  const chartTitle = "text-[var(--text-primary)] font-medium text-lg mb-4";
 
   return (
-    <div className="bg-dark-bg min-h-screen text-dark-text-primary">
-      <main className="container mx-auto">
+    <div className="bg-[var(--bg)] min-h-screen text-[var(--text-primary)]">
+      <main className="container mx-auto px-4 py-6">
         {/* Stats Row */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-6">
           <StatCard
             title="Open Jobs"
             value="42"
-            icon={<Briefcase size={24} className="text-dark-accent" />}
+            icon={<Briefcase size={24} className="text-[var(--accent)]" />}
             change={3.5}
             changeDirection="up"
           />
           <StatCard
             title="Active Candidates"
             value="187"
-            icon={<Users size={24} className="text-dark-accent" />}
+            icon={<Users size={24} className="text-[var(--accent)]" />}
             change={8.2}
             changeDirection="up"
           />
           <StatCard
             title="Scheduled Interviews"
             value="28"
-            icon={<Calendar size={24} className="text-dark-accent" />}
+            icon={<Calendar size={24} className="text-[var(--accent)]" />}
             change={5.7}
             changeDirection="up"
           />
           <StatCard
             title="Screening Success Rate"
             value="62%"
-            icon={<UserCheck size={24} className="text-dark-accent" />}
+            icon={<UserCheck size={24} className="text-[var(--accent)]" />}
             change={2.1}
             changeDirection="down"
           />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
-          <div className="lg:col-span-2 bg-gray-900 p-6 rounded-lg shadow-lg">
+          <div className="lg:col-span-2 bg-[var(--surface)] p-6 rounded-lg shadow-lg border border-[var(--border)]">
             <div className="flex justify-between items-center mb-4">
               <h2 className={chartTitle}>Candidate Trends</h2>
-              <div className="flex bg-dark-surface-lighter rounded-lg overflow-hidden">
+              <div className="flex bg-[var(--surface-lighter)] rounded-lg overflow-hidden">
                 <button
-                  className={`px-3 py-1 text-sm ${timeframe === "day" ? "bg-dark-accent text-dark-bg" : "text-dark-text-secondary"}`}
+                  className={`px-3 py-1 text-sm ${
+                    timeframe === "day"
+                      ? "bg-[var(--accent)] text-[var(--dark-bg)]"
+                      : "text-[var(--text-secondary)]"
+                  }`}
                   onClick={() => setTimeframe("day")}
                 >
                   Day
                 </button>
                 <button
-                  className={`px-3 py-1 text-sm ${timeframe === "week" ? "bg-dark-accent text-dark-bg" : "text-dark-text-secondary"}`}
+                  className={`px-3 py-1 text-sm ${
+                    timeframe === "week"
+                      ? "bg-[var(--accent)] text-[var(--dark-bg)]"
+                      : "text-[var(--text-secondary)]"
+                  }`}
                   onClick={() => setTimeframe("week")}
                 >
                   Week
                 </button>
                 <button
-                  className={`px-3 py-1 text-sm ${timeframe === "month" ? "bg-dark-accent text-dark-bg" : "text-dark-text-secondary"}`}
+                  className={`px-3 py-1 text-sm ${
+                    timeframe === "month"
+                      ? "bg-[var(--accent)] text-[var(--dark-bg)]"
+                      : "text-[var(--text-secondary)]"
+                  }`}
                   onClick={() => setTimeframe("month")}
                 >
                   Month
@@ -189,24 +209,32 @@ export default function RecruiterDashboard() {
                       x2="0"
                       y2="1"
                     >
-                      <stop offset="5%" stopColor="#ffb300" stopOpacity={0.8} />
-                      <stop offset="95%" stopColor="#ffb300" stopOpacity={0} />
+                      <stop
+                        offset="5%"
+                        stopColor="var(--accent)"
+                        stopOpacity={0.8}
+                      />
+                      <stop
+                        offset="95%"
+                        stopColor="var(--accent)"
+                        stopOpacity={0}
+                      />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#30363d" />
-                  <XAxis dataKey="name" stroke="#8b949e" />
-                  <YAxis stroke="#8b949e" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                  <XAxis dataKey="name" stroke="var(--text-secondary)" />
+                  <YAxis stroke="var(--text-secondary)" />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "#161b22",
-                      borderColor: "#30363d",
+                      backgroundColor: "var(--surface)",
+                      borderColor: "var(--border)",
                     }}
-                    labelStyle={{ color: "#ffffff" }}
+                    labelStyle={{ color: "var(--text-primary)" }}
                   />
                   <Area
                     type="monotone"
                     dataKey="candidates"
-                    stroke="#ffb300"
+                    stroke="var(--accent)"
                     fillOpacity={1}
                     fill="url(#colorCandidates)"
                   />
@@ -215,7 +243,7 @@ export default function RecruiterDashboard() {
             </div>
           </div>
 
-          <div className="bg-gray-900 p-6 rounded-lg shadow-lg">
+          <div className="bg-[var(--surface)] p-6 rounded-lg shadow-lg border border-[var(--border)]">
             <h2 className={chartTitle}>Candidate Sources</h2>
             <div className="h-72">
               <ResponsiveContainer width="100%" height="100%">
@@ -242,10 +270,10 @@ export default function RecruiterDashboard() {
                   </Pie>
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "#161b22",
-                      borderColor: "#30363d",
+                      backgroundColor: "var(--surface)",
+                      borderColor: "var(--border)",
                     }}
-                    labelStyle={{ color: "#ffffff" }}
+                    labelStyle={{ color: "var(--text-primary)" }}
                   />
                 </PieChart>
               </ResponsiveContainer>
@@ -254,20 +282,20 @@ export default function RecruiterDashboard() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <div className="bg-gray-900 p-6 rounded-lg shadow-lg">
+          <div className="bg-[var(--surface)] p-6 rounded-lg shadow-lg border border-[var(--border)]">
             <h2 className={chartTitle}>Screening Results</h2>
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={screeningStatusData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#30363d" />
-                  <XAxis dataKey="name" stroke="#8b949e" />
-                  <YAxis stroke="#8b949e" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                  <XAxis dataKey="name" stroke="var(--text-secondary)" />
+                  <YAxis stroke="var(--text-secondary)" />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "#161b22",
-                      borderColor: "#30363d",
+                      backgroundColor: "var(--surface)",
+                      borderColor: "var(--border)",
                     }}
-                    labelStyle={{ color: "#ffffff" }}
+                    labelStyle={{ color: "var(--text-primary)" }}
                   />
                   <Bar dataKey="count">
                     {screeningStatusData.map((entry, index) => (
@@ -282,24 +310,24 @@ export default function RecruiterDashboard() {
             </div>
           </div>
 
-          <div className="lg:col-span-2 bg-gray-900 p-6 rounded-lg shadow-lg">
+          <div className="lg:col-span-2 bg-[var(--surface)] p-6 rounded-lg shadow-lg border border-[var(--border)]">
             <div className="flex justify-between items-center mb-4">
               <h2 className={chartTitle}>
                 Upcoming Interviews{" "}
-                <span className="text-dark-accent">(8)</span>
+                <span className="text-[var(--accent)]">(8)</span>
               </h2>
-              <button className="px-3 py-1 bg-dark-accent hover:bg-dark-accent-hover text-dark-bg rounded text-sm transition-colors duration-300">
+              <button className="px-3 py-1 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--dark-bg)] rounded text-sm transition-colors duration-300">
                 View All
               </button>
             </div>
-            <div className="divide-y divide-dark-border">
+            <div className="divide-y divide-[var(--border)]">
               {[1, 2, 3, 4].map((item) => (
                 <div
                   key={item}
                   className="py-3 flex justify-between items-center"
                 >
                   <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-dark-surface-lighter rounded-full flex items-center justify-center text-dark-accent">
+                    <div className="w-10 h-10 bg-[var(--surface-lighter)] rounded-full flex items-center justify-center text-[var(--accent)]">
                       {["AJ", "ML", "TW", "KP"][item - 1]}
                     </div>
                     <div>
@@ -313,7 +341,7 @@ export default function RecruiterDashboard() {
                           ][item - 1]
                         }
                       </h3>
-                      <p className="text-xs text-dark-text-secondary">
+                      <p className="text-xs text-[var(--text-secondary)]">
                         {
                           [
                             "Senior Developer • Today, 2:00 PM",
@@ -326,10 +354,10 @@ export default function RecruiterDashboard() {
                     </div>
                   </div>
                   <div className="flex space-x-2">
-                    <button className="p-1 px-3 bg-yellow-600 hover:bg-gray-700 rounded text-xs transition-colors duration-300">
+                    <button className="p-1 px-3 bg-[var(--accent)] hover:bg-[var(--accent-hover)] rounded text-xs transition-colors duration-300">
                       View
                     </button>
-                    <button className="p-1 px-3 bg-gray-600 hover:bg-gray-700 rounded text-xs transition-colors duration-300">
+                    <button className="p-1 px-3 bg-[var(--surface-lighter)] hover:bg-[var(--border)] rounded text-xs transition-colors duration-300">
                       Reschedule
                     </button>
                   </div>

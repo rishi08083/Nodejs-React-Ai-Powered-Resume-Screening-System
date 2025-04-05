@@ -1,3 +1,3 @@
 export default function AdminSettings() {
-  return <div>Admin Settings</div>;
+  return <div className="mt-17">Admin Settings</div>;
 }

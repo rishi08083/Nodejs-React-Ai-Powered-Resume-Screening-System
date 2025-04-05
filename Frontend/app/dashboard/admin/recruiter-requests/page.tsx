@@ -1,5 +1,4 @@
 "use client";
-
 import { JSX, useEffect, useState } from "react";
 import {
   fetchRecruiterRequests,
@@ -7,7 +6,6 @@ import {
   rejectRecruiterRequest,
 } from "../../../../api-services/recruiterService";
 
-// Define types for the response and request objects
 interface RecruiterRequest {
   name: string;
   email: string;
@@ -28,7 +26,6 @@ export default function RecruiterRequests(): JSX.Element {
   const [actionInProgress, setActionInProgress] = useState<string | null>(null);
 
   useEffect(() => {
-    // Fetch recruiter requests when the component loads
     const getRequests = async (): Promise<void> => {
       setIsLoading(true);
       try {
@@ -93,9 +90,9 @@ export default function RecruiterRequests(): JSX.Element {
   };
 
   return (
-    <div className="min-h-screen bg-[#0e151f] py-8 px-4 sm:px-6 lg:px-8 text-[#ffffff] mt-10">
+    <div className="min-h-screen bg-[var(--bg)] py-8 px-4 sm:px-6 lg:px-8 text-[var(--text-primary)] mt-10">
       <div className="max-w-5xl mx-auto">
-        <div className="bg-[#1b222c] rounded-xl shadow-lg overflow-hidden border border-[#30363d]">
+        <div className="bg-[var(--surface)] rounded-xl shadow-lg overflow-hidden border border-[var(--border)]">
           {/* Alert Message */}
           <div
             className={`transition-all duration-500 ease-in-out overflow-hidden ${
@@ -119,7 +116,7 @@ export default function RecruiterRequests(): JSX.Element {
                   >
                     <path
                       fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
                       clipRule="evenodd"
                     />
                   </svg>
@@ -176,8 +173,10 @@ export default function RecruiterRequests(): JSX.Element {
             {isLoading ? (
               <div className="flex justify-center py-12">
                 <div className="animate-pulse flex flex-col items-center">
-                  <div className="w-12 h-12 rounded-full bg-[#ffb300]/30"></div>
-                  <div className="mt-4 text-[#ffb300]">Loading requests...</div>
+                  <div className="w-12 h-12 rounded-full bg-[var(--accent)]/30"></div>
+                  <div className="mt-4 text-[var(--accent)]">
+                    Loading requests...
+                  </div>
                 </div>
               </div>
             ) : requests.length > 0 ? (
@@ -185,18 +184,18 @@ export default function RecruiterRequests(): JSX.Element {
                 {requests.map((request) => (
                   <div
                     key={request.email}
-                    className="bg-[#1b222c] border border-[#30363d] rounded-lg shadow-md overflow-hidden transition-all duration-300 transform hover:shadow-lg hover:scale-102 hover:border-[#ffb300]"
+                    className="bg-[var(--surface)] border border-[var(--border)] rounded-lg shadow-md overflow-hidden transition-all duration-300 transform hover:shadow-lg hover:scale-102 hover:border-[var(--accent)]"
                   >
                     <div className="p-5">
                       <div className="flex items-center mb-4">
-                        <div className="h-12 w-12 rounded-full bg-[#ffb300]/20 flex items-center justify-center text-[#ffb300] text-xl font-bold">
+                        <div className="h-12 w-12 rounded-full bg-[var(--accent)]/20 flex items-center justify-center text-[var(--accent)] text-xl font-bold">
                           {request.name.charAt(0).toUpperCase()}
                         </div>
                         <div className="ml-4">
-                          <h3 className="text-lg font-medium text-[#ffffff]">
+                          <h3 className="text-lg font-medium text-[var(--text-primary)]">
                             {request.name}
                           </h3>
-                          <p className="text-sm text-[#8b949e]">
+                          <p className="text-sm text-[var(--text-secondary)]">
                             {request.email}
                           </p>
                         </div>
@@ -206,7 +205,7 @@ export default function RecruiterRequests(): JSX.Element {
                         <button
                           onClick={() => handleAccept(request.email)}
                           disabled={actionInProgress === request.email}
-                          className={`inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-[#0e151f] bg-yellow-500 hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#1b222c] focus:ring-yellow-500 transition-colors duration-300 ${
+                          className={`inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-[var(--dark-bg)] bg-yellow-500 hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[var(--surface)] focus:ring-yellow-500 transition-colors duration-300 ${
                             actionInProgress === request.email
                               ? "opacity-75 cursor-not-allowed"
                               : ""
@@ -214,7 +213,7 @@ export default function RecruiterRequests(): JSX.Element {
                         >
                           {actionInProgress === request.email ? (
                             <svg
-                              className="animate-spin -ml-1 mr-2 h-4 w-4 text-[#0e151f]"
+                              className="animate-spin -ml-1 mr-2 h-4 w-4 text-[var(--dark-bg)]"
                               xmlns="http://www.w3.org/2000/svg"
                               fill="none"
                               viewBox="0 0 24 24"
@@ -252,7 +251,7 @@ export default function RecruiterRequests(): JSX.Element {
                         <button
                           onClick={() => handleReject(request.email)}
                           disabled={actionInProgress === request.email}
-                          className={`inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-[#0e151f] bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#1b222c] focus:ring-red-500 transition-colors duration-300 ${
+                          className={`inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-[var(--dark-bg)] bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[var(--surface)] focus:ring-red-500 transition-colors duration-300 ${
                             actionInProgress === request.email
                               ? "opacity-75 cursor-not-allowed"
                               : ""
@@ -260,7 +259,7 @@ export default function RecruiterRequests(): JSX.Element {
                         >
                           {actionInProgress === request.email ? (
                             <svg
-                              className="animate-spin -ml-1 mr-2 h-4 w-4 text-[#0e151f]"
+                              className="animate-spin -ml-1 mr-2 h-4 w-4 text-[var(--dark-bg)]"
                               xmlns="http://www.w3.org/2000/svg"
                               fill="none"
                               viewBox="0 0 24 24"
@@ -302,7 +301,7 @@ export default function RecruiterRequests(): JSX.Element {
               </div>
             ) : (
               <div className="text-center py-12">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#ffb300]/20 text-[#ffb300] mb-4">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[var(--accent)]/20 text-[var(--accent)] mb-4">
                   <svg
                     className="h-8 w-8"
                     xmlns="http://www.w3.org/2000/svg"
@@ -318,10 +317,10 @@ export default function RecruiterRequests(): JSX.Element {
                     />
                   </svg>
                 </div>
-                <h3 className="text-lg font-medium text-[#ffffff]">
+                <h3 className="text-lg font-medium text-[var(--text-primary)]">
                   No Pending Requests
                 </h3>
-                <p className="mt-2 text-[#8b949e]">
+                <p className="mt-2 text-[var(--text-secondary)]">
                   There are currently no recruiter requests to review.
                 </p>
               </div>

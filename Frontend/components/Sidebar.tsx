@@ -14,6 +14,7 @@ import {
   UserRound,
   X,
 } from "lucide-react";
+import { useTheme } from "../lib/themeContext";
 
 const recruiterLinks = [
   {
@@ -69,6 +70,7 @@ export default function Sidebar({
 }) {
   const links = role === "admin" ? adminLinks : recruiterLinks;
   const pathname = usePathname();
+  const { theme, toggleTheme } = useTheme();
 
   return (
     <>
@@ -78,13 +80,23 @@ export default function Sidebar({
       />
       <aside className={`sidebar ${isOpen ? "open" : ""}`}>
         <div className="logo-container">
-          <Image
-            src="/promact.png"
-            alt="Logo"
-            width={190}
-            height={60}
-            className="inset-0"
-          />
+          {theme === "dark" ? (
+            <Image
+              src="/promact.png"
+              alt="Logo"
+              width={190}
+              height={60}
+              className="inset-0"
+            />
+          ) : (
+            <Image
+              src="/logo.jpg"
+              alt="Logo"
+              width={190}
+              height={60}
+              className="inset-0"
+            />
+          )}
 
           <button className="close-button" onClick={() => setIsOpen(false)}>
             <X size={24} />
