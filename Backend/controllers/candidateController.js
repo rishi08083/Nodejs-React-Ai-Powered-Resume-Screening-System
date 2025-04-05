@@ -67,7 +67,7 @@ module.exports.listCandidate = async (req, res) => {
     }
 
     const candidates = await db.Candidates.findAll({
-      where: { job_id: parseInt(job_id) },
+      where: { job_id: parseInt(job_id), is_deleted: false },
     });
     console.log("Candidates:", candidates);
     if (candidates.length === 0) {
@@ -87,6 +87,85 @@ module.exports.listCandidate = async (req, res) => {
     res.status(500).json({
       status: "error",
       message: "Candidate Fetching failed",
+      error: { details: error.message },
+    });
+  }
+};
+
+module.exports.deleteCandidate = async (req, res) => {
+  try {
+    const { candidate_id } = req.params;
+
+    if (!candidate_id) {
+      return res.status(400).json({
+        status: "error",
+        message: "Candidate ID is required",
+      });
+    }
+
+    const candidate = await db.Candidates.findByPk(candidate_id);
+
+    if (!candidate) {
+      return res.status(404).json({
+        status: "error",
+        message: "Candidate not found",
+      });
+    }
+
+    await candidate.update({ is_deleted: true });
+
+    res.status(200).json({
+      status: "success",
+      message: "Candidate deleted successfully",
+    });
+  } catch (error) {
+    console.error("Error deleting candidate:", error);
+    res.status(500).json({
+      status: "error",
+      message: "Candidate deletion failed",
+      error: { details: error.message },
+    });
+  }
+};
+
+module.exports.getRecommendedCandidates = async (req, res) => {
+  try {
+    const { job_id } = req.params;
+    if (!job_id) {
+      return res.status(400).json({
+        status: "error",
+        message: "Job ID is required",
+      });
+    }
+
+    const recommendedCandidates = await db.Candidates.findAll({
+      where: { 
+        job_id: parseInt(job_id), 
+        is_deleted: false,
+        match_score: {
+          [db.Sequelize.Op.gt]: 40 // Greater than 40
+        }
+      },
+      order: [['match_score', 'DESC']], // Order by match score in descending order
+    });
+
+    if (recommendedCandidates.length === 0) {
+      return res.status(200).json({
+        status: "success",
+        message: "No recommended candidates found with match score greater than 40",
+      });
+    }
+
+    res.status(200).json({
+      status: "success",
+      message: "Recommended candidates fetched successfully",
+      data: { recommendedCandidates },
+    });
+  } catch (error) {
+    console.error("Error fetching recommended candidates:", error);
+    res.status(500).json({
+      status: "error",
+      message: "Failed to fetch recommended candidates",
       error: { details: error.message },
     });
   }

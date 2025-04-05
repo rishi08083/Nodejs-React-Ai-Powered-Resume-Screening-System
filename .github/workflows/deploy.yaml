@@ -58,6 +58,7 @@ jobs:
         run: |
           echo "Fetching frontend environment variables..."
           echo "${{ vars.FRONTEND_ENV }}" > frontend.env
+          echo "${{ vars.FRONTEND_ENV }}" > Frontend/.env
           echo "This is the content of the frontend.env file:"
           cat frontend.env
 
