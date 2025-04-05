@@ -184,17 +184,7 @@ const Home = () => {
               >
                 <Briefcase className="mr-3" size={20} /> Jobs
               </button>
-              <button
-                onClick={() => setActiveSection("upload")}
-                //className={state.activeSection === "upload" ? "font-bold" : ""}
-                className={`w-full text-left p-2 rounded flex items-center ${
-                  state.activeSection == "upload"
-                    ? "bg-yellow-100 text-yellow-700 font-semibold"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
-              >
-                <FileUp className="mr-3" size={20} /> Upload Resume
-              </button>
+             
               <button
                 onClick={() => setActiveSection("candidate")}
                 // className={state.activeSection === "candidate" ? "font-bold" : ""}

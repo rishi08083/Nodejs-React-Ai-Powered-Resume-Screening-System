@@ -44,7 +44,9 @@ const UploadForm = () => {
   >(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const candidatesPerPage = 10;
-  
+  const [jobId, setJobId] = useState("");
+
+
   // Resume upload state
   const [files, setFiles] = useState<File[]>([]);
   const [errorMessage, setErrorMessage] = useState<string>("");
@@ -53,7 +55,8 @@ const UploadForm = () => {
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [showUploadModal, setShowUploadModal] = useState<boolean>(false);
-  
+  const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
+
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
@@ -97,8 +100,6 @@ const UploadForm = () => {
           setJobs(data.data);
           console.log(data.data, "data data");
           console.log(jobs, "jobs data");
-          
-          
         } else {
           const errorData = await response.json();
           throw new Error(errorData.message);
@@ -113,7 +114,7 @@ const UploadForm = () => {
   useEffect(() => {
     const getCandidates = async () => {
       if (!selectedJob) return;
-      
+
       try {
         const response = await fetch(
           `${BASE_URL}/candidates/list/${selectedJob}`,
@@ -159,13 +160,16 @@ const UploadForm = () => {
 
   const get_feedback = async (candidateId: string) => {
     try {
-      const response = await fetch(`${BASE_URL}/screening/get_feedback/${candidateId}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + localStorage.getItem("token"),
-        },
-      });
+      const response = await fetch(
+        `${BASE_URL}/screening/get_feedback/${candidateId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        }
+      );
 
       if (response.ok) {
         const data = await response.json();
@@ -177,7 +181,6 @@ const UploadForm = () => {
           ...prev,
           [candidateId]: data.data[0].feedback_text,
         }));
-    
       } else {
         const errorData = await response.json();
         throw new Error(errorData.message);
@@ -213,7 +216,6 @@ const UploadForm = () => {
       console.log(error, "error");
     }
   };
-  
 
   const handleDeleteCandidate = async (candidateId: string) => {
     try {
@@ -309,12 +311,12 @@ const UploadForm = () => {
     setIsModalOpen(false);
     setSelectedFeedback(null);
   };
-  
+
   // Resume upload functionality
   const getFileExtension = (filename: string): string => {
     return filename.split(".").pop()?.toLowerCase() || "";
   };
-  
+
   const handleDragEnter = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     setIsDragging(true);
@@ -348,8 +350,8 @@ const UploadForm = () => {
     if (invalidFiles.length > 0) {
       setErrorMessage(
         `Invalid file types: ${invalidFiles.join(
-          ", ",
-        )}. Please upload PDF, DOCX, or JPG files.`,
+          ", "
+        )}. Please upload PDF, DOCX, or JPG files.`
       );
     } else {
       setErrorMessage("");
@@ -403,7 +405,7 @@ const UploadForm = () => {
           setFiles([]);
           setErrorMessage("");
           setSuccessMessage("Files uploaded successfully.");
-          
+
           // Refresh candidates list
           const candidatesResponse = await fetch(
             `${BASE_URL}/candidates/list/${selectedJob}`,
@@ -413,14 +415,14 @@ const UploadForm = () => {
                 "Content-Type": "application/json",
                 Authorization: "Bearer " + localStorage.getItem("token"),
               },
-            },
+            }
           );
-          
+
           if (candidatesResponse.ok) {
             const data = await candidatesResponse.json();
             setCandidates(data.data.candidates);
           }
-          
+
           // Close the modal after 2 seconds
           setTimeout(() => {
             setShowUploadModal(false);
@@ -454,43 +456,13 @@ const UploadForm = () => {
     }
   };
 
-
   const [isOpen, setIsOpen] = useState<string | null>(null);
   const dropdownRef = useRef(null);
 
   // Close dropdown when clicked outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target)
-      ) {
-        setIsOpen(null);
-      }
-    };
-
-    if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    } else {
-      document.removeEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [isOpen]);
-
-
-  // const [isOpen, setIsOpen] = useState<string | null>(null);
-  // const dropdownRef = useRef(null);
-
-  // Close dropdown when clicked outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target)
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsOpen(null);
       }
     };
@@ -523,7 +495,8 @@ const UploadForm = () => {
           onClick={() => setShowUploadModal(true)}
           className="px-4 py-2 bg-yellow-400 text-white rounded-lg shadow-md hover:bg-yellow-500 transition-colors duration-200"
         >
-          Upload Resumes
+          <span className="inline-block mr-2">📤</span>
+          Upload Multiple Resumes
         </motion.button>
       </div>
 
@@ -548,8 +521,8 @@ const UploadForm = () => {
             </option>
           ))}
         </select>
+        <span className="text-gray-600">{isDropdownOpen ? "▲" : "▼"}</span>
       </div>
-
       {/* Candidate Table */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -638,43 +611,47 @@ const UploadForm = () => {
                 </td>
                 <td className="px-4 py-4 text-sm text-gray-600 relative">
                   <div
-                  ref={dropdownRef}
-                  className="relative inline-block text-left"
+                    ref={dropdownRef}
+                    className="relative inline-block text-left"
                   >
-                  <button
-                    onClick={() => setIsOpen((prev) => (prev === candidate.id ? null : candidate.id))}
-                    className="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-3 py-1 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none"
-                    aria-haspopup="true"
-                    aria-expanded={isOpen === candidate.id}
-                  >
-                    &#x22EE;
-                  </button>
+                    <button
+                      onClick={() =>
+                        setIsOpen((prev) =>
+                          prev === candidate.id ? null : candidate.id
+                        )
+                      }
+                      className="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-3 py-1 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none"
+                      aria-haspopup="true"
+                      aria-expanded={isOpen === candidate.id}
+                    >
+                      &#x22EE;
+                    </button>
 
                     {isOpen === candidate.id && (
-                    <div
-                      className="absolute right-10 top-[-10px] mt-2 w-32 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-1000"
-                      tabIndex={-1}
-                      onClick={(e) => e.stopPropagation()}
-                      style={{ zIndex: 1000 }}
-                    >
                       <div
-                      className="py-1"
-                      role="menu"
-                      aria-orientation="vertical"
-                      aria-labelledby="options-menu"
+                        className="absolute right-10 top-[-10px] mt-2 w-32 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-1000"
+                        tabIndex={-1}
+                        onClick={(e) => e.stopPropagation()}
+                        style={{ zIndex: 1000 }}
                       >
-                      <button
-                        onClick={() => {
-                        handleDeleteCandidate(candidate.id);
-                        setIsOpen(null);
-                        }}
-                        className="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 w-full text-left"
-                        role="menuitem"
-                      >
-                        Delete
-                      </button>
+                        <div
+                          className="py-1"
+                          role="menu"
+                          aria-orientation="vertical"
+                          aria-labelledby="options-menu"
+                        >
+                          <button
+                            onClick={() => {
+                              handleDeleteCandidate(candidate.id);
+                              setIsOpen(null);
+                            }}
+                            className="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 w-full text-left"
+                            role="menuitem"
+                          >
+                            Delete
+                          </button>
+                        </div>
                       </div>
-                    </div>
                     )}
                   </div>
                 </td>
@@ -745,18 +722,18 @@ const UploadForm = () => {
           </div>
         </motion.div>
       )}
-      
+
       {/* Upload Resume Modal */}
       {showUploadModal && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          className="fixed inset-0 backdrop-blur-sm bg-opacity-50 flex items-center justify-center z-50"
         >
           <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold text-gray-800">
-                Upload Resumes
+                Upload Multiple Resumes
               </h2>
               <button
                 onClick={() => {
@@ -770,10 +747,9 @@ const UploadForm = () => {
                 ✕
               </button>
             </div>
-            
-            {/* Job Selection */}
+
+            {/* Job Selection
             <div className="mb-4">
-              <label className="block text-gray-700 mb-2">Select Job</label>
               <select
                 className="w-full p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
                 value={selectedJob}
@@ -786,8 +762,53 @@ const UploadForm = () => {
                   </option>
                 ))}
               </select>
+            </div> */}
+            <div className="relative mb-6" ref={dropdownRef}>
+
+              <div
+                className={`w-full p-3 pl-10 border-2 rounded-lg text-gray-700 bg-yellow-50 border-yellow-300 hover:border-yellow-500 cursor-pointer transition-all duration-300 flex justify-between items-center ${
+                  selectedJob ? "font-medium" : "text-gray-500"
+                }`}
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              >
+                <div className="flex items-center">
+                  <span className="absolute left-3 text-gray-600">🔍</span>
+                  {selectedJob || "Select a Job Position"}
+                </div>
+                <span className="text-gray-600">
+                  {isDropdownOpen ? "▲" : "▼"}
+                </span>
+              </div>
+
+              {isDropdownOpen && (
+                <div className="absolute z-10 w-full mt-1 bg-white border border-yellow-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                  <div
+                    className="p-3 hover:bg-yellow-100 cursor-pointer transition-colors duration-200 border-l-4 border-transparent hover:border-yellow-500"
+                    onClick={() => {
+                      setSelectedJob("");
+                      setJobId("");
+                      setIsDropdownOpen(false);
+                    }}
+                  >
+                    Select a Job Position
+                  </div>
+                  {jobs.map((job) => (
+                    <div
+                      key={job.id}
+                      className="p-3 hover:bg-yellow-100 cursor-pointer transition-colors duration-200 border-l-4 border-transparent hover:border-yellow-500"
+                      onClick={() => {
+                        setSelectedJob(job.title);
+                        setJobId(job.id);
+                        setIsDropdownOpen(false);
+                      }}
+                    >
+                      {job.title}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-            
+
             {/* Drag and Drop Area */}
             <div
               className={`border-2 border-dashed rounded-lg p-8 text-center transition-all duration-300 ${
@@ -828,7 +849,7 @@ const UploadForm = () => {
                 Supported formats: PDF, DOCX, JPG, JPEG
               </p>
             </div>
-            
+
             {/* Error Message */}
             {errorMessage && (
               <div className="mt-4 p-4 bg-red-50 text-red-700 rounded-lg border border-red-200 animate-pulse">
@@ -838,7 +859,7 @@ const UploadForm = () => {
                 </div>
               </div>
             )}
-            
+
             {/* Success Message */}
             {successMessage && (
               <div className="mt-4 p-4 bg-green-50 text-green-700 rounded-lg border border-green-200">
@@ -848,7 +869,7 @@ const UploadForm = () => {
                 </div>
               </div>
             )}
-            
+
             {/* Selected Files */}
             {files.length > 0 && (
               <div className="mt-6 bg-gray-50 p-4 rounded-lg border border-gray-100">
@@ -863,9 +884,13 @@ const UploadForm = () => {
                       className="flex items-center justify-between p-3 bg-white rounded border border-gray-200 hover:border-yellow-300 transition-all duration-200"
                     >
                       <div className="flex items-center">
-                        <span className="text-xl mr-3">{getFileIcon(file.name)}</span>
+                        <span className="text-xl mr-3">
+                          {getFileIcon(file.name)}
+                        </span>
                         <div>
-                          <p className="text-gray-800 font-medium">{file.name}</p>
+                          <p className="text-gray-800 font-medium">
+                            {file.name}
+                          </p>
                           <p className="text-xs text-gray-500">
                             {(file.size / 1024).toFixed(2)} KB
                           </p>
@@ -894,7 +919,7 @@ const UploadForm = () => {
           </div>
         </motion.div>
       )}
-      
+
       {/* Loading Overlay */}
       {isLoading && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
