@@ -46,7 +46,6 @@ const UploadForm = () => {
   const candidatesPerPage = 10;
   const [jobId, setJobId] = useState("");
 
-
   // Resume upload state
   const [files, setFiles] = useState<File[]>([]);
   const [errorMessage, setErrorMessage] = useState<string>("");
@@ -764,7 +763,6 @@ const UploadForm = () => {
               </select>
             </div> */}
             <div className="relative mb-6" ref={dropdownRef}>
-
               <div
                 className={`w-full p-3 pl-10 border-2 rounded-lg text-gray-700 bg-yellow-50 border-yellow-300 hover:border-yellow-500 cursor-pointer transition-all duration-300 flex justify-between items-center ${
                   selectedJob ? "font-medium" : "text-gray-500"
@@ -948,4 +946,4 @@ const UploadForm = () => {
   );
 };
 
-export default React.memo(UploadForm);
+export default React.memo(CandidateList);

@@ -4,8 +4,11 @@ import { useState, ChangeEvent, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import React from "react";
 import Link from "next/link";
-import { useAuth } from "../../lib/auth";
+import { useAuth } from "../../../lib/auth";
 import Image from "next/image";
+import { ToastContainer, toast } from "react-toastify";
+import { GoogleLogin } from "@react-oauth/google";
+import GoogleSignIn from "../../../components/auth/GoogleAuth";
 
 const Login = () => {
   const [email, setEmail] = useState<string>("");
@@ -24,10 +27,11 @@ const Login = () => {
     try {
       let data = await login({ email, password });
       console.log(data);
-      router.push("/");
+      router.push("/dashboard");
     } catch (err) {
       console.log(err);
-      setError(err.message);
+      //setError(err.message);
+      toast.error(err.message);
       setIsOpen(true);
       setTimeout(() => {
         setIsOpen(false);
@@ -40,9 +44,10 @@ const Login = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50 font-sans">
+    <div className="flex min-h-screen bg-[#0e151f] font-sans">
       {/* Left side decorative panel */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-r from-yellow-400 to-yellow-300 items-center justify-center">
+      <ToastContainer theme="dark" />
+      <div className="hidden lg:flex lg:w-1/2  bg-[#1b222c]  items-center justify-center">
         <div className="max-w-md text-center">
           <h1 className="text-4xl font-bold text-white mb-6">Welcome Back</h1>
           <p className="text-white text-lg">
@@ -55,29 +60,32 @@ const Login = () => {
       {/* Right side login form */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
         <div className="w-full max-w-md">
-          <div className="bg-white p-8 rounded-xl shadow-lg">
+          <div
+            className="bg-[#1b222c] p-8 rounded-xl shadow-lg"
+            style={{ boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.3)" }}
+          >
             <div className="flex justify-center mb-6">
               <div className="w-32 h-12 relative">
                 {/* You can replace this with your actual logo */}
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-2xl font-bold text-yellow-500"></span>
+                  <span className="text-2xl font-bold text-[#ffb300]"></span>
                 </div>
               </div>
             </div>
 
-            <h1 className="text-3xl font-bold text-center text-gray-800 mb-8">
+            <h1 className="text-3xl font-bold text-center text-[#ffffff] mb-8">
               Sign In
             </h1>
 
             {/* Error Alert */}
-            <div
+            {/* <div
               className={`transition-all duration-500 ease-in-out ${
                 isOpen
                   ? "opacity-100 max-h-20 mb-6"
                   : "opacity-0 max-h-0 overflow-hidden"
               }`}
             >
-              <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded">
+              <div className="bg-red-900 bg-opacity-20 border-l-4 border-red-500 p-4 rounded">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
                     <svg
@@ -94,11 +102,11 @@ const Login = () => {
                     </svg>
                   </div>
                   <div className="ml-3">
-                    <p className="text-sm text-red-700">{error}</p>
+                    <p className="text-sm text-red-400">{error}</p>
                   </div>
                   <button
                     onClick={onClose}
-                    className="ml-auto text-red-500 hover:text-red-700 focus:outline-none"
+                    className="ml-auto text-red-400 hover:text-red-300 focus:outline-none"
                   >
                     <svg
                       className="h-4 w-4"
@@ -115,7 +123,7 @@ const Login = () => {
                   </button>
                 </div>
               </div>
-            </div>
+            </div> */}
 
             <form onSubmit={handleSubmit}>
               <div className="mb-6 relative">
@@ -123,8 +131,8 @@ const Login = () => {
                   htmlFor="email"
                   className={`absolute left-3 transition-all duration-300 pointer-events-none ${
                     isFocused.email || email
-                      ? "-top-2.5 text-xs font-medium text-yellow-500 bg-white px-1"
-                      : "top-3 text-gray-500"
+                      ? "-top-2.5 text-xs font-medium text-[#ffb300] bg-[#1b222c] px-1"
+                      : "top-3 text-[#8b949e]"
                   }`}
                 >
                   Email Address
@@ -132,9 +140,9 @@ const Login = () => {
                 <input
                   type="email"
                   id="email"
-                  className="w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition-colors duration-300 ease-in-out bg-white text-gray-800"
+                  className="w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition-colors duration-300 ease-in-out bg-[#1b222c] text-[#ffffff]"
                   style={{
-                    borderColor: isFocused.email ? "#FFD700" : "#E5E7EB",
+                    borderColor: isFocused.email ? "#ffb300" : "#30363d",
                   }}
                   value={email}
                   onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -154,8 +162,8 @@ const Login = () => {
                   htmlFor="password"
                   className={`absolute left-3 transition-all duration-300 pointer-events-none ${
                     isFocused.password || password
-                      ? "-top-2.5 text-xs font-medium text-yellow-500 bg-white px-1"
-                      : "top-3 text-gray-500"
+                      ? "-top-2.5 text-xs font-medium text-[#ffb300] bg-[#1b222c] px-1"
+                      : "top-3 text-[#8b949e]"
                   }`}
                 >
                   Password
@@ -163,9 +171,9 @@ const Login = () => {
                 <input
                   type="password"
                   id="password"
-                  className="w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition-colors duration-300 ease-in-out bg-white text-gray-800"
+                  className="w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition-colors duration-300 ease-in-out bg-[#1b222c] text-[#ffffff]"
                   style={{
-                    borderColor: isFocused.password ? "#FFD700" : "#E5E7EB",
+                    borderColor: isFocused.password ? "#ffb300" : "#30363d",
                   }}
                   value={password}
                   onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -182,24 +190,25 @@ const Login = () => {
               </div>
               <button
                 type="submit"
-                className="w-full bg-yellow-400 text-white font-medium py-3 rounded-lg hover:bg-yellow-500 transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-lg"
+                className="w-full bg-[#ffb300] text-[#0e151f] font-medium py-3 rounded-lg hover:bg-[#ffc133] transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-lg mb-10"
               >
                 Sign In
               </button>
+              <GoogleSignIn onSuccess={() => {}} onError={() => {}} />
             </form>
 
             <div className="mt-6 flex flex-col items-center space-y-4">
               <Link
                 href="/forgetpassword"
-                className="text-yellow-500 hover:text-yellow-600 transition-colors duration-300"
+                className="text-[#ffb300] hover:text-[#ffc133] transition-colors duration-300"
               >
                 Forgot your password?
               </Link>
-              <div className="w-full border-t border-gray-200 my-2"></div>
-              <p className="text-gray-600">Don't have an account?</p>
+              <div className="w-full border-t border-[#30363d] my-2"></div>
+              <p className="text-[#8b949e]">Don't have an account?</p>
               <Link
-                href="/recruiter/register"
-                className="w-full bg-white border-2 border-yellow-400 text-yellow-500 font-medium py-2.5 rounded-lg text-center hover:bg-yellow-50 transition-colors duration-300"
+                href="/register"
+                className="w-full bg-transparent border-2 border-[#ffb300] text-[#ffb300] font-medium py-2.5 rounded-lg text-center  hover:bg-opacity-10 transition-colors duration-300"
               >
                 Recruiter Registration
               </Link>

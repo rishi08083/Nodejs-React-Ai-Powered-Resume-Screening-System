@@ -158,7 +158,7 @@ const ListJobs = () => {
   }, []);
 
   return (
-    <div className="w-full p-2 bg-[#0e151f] text-[#ffffff]">
+    <div className="w-full p-2 bg-[#0e151f] text-[#ffffff] mt-16">
       <div className="mb-6">
         <h1 className="text-2xl md:text-3xl font-bold text-[#ffffff]">
           Available Job Positions
@@ -191,7 +191,7 @@ const ListJobs = () => {
           <div className="overflow-scroll">
             <table className="min-w-full table-auto border-collapse">
               <thead>
-                <tr className="bg-[#1f6feb33] border-b border-[#30363d]">
+                <tr className=" bg-[#0e151f]  border-b border-[#30363d]">
                   <th className="px-4 py-4 text-left text-sm font-semibold text-[#ffffff]">
                     Title
                   </th>
@@ -213,7 +213,7 @@ const ListJobs = () => {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: index * 0.1 }}
-                    className="border-b border-[#30363d] hover:bg-[#1f6feb33] transition-colors duration-200"
+                    className="border-b border-[#30363d] hover:bg-[#0e151f] transition-colors duration-200"
                   >
                     <td className="px-4 py-4 text-sm font-medium text-[#ffffff]">
                       {job.title}
@@ -222,7 +222,7 @@ const ListJobs = () => {
                       {job.experience_required}
                     </td>
                     <td className="px-4 py-4 text-sm">
-                      <span className="px-2 py-1 bg-[#ffb300] bg-opacity-20 text-[#ffb300] rounded-full text-xs font-medium">
+                      <span className="px-2 py-1 bg-[#ffb300] bg-opacity-20 text-amber-950 rounded-full text-xs font-medium">
                         {job.openings} positions
                       </span>
                     </td>
@@ -268,7 +268,7 @@ const ListJobs = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 p-4 z-50"
+            className="fixed inset-0 flex items-center justify-center bg-opacity-70 p-4 z-50"
           >
             <motion.div
               initial={{ scale: 0.9, y: 20 }}
