@@ -391,7 +391,7 @@ const CandidateList = () => {
         <div className="overflow-x-auto">
           <table className="min-w-full table-auto border-collapse">
             <thead>
-              <tr className="bg-[var(--accent)] border-b border-[var(--border)]">
+              <tr className="bg-[var(--surface)] border-b border-[var(--border)]">
                 <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
                   Candidate Name
                 </th>
@@ -422,7 +422,7 @@ const CandidateList = () => {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.05, duration: 0.4 }}
-                  className="border-b border-[var(--border)] hover:bg-[var(--accent-hover)] transition-all duration-300"
+                  className="border-b border-[var(--border)]  transition-all duration-300"
                 >
                   <td className="px-6 py-4 text-sm font-medium text-[var(--text-primary)]">
                     {candidate.name}
@@ -472,7 +472,7 @@ const CandidateList = () => {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={() => handleCheckCompatibility(candidate.id)}
-                        className="px-4 py-2 bg-[var(--accent)] text-[var(--dark-bg)] font-medium rounded-lg shadow hover:bg-[var(--accent-hover)] transition-colors duration-300"
+                        className="px-4 py-2 bg-[var(--bg)] text-[var(--text-primary)] font-medium rounded-lg shadow hover:bg-[var(--accent-hover)] transition-colors duration-300"
                       >
                         Check Compatibility
                       </motion.button>

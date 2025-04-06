@@ -115,7 +115,12 @@ export default function RecruiterRegister() {
       {/* Left side decorative panel */}
       <div className="hidden lg:flex lg:w-1/2 bg-[var(--dark-surface)] items-center justify-center">
         <div className="max-w-md text-center">
-          <Image src="freelancer3.svg" width={600} height={600} alt="Welcome" />
+          <Image
+            src="/freelancer3.svg"
+            width={600}
+            height={600}
+            alt="Welcome"
+          />
           <p className="text-[var(--dark-text-secondary)] text-lg">
             Register as a recruiter to access powerful hiring tools and find the
             best talent for your organization.
