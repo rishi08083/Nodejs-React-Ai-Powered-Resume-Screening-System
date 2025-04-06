@@ -1,15 +1,16 @@
 @import "tailwindcss";
 
 body {
-  background: var(--background);
-  color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
   width: 100%;
   margin: 0;
   padding: 0;
+  background-color: var(--bg);
+  color: var(--text-primary);
+  transition:
+    background-color 0.3s,
+    color 0.3s;
 }
-
-/* Remove scrollbars from all elements */
 *,
 *::before,
 *::after {
@@ -49,18 +50,10 @@ body {
   --text-primary: #ffffff;
   --text-secondary: #8b949e;
   --accent: #ffb300;
-  --accent-hover: #271c03;
+  --accent-hover: #fdb50f;
   --border: #30363d;
   --shadow: rgba(0, 0, 0, 0.3);
   --blue-highlight: #1f6feb33;
-}
-
-body {
-  background-color: var(--bg);
-  color: var(--text-primary);
-  transition:
-    background-color 0.3s,
-    color 0.3s;
 }
 
 /* Dashboard container */
@@ -102,13 +95,13 @@ main {
 
 /* Navbar */
 .navbar {
-  background-color: var(--dark-surface);
+  background-color: var(--bg);
   padding: 1rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 2px 8px var(--dark-shadow);
-  position: absolute;
+  box-shadow: 0 2px 8px var(--surface);
+  position: fixed;
   top: 0;
   z-index: 10;
   width: 100%;
@@ -382,7 +375,6 @@ main {
   .navbar {
     width: calc(100% - 250px);
     margin-left: 250px;
-    background-color: var(--surface);
   }
 
   .menu-button {
