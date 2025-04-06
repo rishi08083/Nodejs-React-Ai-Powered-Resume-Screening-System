@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo,useRef } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { motion } from "framer-motion";
 import {
   fetchJobs,
@@ -256,17 +256,13 @@ const CandidateList = () => {
     setSelectedFeedback(null);
   };
 
-
   const [isOpen, setIsOpen] = useState<string | null>(null);
   const dropdownRef = useRef(null);
 
   // Close dropdown when clicked outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target)
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsOpen(null);
       }
     };
@@ -405,43 +401,47 @@ const CandidateList = () => {
                 </td>
                 <td className="px-4 py-4 text-sm text-gray-600 relative">
                   <div
-                  ref={dropdownRef}
-                  className="relative inline-block text-left"
+                    ref={dropdownRef}
+                    className="relative inline-block text-left"
                   >
-                  <button
-                    onClick={() => setIsOpen((prev) => (prev === candidate.id ? null : candidate.id))}
-                    className="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-3 py-1 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none"
-                    aria-haspopup="true"
-                    aria-expanded={isOpen === candidate.id}
-                  >
-                    &#x22EE;
-                  </button>
+                    <button
+                      onClick={() =>
+                        setIsOpen((prev) =>
+                          prev === candidate.id ? null : candidate.id
+                        )
+                      }
+                      className="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-3 py-1 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none"
+                      aria-haspopup="true"
+                      aria-expanded={isOpen === candidate.id}
+                    >
+                      &#x22EE;
+                    </button>
 
                     {isOpen === candidate.id && (
-                    <div
-                      className="absolute right-10 top-[-10px] mt-2 w-32 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-1000"
-                      tabIndex={-1}
-                      onClick={(e) => e.stopPropagation()}
-                      style={{ zIndex: 1000 }}
-                    >
                       <div
-                      className="py-1"
-                      role="menu"
-                      aria-orientation="vertical"
-                      aria-labelledby="options-menu"
+                        className="absolute right-10 top-[-10px] mt-2 w-32 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-1000"
+                        tabIndex={-1}
+                        onClick={(e) => e.stopPropagation()}
+                        style={{ zIndex: 1000 }}
                       >
-                      <button
-                        onClick={() => {
-                        handleDeleteCandidate(candidate.id);
-                        setIsOpen(null);
-                        }}
-                        className="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 w-full text-left"
-                        role="menuitem"
-                      >
-                        Delete
-                      </button>
+                        <div
+                          className="py-1"
+                          role="menu"
+                          aria-orientation="vertical"
+                          aria-labelledby="options-menu"
+                        >
+                          <button
+                            onClick={() => {
+                              handleDeleteCandidate(candidate.id);
+                              setIsOpen(null);
+                            }}
+                            className="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 w-full text-left"
+                            role="menuitem"
+                          >
+                            Delete
+                          </button>
+                        </div>
                       </div>
-                    </div>
                     )}
                   </div>
                 </td>
