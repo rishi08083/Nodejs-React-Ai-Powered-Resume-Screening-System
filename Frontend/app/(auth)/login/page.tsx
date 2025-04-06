@@ -51,7 +51,7 @@ const Login = () => {
 
       {/* Left side decorative panel */}
       <div className="hidden lg:flex lg:w-1/2 bg-[var(--dark-surface)] items-center justify-center flex-col pt-4 pl-7">
-        <Image src="freelancer.svg" width={600} height={600} alt="Welcome" />
+        <Image src="/freelancer.svg" width={600} height={600} alt="Welcome" />
         <div className="max-w-md text-center">
           <p className="text-[var(--dark-text-secondary)] text-lg font-bold font-stretch-ultra-expanded">
             Sign in to access your dashboard and manage your recruitment tasks.

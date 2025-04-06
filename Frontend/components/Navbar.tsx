@@ -2,6 +2,7 @@
 
 import { Menu, UserRound, LogOut } from "lucide-react";
 import ThemeToggle from "./theme/ThemeToggle";
+import { useState } from "react";
 
 export default function Navbar({
   user,
@@ -9,6 +10,7 @@ export default function Navbar({
   isSidebarOpen,
   setIsLogoutModalOpen,
 }) {
+  const [modalVisible, setModalVisible] = useState(false);
   return (
     <header className="navbar">
       <div className="navbar-content">
@@ -29,16 +31,19 @@ export default function Navbar({
       </div>
 
       <div className="user-actions">
-        <UserRound className="user-icon" />
-        <button
-          onClick={() => setIsLogoutModalOpen(true)}
-          className="logout-button"
-        >
-          <LogOut className="logout-icon" />
-          <span>Logout</span>
-        </button>
+        <UserRound
+          className="user-icon"
+          onClick={() => setModalVisible((modalVisible) => !modalVisible)}
+        />
+
         <ThemeToggle />
       </div>
+      {modalVisible && (
+        <div className="absolute z-50 top-16 right-2 w-40 p-4 bg-[var(--surface)] rounded-lg  transition-all duration-300 ease-in-out">
+          <div className="w-full">Profile</div>
+          <div>Log Out</div>
+        </div>
+      )}
     </header>
   );
 }
