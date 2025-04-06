@@ -1,6 +1,6 @@
 const db = require("../../models"); // Load models
 const axios = require("axios");
-const { generateToken } = require("../../utils/tokenGenration"); // Token generator utility
+const { generateToken } = require("../../utils/tokenGeneration"); // Token generator utility
 
 const screenCandidate = async (req, res) => {
   try {
@@ -105,12 +105,12 @@ const getFeedback = async (req, res) => {
           message: "No feedback found for this candidate.",
         });
     }
-
     res.json({
       status: "success",
       message: "Feedback retrieved successfully.",
       data: feedback,
     });
+    
   } catch (error) {
     // console.error("Error fetching feedback:", error);
     res.status(500).json({ status: "error", message: "Internal Server Error" });
@@ -277,6 +277,7 @@ async function getFeedbackByCandidateId(candidate_id) {
       candidate_id: entry.candidate_id,
       feedback_text: JSON.parse(entry.feedback_text),
       rating: entry.rating,
+      
       given_by: entry.given_by,
       created_at: entry.created_at,
     }));
