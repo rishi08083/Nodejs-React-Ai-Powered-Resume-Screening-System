@@ -14,7 +14,7 @@ let isScreeningInProgress = false;
 async function screenCandidate(candidate) {
   try {
     const candidate_id = candidate.id;
-    console.log(`📝 Starting screening for candidate ${candidate_id}`);
+    // console.log(`📝 Starting screening for candidate ${candidate_id}`);
     
     const candidateDetails = await getCandidateDetails(candidate_id);
     const token = generateToken();
@@ -55,7 +55,7 @@ async function screenCandidate(candidate) {
 
     await db.Candidates.update({ is_screened: true }, { where: { id: candidate_id } });
 
-    console.log(`✅ Candidate ${candidate_id} screened successfully`);
+    // console.log(`✅ Candidate ${candidate_id} screened successfully`);
     return true;
   } catch (err) {
     console.error(`❌ Error screening ${candidate.id}:`, err.message);
@@ -90,7 +90,7 @@ async function processQueue() {
     });
 
     if (!candidate) {
-      console.log("✅ No candidates to screen at this time.");
+      // console.log("✅ No candidates to screen at this time.");
       isScreeningInProgress = false;
       return;
     }
