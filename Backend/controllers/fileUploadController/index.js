@@ -9,7 +9,7 @@ const path = require("path");
 const crypto = require("crypto");
 const db = require("../../models");
 require("dotenv").config();
-const { generateToken } = require("../../utils/tokenGenration");
+const { generateToken } = require("../../utils/tokenGeneration");
 
 // AWS S3 Configuration
 const s3 = new S3Client({

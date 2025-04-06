@@ -33,7 +33,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
-  console.log("da", BASE_URL);
+  // console.log("da", BASE_URL);
   async function checkAuth() {
     try {
       const response = await fetch(BASE_URL + "/api/user/getuserdetails", {
@@ -47,10 +47,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (response.ok) {
         const data = await response.json();
         // console.log(data.user);
-        console.log(data.data.user);
+        // console.log(data.data.user);
         setUser(data.data.user);
         setLoading(false);
-        console.log(user);
       } else {
         setUser(null);
         setLoading(false);

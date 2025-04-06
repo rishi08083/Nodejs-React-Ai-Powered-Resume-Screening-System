@@ -61,9 +61,18 @@ module.exports = (sequelize, DataTypes) => {
       match_score: DataTypes.INTEGER,
       parsed_resume_id: DataTypes.INTEGER,
       resume_url: DataTypes.STRING,
+      is_recommended: {
+        type: DataTypes.ENUM,
+        values: [false, true, "NOT_SET"],
+        defaultValue: false,
+      },
       is_screen_call_done: DataTypes.BOOLEAN,
       hiring_bull_status: DataTypes.BOOLEAN,
       status: DataTypes.STRING,
+      is_screened: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
       is_deleted: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
@@ -74,6 +83,13 @@ module.exports = (sequelize, DataTypes) => {
       modelName: "Candidates",
       tableName: "candidates",
       timestamps: true,
+      underscored: true,
+    }
+  );
+
+  return Candidates;
+};
+     timestamps: true,
       underscored: true,
     }
   );

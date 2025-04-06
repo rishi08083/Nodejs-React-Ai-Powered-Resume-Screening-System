@@ -7,6 +7,7 @@ const securityMiddleware = require("./middlewares/securityMiddleware");
 securityMiddleware(app);
 app.use(express.json());
 app.use(morgan("dev"));
+require('./cron-job/screenCandidate.js'); 
 
 // Routes
 const indexRouter = require("./routes/indexRoutes");
