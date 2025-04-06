@@ -62,9 +62,9 @@ module.exports = (sequelize, DataTypes) => {
       parsed_resume_id: DataTypes.INTEGER,
       resume_url: DataTypes.STRING,
       is_recommended: {
-        type: DataTypes.ENUM,
-        values: [false, true, "NOT_SET"],
-        defaultValue: false,
+        type: DataTypes.ENUM("YES", "NO", "NOT_SET"),
+        defaultValue: "NOT_SET",
+        allowNull: false
       },
       is_screen_call_done: DataTypes.BOOLEAN,
       hiring_bull_status: DataTypes.BOOLEAN,
@@ -86,13 +86,5 @@ module.exports = (sequelize, DataTypes) => {
       underscored: true,
     }
   );
-
-  return Candidates;
-};
-     timestamps: true,
-      underscored: true,
-    }
-  );
-
   return Candidates;
 };

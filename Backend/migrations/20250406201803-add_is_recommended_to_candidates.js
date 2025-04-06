@@ -8,7 +8,7 @@ module.exports = {
       type: Sequelize.ENUM('YES', 'NO', 'NOT_SET'),
       defaultValue: 'NOT_SET',
       allowNull: false,
-      after: 'resume_url' // This will place the column after resume_url
+      after: 'resume_url' 
     });
   },
 
