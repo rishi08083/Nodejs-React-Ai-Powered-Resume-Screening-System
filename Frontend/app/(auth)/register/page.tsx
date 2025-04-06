@@ -63,7 +63,7 @@ export default function RecruiterRegister() {
         setIsError(false);
         setIsOpen(true);
         setTimeout(() => {
-          router.push("/login");
+          router.push("/register-verification");
         }, 2000);
       } else {
         const errorMessages = handleErrors(response?.error?.details);
