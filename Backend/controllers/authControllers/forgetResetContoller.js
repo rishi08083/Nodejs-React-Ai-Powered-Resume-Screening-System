@@ -26,22 +26,22 @@ const forgetPassword = async (req, res) => {
       });
     }
 
-    //const resetToken = crypto.randomBytes(32).toString("hex");
+    //const token = crypto.randomBytes(32).toString("hex");
     const tokenExpiry = Date.now() + 3600000;
     // 4 digit random number in string
-    const resetToken = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
-    user.resetToken = resetToken;
-    user.resetTokenExpires = tokenExpiry;
+    const token = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+    user.token = token;
+    user.token_expires = tokenExpiry;
     await user.save();
 
-    //const resetUrl = `http://localhost:3000/reset-password?token=${resetToken}`;
+    //const resetUrl = `http://localhost:3000/reset-password?token=${token}`;
 
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: email,
       subject: "Password Reset Request",
-      text: `Here is your otp: ${resetToken}`,
-      html: `<p>Enter this OTP ${resetToken} to reset your password.</p>`,
+      text: `Here is your otp: ${token}`,
+      html: `<p>Enter this OTP ${token} to reset your password.</p>`,
     };
 
     await transporter.sendMail(mailOptions);
@@ -83,8 +83,8 @@ const resetPassword = async (req, res) => {
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
     user.password_hash = hashedPassword;
-    user.resetToken = null;
-    user.resetTokenExpires = null;
+    user.token = null;
+    user.token_expires = null;
     await user.save();
 
     res.status(200).json({
@@ -101,38 +101,7 @@ const resetPassword = async (req, res) => {
   }
 };
 
-const verifyOtp = async (req, res) => {
-  try {
-    const { email, otp } = req.body;
-    const user = await db.Users.findOne({
-      where: {
-        email: email,
-        reset_token: otp,
-        reset_token_expires: { [Op.gt]: Date.now() },
-      },
-    });
-    if (!user) {
-      return res.status(400).json({
-        status: "error",
-        message: "Invalid or expired token",
-      });
-    }
-    res.status(200).json({
-      status: "success",
-      message: "OTP verified successfully",
-      data: { email: user.email },
-    });
-  } catch (error) {
-    res.status(500).json({
-      status: "error",
-      message: "An error occurred while verifying the OTP",
-      error: { details: error.message },
-    });
-  }
-};
-
 module.exports = {
   resetPassword,
   forgetPassword,
-  verifyOtp,
 };

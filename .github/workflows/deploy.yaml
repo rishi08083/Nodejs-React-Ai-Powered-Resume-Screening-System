@@ -81,4 +81,6 @@ jobs:
             cd Internship-2025/Resume-Screening-App
             docker compose build frontend
             docker compose up -d --force-recreate frontend
-            docker system prune -af
+            docker system prune -af 
+
+            
