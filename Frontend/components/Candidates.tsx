@@ -1,11 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { motion } from "framer-motion";
-import {
-  fetchJobs,
-  fetchCandidates,
-  checkCandidateCompatibility,
-} from "../api-services/CandidateServices";
-import { log } from "console";
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 type Job = {
@@ -149,8 +143,9 @@ const CandidateList = () => {
     
           if (response.ok) {
             const data = await response.json();
-            // setResumeUrl(data.data.resume_url);
             console.log(data.data.resume_url, "resume url data");
+            window.open(data.data.resume_url, "_blank", "noopener,noreferrer");
+
                     
           } else {
             const errorData = await response.json();
@@ -159,10 +154,13 @@ const CandidateList = () => {
         } catch (error) {
           console.log(error, "error");
         }
+
   };
 
   const handleDeleteCandidate = async (candidateId: string) => {
     try {
+      console.log(candidateId, "candidate id to delete");
+      
       const response = await fetch(
         `${BASE_URL}/candidates/delete/${candidateId}`,
         {
@@ -179,7 +177,7 @@ const CandidateList = () => {
         setCandidates((prevCandidates) =>
           prevCandidates.filter((candidate) => candidate.id !== candidateId)
         );
-        console.log("Candidate deleted successfully");
+       
       } else {
         const errorData = await response.json();
         throw new Error(errorData.message);
@@ -370,7 +368,8 @@ const CandidateList = () => {
                     }}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-yellow-600 underline hover:text-yellow-800"
+
+                    className="text-yellow-600 underline hover:text-yellow-800 cursor-pointer"
                     >
                     View Resume
                   </a>
