@@ -38,6 +38,6 @@ router.delete("/reject-recruiter-req", rejectRecruiterReq);
 router.post("/forget-password", forgetPassword);
 router.post("/reset-password", resetPassword);
 
-router.post("/verify-otp", verifyToken);
+router.post("/verify-token", verifyToken);
 
 module.exports = router;

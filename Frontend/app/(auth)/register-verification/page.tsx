@@ -1,80 +1,124 @@
 "use client";
-import React, { useState, useRef } from "react";
 
-const RegisterVerification = () => {
-  const [otp, setOtp] = useState<string[]>(["", "", "", ""]);
+import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import axios from "axios";
+import { toast, ToastContainer } from "react-toastify";
+
+export default function RegisterVerification() {
+  const [otp, setOtp] = useState(["", "", "", ""]);
   const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
 
-  const handleOtpChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    index: number
-  ) => {
-    const value = e.target.value;
-
-    // Only allow numeric input
-    if (value && !/^[0-9]$/.test(value)) {
-      return;
-    }
-
+  // Focus next input on digit entry
+  const handleChange = (index: number, value: string) => {
+    if (!/^\d?$/.test(value)) return;
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
 
-    // Auto-focus to next input if there's a value
-    if (value && index < 5) {
+    if (value && index < 3) {
       inputRefs.current[index + 1]?.focus();
     }
   };
 
-  const handleKeyDown = (
-    e: React.KeyboardEvent<HTMLInputElement>,
-    index: number
-  ) => {
+  // Handle arrow key and backspace navigation
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
     if (e.key === "Backspace" && !otp[index] && index > 0) {
-      // Move focus to previous input on backspace if current is empty
       inputRefs.current[index - 1]?.focus();
     } else if (e.key === "ArrowLeft" && index > 0) {
-      // Move focus left with arrow key
       inputRefs.current[index - 1]?.focus();
-    } else if (e.key === "ArrowRight" && index < 5) {
-      // Move focus right with arrow key
+    } else if (e.key === "ArrowRight" && index < 3) {
       inputRefs.current[index + 1]?.focus();
     }
   };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const finalOtp = otp.join("");
+    if (finalOtp.length !== 4) {
+      toast.error("Please enter a valid 4-digit OTP.");
+      return;
+    }
+
+    const email = localStorage.getItem("recruiterEmail");
+    if (!email) {
+      toast.error("Email not found. Please register again.");
+      router.push("/register");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/verify-token`,
+        { email, otp: finalOtp }
+      );
+
+      if (response.data.status === "success") {
+        toast.success("OTP Verified Successfully!");
+        localStorage.removeItem("recruiterEmail");
+        setTimeout(() => {
+          router.push("/login");
+        }, 2000);
+      } else {
+        toast.error(response.data.message || "Invalid OTP.");
+      }
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || "Verification failed.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Autofocus the first input on mount
+  useEffect(() => {
+    inputRefs.current[0]?.focus();
+  }, []);
+
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-[var(--bg)]">
-      <h1 className="text-2xl font-bold text-center text-[var(--text-primary)]">
-        Verify OTP
-      </h1>
-      <p className="mt-4 text-lg text-center text-[var(--text-secondary)]">
-        Please check your email for the verification code.
-      </p>
-      <p className="mt-2 text-lg text-center text-[var(--text-secondary)]">
-        Enter the code below to verify your email address.
-      </p>
-      <div className="mt-6">
-        {otp.map((data, index) => (
-          <input
-            key={index}
-            ref={(el) => {
-              inputRefs.current[index] = el;
-            }}
-            type="text"
-            maxLength={1}
-            className="w-12 h-12 border border-gray-300 rounded text-center mx-1 focus:outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]"
-            value={data}
-            onChange={(e) => handleOtpChange(e, index)}
-            onKeyDown={(e) => handleKeyDown(e, index)}
-            inputMode="numeric"
-          />
-        ))}
-      </div>
-      <button className="bg-[var(--accent)]  text-[--bg] font-bold py-2 px-4 rounded mt-4">
-        Verify
-      </button>
+    <div className="min-h-screen flex items-center justify-center bg-[var(--surface)]">
+      <ToastContainer theme="dark" />
+      <form
+        onSubmit={handleSubmit}
+        className="bg-[var(--bg)] p-8 rounded-xl shadow-lg w-full max-w-md text-center border border-[var(--border)]"
+      >
+        <h2 className="text-2xl font-semibold text-[var(--text-primary)] mb-4">
+          Enter OTP
+        </h2>
+        <p className="text-[var(--text-secondary)] mb-6">
+          Please enter the 4-digit OTP sent to your email.
+        </p>
+        <div className="flex justify-center gap-4 mb-6">
+          {otp.map((digit, index) => (
+            <input
+              key={index}
+              type="text"
+              inputMode="numeric"
+              maxLength={1}
+              value={digit}
+              onChange={(e) => handleChange(index, e.target.value)}
+              onKeyDown={(e) => handleKeyDown(e, index)}
+              ref={(el) => {
+                inputRefs.current[index] = el;
+              }}              
+              className="w-12 h-12 text-xl text-center border-2 rounded-lg outline-none bg-[var(--surface)] text-[var(--text-primary)]"
+              style={{
+                borderColor: digit ? "var(--accent)" : "var(--border)",
+              }}
+            />
+          ))}
+        </div>
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="w-full bg-[var(--accent)] text-[var(--dark-bg)] font-medium py-3 rounded-lg hover:bg-[var(--accent-hover)] transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-lg disabled:opacity-60"
+        >
+          {isSubmitting ? "Verifying..." : "Verify OTP"}
+        </button>
+      </form>
     </div>
   );
-};
-
-export default RegisterVerification;
+}
