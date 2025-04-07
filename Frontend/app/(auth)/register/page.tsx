@@ -63,6 +63,7 @@ export default function RecruiterRegister() {
         setIsError(false);
         setIsOpen(true);
         setTimeout(() => {
+          localStorage.setItem("recruiterEmail", formData.email);
           router.push("/register-verification");
         }, 2000);
       } else {
