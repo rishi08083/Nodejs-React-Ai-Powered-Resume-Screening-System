@@ -15,6 +15,7 @@ type Candidate = {
   email: string;
   phone_number: string;
   resume_url: string;
+  is_recommended: string;
   match_score: number | null;
   is_screened: boolean;
   status: string;
@@ -26,6 +27,7 @@ type Candidate = {
       experience_match: boolean;
       recommendation: string;
     };
+    is_recommended?: string;
   };
 };
 
@@ -34,8 +36,10 @@ const CandidateList = () => {
   const [selectedJob, setSelectedJob] = useState<string>("");
   const [resumeUrl, setResumeUrl] = useState<string>("");
   const [candidates, setCandidates] = useState<Candidate[]>([]);
+  const [originalCandidates, setOriginalCandidates] = useState<Candidate[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [selectedRecommendation, setSelectedRecommendation] = useState("");
   const [feedbackData, setFeedbackData] = useState<{
     [id: string]: Candidate["feedback"];
   }>({});
@@ -91,9 +95,19 @@ const CandidateList = () => {
           const data = await response.json();
           console.log(data, "response");
           if (data.data) {
-            setCandidates(data.data.candidates);
+            setOriginalCandidates(data.data.candidates);
+            setCandidates(() => {
+              if (selectedRecommendation === "") return data.data.candidates;
+
+              return data.data.candidates.filter(
+                (candidate) =>
+                  candidate.is_recommended ===
+                  selectedRecommendation.toUpperCase()
+              );
+            });
           } else {
             setCandidates([]);
+            setOriginalCandidates([]);
           }
         } else {
           const errorData = await response.json();
@@ -217,10 +231,18 @@ const CandidateList = () => {
 
   const handleShowFeedback = (candidate: Candidate) => {
     if (feedbackData[candidate.id]) {
-      setSelectedFeedback(feedbackData[candidate.id]);
+      setSelectedFeedback({
+        ...feedbackData[candidate.id],
+        is_recommended: candidate.is_recommended,
+      });
       setIsModalOpen(true);
     } else {
-      fetchCandidateFeedback(candidate.id);
+      fetchCandidateFeedback(candidate.id).then(() => {
+        setSelectedFeedback((prev) => ({
+          ...prev,
+          is_recommended: candidate.is_recommended,
+        }));
+      });
     }
   };
 
@@ -267,7 +289,7 @@ const CandidateList = () => {
         </p>
       </motion.div>
 
-      {/* Search and Filter */}
+      {/* Search, Filter, and Recommendation Filter */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -301,15 +323,62 @@ const CandidateList = () => {
           <select
             className="w-full p-3 pl-4 border rounded-lg shadow-md appearance-none focus:outline-none focus:ring-2 focus:ring-[var(--accent)] bg-[var(--surface)] border-[var(--border)] text-[var(--text-primary)] transition-all duration-300"
             value={selectedJob}
-            onChange={(e) => setSelectedJob(e.target.value)}
+            onChange={(e) => {
+              setSelectedJob(e.target.value);
+              setCandidates(originalCandidates); // Reset candidates when job changes
+            }}
           >
-            <option value="">Select a Job</option>
+            <option value="" disabled>
+              Select a Job
+            </option>
             {jobs.map((job) => (
               <option key={job.id} value={job.id}>
                 {job.title}
               </option>
             ))}
           </select>
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[var(--text-secondary)]">
+            <svg
+              className="h-5 w-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M19 9l-7 7-7-7"
+              ></path>
+            </svg>
+          </div>
+        </div>
+        <div className="relative w-full md:w-1/4">
+          <select
+            className="w-full p-2 pl-4 border rounded-lg shadow-md appearance-none focus:outline-none focus:ring-2 focus:ring-[var(--accent)] bg-[var(--surface)] border-[var(--border)] text-[var(--text-primary)] transition-all duration-300"
+            value={selectedRecommendation}
+            onChange={(e) => {
+              const value = e.target.value;
+              setSelectedRecommendation(value);
+
+              if (value === "") {
+                setCandidates(originalCandidates);
+              } else {
+                const filtered = originalCandidates.filter(
+                  (candidate) =>
+                    candidate.is_recommended === value.toUpperCase()
+                );
+                setCandidates(filtered);
+              }
+            }}
+            disabled={!selectedJob}
+          >
+            <option value="">Recommendation</option>
+            <option value="YES">Yes</option>
+            <option value="NO">No</option>
+          </select>
+
           <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[var(--text-secondary)]">
             <svg
               className="h-5 w-5"
@@ -479,10 +548,14 @@ const CandidateList = () => {
 
                     {/* Recommended */}
                     <td className="px-6 py-4 text-sm">
-                      {candidate.feedback?.feedback.experience_match ? (
+                      {candidate.is_recommended === "YES" ? (
                         <span className="text-green-400 font-medium">Yes</span>
-                      ) : (
+                      ) : candidate.is_recommended === "NO" ? (
                         <span className="text-red-400 font-medium">No</span>
+                      ) : (
+                        <span className="text-yellow-400 font-medium">
+                          Pending
+                        </span>
                       )}
                     </td>
 
@@ -664,10 +737,29 @@ const CandidateList = () => {
               </motion.button>
             </div>
 
+            {/* Recommended/Not Recommended Title */}
+            <div className="text-center mb-6">
+              {selectedFeedback?.is_recommended === "YES" ? (
+                <h3 className="text-xl font-bold text-green-500">
+                  Recommended
+                </h3>
+              ) : selectedFeedback?.is_recommended === "NO" ? (
+                <h3 className="text-xl font-bold text-red-500">
+                  Not Recommended
+                </h3>
+              ) : (
+                <h3 className="text-xl font-bold text-yellow-500">
+                  Pending Recommendation
+                </h3>
+              )}
+            </div>
+
             <div className="space-y-4">
               <div className="p-3 bg-[var(--blue-highlight)] rounded-lg flex items-center justify-between">
                 <p className="text-[var(--text-primary)] font-medium">
-                  <span className="text-[var(--accent)]">Compatibility Score:</span>{" "}
+                  <span className="text-[var(--accent)]">
+                    Compatibility Score:
+                  </span>{" "}
                   {selectedFeedback.Combined_Score.toFixed(2)}
                 </p>
                 <div className="relative group">
@@ -742,7 +834,8 @@ const CandidateList = () => {
                       ></path>
                     </svg>
                     <div className="absolute left-6 top-0 hidden group-hover:block bg-[var(--surface)] text-[var(--text-secondary)] text-sm p-2 rounded shadow-lg border border-[var(--border)]">
-                      The match percentage based on the role clarity document given with job description.
+                      The match percentage based on the role clarity document
+                      given with job description.
                     </div>
                   </div>
                 </div>
@@ -804,7 +897,8 @@ const CandidateList = () => {
                       ></path>
                     </svg>
                     <div className="absolute left-6 top-0 hidden group-hover:block bg-[var(--surface)] text-[var(--text-secondary)] text-sm p-2 rounded shadow-lg border border-[var(--border)]">
-                      The system's recommendation based on the candidate's profile skills and experience.
+                      The system's recommendation based on the candidate's
+                      profile skills and experience.
                     </div>
                   </div>
                 </div>
