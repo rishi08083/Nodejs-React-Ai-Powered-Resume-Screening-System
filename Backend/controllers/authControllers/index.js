@@ -53,16 +53,16 @@ const recruiterRegister = async (req, res) => {
     const { name, email, password } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const tokenExpiry = Date.now() + 3600000;
+    const tokenExpiry = Date.now() + 10 * 60 * 1000;
     // 4 digit random number in string
-    const resetToken = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+    const token = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
 
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: email,
       subject: "Email Verification",
-      text: `Here is your OTP: ${resetToken}`,
-      html: `<p>Enter this OTP ${resetToken} to verify your email.</p>`,
+      text: `Here is your OTP: ${token}`,
+      html: `<p>Enter this OTP ${token} to verify your email.</p>`,
     };
     await transporter.sendMail(mailOptions);
 
@@ -71,8 +71,8 @@ const recruiterRegister = async (req, res) => {
       email,
       password_hash: hashedPassword,
       role: "recruiter",
-      reset_token: resetToken,
-      reset_token_expires: tokenExpiry
+      token: token,
+      token_expires: tokenExpiry
     });
 
     res.status(201).json({
