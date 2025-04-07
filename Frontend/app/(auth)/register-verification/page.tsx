@@ -70,7 +70,7 @@ const RegisterVerification = () => {
           />
         ))}
       </div>
-      <button className="bg-[var(--primary)] hover:bg-[var(--primary-dark)] text-white font-bold py-2 px-4 rounded mt-4">
+      <button className="bg-[var(--accent)]  text-[--bg] font-bold py-2 px-4 rounded mt-4">
         Verify
       </button>
     </div>

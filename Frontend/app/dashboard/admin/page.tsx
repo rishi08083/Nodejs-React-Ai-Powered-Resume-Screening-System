@@ -33,25 +33,25 @@ import {
 } from "lucide-react";
 import axios from "axios";
 
-// Define a consistent color palette for better aesthetics
+// Define a consistent color palette that better aligns with our theme variables
 const colorPalette = {
-  // Primary colors
-  primary: ["#4f46e5", "#8b5cf6", "#d946ef", "#ec4899", "#f43f5e"],
+  // Primary colors that work with both light and dark modes
+  primary: ["#ffb300", "#ffc233", "#ffd166", "#ffdf99", "#ffedcc"],
   // Status colors
-  success: "#22c55e",
-  warning: "#f59e0b", 
-  danger: "#ef4444",
-  info: "#3b82f6",
-  neutral: "#6b7280",
+  success: "#4ade80",
+  warning: "#ffb300",
+  danger: "#f87171",
+  info: "#60a5fa",
+  neutral: "#8b949e",
   // Additional colors for variety
-  accent1: "#06b6d4",
+  accent1: "#0ea5e9",
   accent2: "#14b8a6",
-  accent3: "#0ea5e9",
-  accent4: "#8b5cf6",
-  accent5: "#a855f7"
+  accent3: "#3b82f6",
+  accent4: "#a855f7",
+  accent5: "#ec4899",
 };
 
-// Sample data - replace with actual API calls in useEffect
+// Sample data
 const screeningOutcomeData = [
   { name: "Shortlisted", value: 120, color: colorPalette.success },
   { name: "Rejected", value: 85, color: colorPalette.danger },
@@ -83,11 +83,11 @@ const topSkillsData = [
 ];
 
 const jobDistributionData = [
-  { name: "Frontend Developer", value: 35, color: colorPalette.accent3 },
-  { name: "Backend Developer", value: 42, color: colorPalette.accent4 },
-  { name: "Data Scientist", value: 28, color: colorPalette.accent2 },
-  { name: "DevOps Engineer", value: 20, color: colorPalette.warning },
-  { name: "Product Manager", value: 15, color: colorPalette.accent5 },
+  { name: "Frontend Developer", value: 35, color: colorPalette.primary[0] },
+  { name: "Backend Developer", value: 42, color: colorPalette.primary[1] },
+  { name: "Data Scientist", value: 28, color: colorPalette.primary[2] },
+  { name: "DevOps Engineer", value: 20, color: colorPalette.primary[3] },
+  { name: "Product Manager", value: 15, color: colorPalette.primary[4] },
 ];
 
 const scoreDistributionData = [
@@ -140,10 +140,10 @@ export default function AdminDashboard() {
     change,
     changeDirection,
   }: StatCardProps) => (
-    <div className="bg-[var(--surface)] p-6 rounded-lg shadow-lg border border-[var(--border)]">
+    <div className="bg-[var(--surface)] p-6 rounded-xl shadow-md border border-[var(--border)] transition-all hover:shadow-lg">
       <div className="flex justify-between items-start">
         <div>
-          <h3 className="text-[var(--text-secondary)] text-sm font-medium mb-1">
+          <h3 className="text-[var(--text-secondary)] text-sm font-medium mb-2">
             {title}
           </h3>
           <div className="flex items-baseline">
@@ -166,21 +166,23 @@ export default function AdminDashboard() {
             )}
           </div>
         </div>
-        <div className="p-2 bg-[var(--blue-highlight)] rounded-lg">{icon}</div>
+        <div className="p-3 bg-[var(--blue-highlight)] rounded-lg">{icon}</div>
       </div>
     </div>
   );
 
   // Chart titles style
-  const chartTitle = "text-[var(--text-primary)] font-medium text-lg mb-4";
+  const chartTitle = "text-[var(--text-primary)] font-semibold text-lg mb-4";
 
   return (
     <div className="bg-[var(--bg)] min-h-screen text-[var(--text-primary)]">
-      <main className="container mx-auto px-4 py-6">
-        <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
-        
+      <main className="container mx-auto px-4">
+        <h1 className="text-3xl font-bold mb-8 text-[var(--text-primary)]">
+          Admin Dashboard
+        </h1>
+
         {/* KPI Stats Row */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <StatCard
             title="Total Resumes Uploaded"
             value={dashboardData.totalResumes}
@@ -212,72 +214,37 @@ export default function AdminDashboard() {
         </div>
 
         {/* Row 1: Main Charts */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          {/* Candidate Screening Outcome */}
-          <div className="bg-[var(--surface)] p-6 rounded-lg shadow-lg border border-[var(--border)]">
-            <h2 className={chartTitle}>Candidate Screening Outcome</h2>
-            <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={screeningOutcomeData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={100}
-                    paddingAngle={5}
-                    dataKey="value"
-                    label={({ name, value, percent }) => 
-                      `${name}: ${value} (${(percent * 100).toFixed(0)}%)`
-                    }
-                  >
-                    {screeningOutcomeData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "var(--surface)",
-                      borderColor: "var(--border)",
-                    }}
-                    labelStyle={{ color: "var(--text-primary)" }}
-                  />
-                  <Legend layout="vertical" verticalAlign="middle" align="right" />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* Resumes Parsed Over Time */}
-          <div className="bg-[var(--surface)] p-6 rounded-lg shadow-lg border border-[var(--border)]">
+          <div className="bg-[var(--surface)] p-6 rounded-xl shadow-md border border-[var(--border)] transition-all hover:shadow-lg">
             <div className="flex justify-between items-center mb-4">
               <h2 className={chartTitle}>Resumes Parsed Over Time</h2>
               <div className="flex bg-[var(--surface-lighter)] rounded-lg overflow-hidden">
                 <button
-                  className={`px-3 py-1 text-sm ${
+                  className={`px-4 py-2 text-sm transition-colors ${
                     timeframe === "week"
-                      ? "bg-[var(--accent)] text-[var(--dark-bg)]"
-                      : "text-[var(--text-secondary)]"
+                      ? "bg-[var(--accent)] text-[var(--bg)] font-medium"
+                      : "text-[var(--text-secondary)] hover:bg-[var(--accent-hover)] hover:text-[var(--text-primary)]"
                   }`}
                   onClick={() => setTimeframe("week")}
                 >
                   Week
                 </button>
                 <button
-                  className={`px-3 py-1 text-sm ${
+                  className={`px-4 py-2 text-sm transition-colors ${
                     timeframe === "month"
-                      ? "bg-[var(--accent)] text-[var(--dark-bg)]"
-                      : "text-[var(--text-secondary)]"
+                      ? "bg-[var(--accent)] text-[var(--bg)] font-medium"
+                      : "text-[var(--text-secondary)] hover:bg-[var(--accent-hover)] hover:text-[var(--text-primary)]"
                   }`}
                   onClick={() => setTimeframe("month")}
                 >
                   Month
                 </button>
                 <button
-                  className={`px-3 py-1 text-sm ${
+                  className={`px-4 py-2 text-sm transition-colors ${
                     timeframe === "year"
-                      ? "bg-[var(--accent)] text-[var(--dark-bg)]"
-                      : "text-[var(--text-secondary)]"
+                      ? "bg-[var(--accent)] text-[var(--bg)] font-medium"
+                      : "text-[var(--text-secondary)] hover:bg-[var(--accent-hover)] hover:text-[var(--text-primary)]"
                   }`}
                   onClick={() => setTimeframe("year")}
                 >
@@ -298,27 +265,27 @@ export default function AdminDashboard() {
                     >
                       <stop
                         offset="5%"
-                        stopColor={colorPalette.primary[0]}
+                        stopColor="var(--accent)"
                         stopOpacity={0.8}
                       />
                       <stop
                         offset="95%"
-                        stopColor={colorPalette.primary[0]}
+                        stopColor="var(--accent)"
                         stopOpacity={0}
                       />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid 
-                    strokeDasharray="3 3" 
-                    stroke="var(--border)" 
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    stroke="var(--border)"
                     vertical={false}
                   />
-                  <XAxis 
-                    dataKey="date" 
+                  <XAxis
+                    dataKey="date"
                     stroke="var(--text-secondary)"
                     tick={{ fontSize: 12 }}
                   />
-                  <YAxis 
+                  <YAxis
                     stroke="var(--text-secondary)"
                     tick={{ fontSize: 12 }}
                   />
@@ -326,13 +293,16 @@ export default function AdminDashboard() {
                     contentStyle={{
                       backgroundColor: "var(--surface)",
                       borderColor: "var(--border)",
+                      borderRadius: "0.5rem",
+                      boxShadow: "0 4px 6px var(--shadow)",
                     }}
                     labelStyle={{ color: "var(--text-primary)" }}
+                    formatter={(value) => [`${value} resumes`, "Count"]}
                   />
                   <Area
                     type="monotone"
                     dataKey="count"
-                    stroke={colorPalette.primary[0]}
+                    stroke="var(--accent)"
                     fillOpacity={1}
                     fill="url(#colorParsed)"
                   />
@@ -340,12 +310,53 @@ export default function AdminDashboard() {
               </ResponsiveContainer>
             </div>
           </div>
+          {/* Candidate Screening Outcome */}
+          <div className="bg-[var(--surface)] p-6 rounded-xl shadow-md border border-[var(--border)] transition-all hover:shadow-lg">
+            <h2 className={chartTitle}>Candidate Screening Outcome</h2>
+            <div className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={screeningOutcomeData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={100}
+                    paddingAngle={5}
+                    dataKey="value"
+                    label={({ name, value, percent }) =>
+                      `${name}: ${value} (${(percent * 100).toFixed(0)}%)`
+                    }
+                  >
+                    {screeningOutcomeData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "var(--surface)",
+                      borderColor: "var(--border)",
+                      borderRadius: "0.5rem",
+                      boxShadow: "0 4px 6px var(--shadow)",
+                    }}
+                    labelStyle={{ color: "var(--text-primary)" }}
+                  />
+                  <Legend
+                    layout="vertical"
+                    verticalAlign="middle"
+                    align="right"
+                    wrapperStyle={{ fontSize: "12px" }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
         </div>
 
         {/* Row 2: Bar Charts */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* Top Skills Across Candidates */}
-          <div className="bg-[var(--surface)] p-6 rounded-lg shadow-lg border border-[var(--border)]">
+          <div className="bg-[var(--surface)] p-6 rounded-xl shadow-md border border-[var(--border)] transition-all hover:shadow-lg">
             <h2 className={chartTitle}>Top Skills Across Candidates</h2>
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
@@ -354,19 +365,19 @@ export default function AdminDashboard() {
                   layout="vertical"
                   margin={{ left: 60 }}
                 >
-                  <CartesianGrid 
-                    strokeDasharray="3 3" 
-                    stroke="var(--border)" 
-                    horizontal={false} 
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    stroke="var(--border)"
+                    horizontal={false}
                   />
-                  <XAxis 
-                    type="number" 
+                  <XAxis
+                    type="number"
                     stroke="var(--text-secondary)"
                     tick={{ fontSize: 12 }}
                   />
-                  <YAxis 
-                    dataKey="name" 
-                    type="category" 
+                  <YAxis
+                    dataKey="name"
+                    type="category"
                     stroke="var(--text-secondary)"
                     tick={{ fontSize: 12 }}
                     width={80}
@@ -375,14 +386,17 @@ export default function AdminDashboard() {
                     contentStyle={{
                       backgroundColor: "var(--surface)",
                       borderColor: "var(--border)",
+                      borderRadius: "0.5rem",
+                      boxShadow: "0 4px 6px var(--shadow)",
                     }}
                     labelStyle={{ color: "var(--text-primary)" }}
+                    formatter={(value) => [`${value} candidates`, "Count"]}
                   />
-                  <Bar dataKey="count" radius={[0, 4, 4, 0]} barSize={20}>
+                  <Bar dataKey="count" radius={[0, 4, 4, 0]} barSize={24}>
                     {topSkillsData.map((entry, index) => (
-                      <Cell 
-                        key={`cell-${index}`} 
-                        fill={colorPalette.primary[index % colorPalette.primary.length]} 
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={`rgba(255, 179, 0, ${1 - index * 0.1})`}
                       />
                     ))}
                   </Bar>
@@ -392,21 +406,18 @@ export default function AdminDashboard() {
           </div>
 
           {/* Screening Score Distribution */}
-          <div className="bg-[var(--surface)] p-6 rounded-lg shadow-lg border border-[var(--border)]">
+          <div className="bg-[var(--surface)] p-6 rounded-xl shadow-md border border-[var(--border)] transition-all hover:shadow-lg">
             <h2 className={chartTitle}>Screening Score Distribution</h2>
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={scoreDistributionData}>
-                  <CartesianGrid 
-                    strokeDasharray="3 3" 
-                    stroke="var(--border)" 
-                  />
-                  <XAxis 
-                    dataKey="range" 
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                  <XAxis
+                    dataKey="range"
                     stroke="var(--text-secondary)"
                     tick={{ fontSize: 12 }}
                   />
-                  <YAxis 
+                  <YAxis
                     stroke="var(--text-secondary)"
                     tick={{ fontSize: 12 }}
                   />
@@ -414,27 +425,26 @@ export default function AdminDashboard() {
                     contentStyle={{
                       backgroundColor: "var(--surface)",
                       borderColor: "var(--border)",
+                      borderRadius: "0.5rem",
+                      boxShadow: "0 4px 6px var(--shadow)",
                     }}
                     labelStyle={{ color: "var(--text-primary)" }}
+                    formatter={(value) => [`${value} candidates`, "Count"]}
                   />
-                  <Bar 
-                    dataKey="count" 
-                    radius={[4, 4, 0, 0]}
-                    barSize={40}
-                  >
-                    {
-                      scoreDistributionData.map((entry, index) => {
-                        // Create a color gradient from red to green to indicate score quality
-                        const colors = [
-                          colorPalette.danger, 
-                          colorPalette.warning, 
-                          colorPalette.neutral, 
-                          colorPalette.accent2, 
-                          colorPalette.success
-                        ];
-                        return <Cell key={`cell-${index}`} fill={colors[index]} />;
-                      })
-                    }
+                  <Bar dataKey="count" radius={[4, 4, 0, 0]} barSize={40}>
+                    {scoreDistributionData.map((entry, index) => {
+                      // Create a gradient from danger to success
+                      const colors = [
+                        colorPalette.danger,
+                        "#f0a050", // custom orange
+                        colorPalette.warning,
+                        "#7ac142", // light green
+                        colorPalette.success,
+                      ];
+                      return (
+                        <Cell key={`cell-${index}`} fill={colors[index]} />
+                      );
+                    })}
                   </Bar>
                 </BarChart>
               </ResponsiveContainer>
@@ -445,7 +455,7 @@ export default function AdminDashboard() {
         {/* Row 3: Pie Chart and Stats Table */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Job-wise Candidate Distribution */}
-          <div className="bg-[var(--surface)] p-6 rounded-lg shadow-lg border border-[var(--border)]">
+          <div className="bg-[var(--surface)] p-6 rounded-xl shadow-md border border-[var(--border)] col-span-1 lg:col-span-3 xl:col-span-1 transition-all hover:shadow-lg">
             <h2 className={chartTitle}>Job-wise Candidate Distribution</h2>
             <div className="h-72">
               <ResponsiveContainer width="100%" height="100%">
@@ -456,7 +466,9 @@ export default function AdminDashboard() {
                     cy="50%"
                     outerRadius={80}
                     dataKey="value"
-                    label={({ name, percent }) => `${(percent * 100).toFixed(0)}%`}
+                    label={({ name, percent }) =>
+                      `${(percent * 100).toFixed(0)}%`
+                    }
                   >
                     {jobDistributionData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
@@ -466,16 +478,71 @@ export default function AdminDashboard() {
                     contentStyle={{
                       backgroundColor: "var(--surface)",
                       borderColor: "var(--border)",
+                      borderRadius: "0.5rem",
+                      boxShadow: "0 4px 6px var(--shadow)",
                     }}
                     labelStyle={{ color: "var(--text-primary)" }}
-                    formatter={(value, name, props) => [`${value} candidates`, props.payload.name]}
+                    formatter={(value, name, props) => [
+                      `${value} candidates`,
+                      props.payload.name,
+                    ]}
                   />
-                  <Legend layout="vertical" verticalAlign="bottom" align="center" />
+                  <Legend
+                    layout="vertical"
+                    verticalAlign="bottom"
+                    align="center"
+                    wrapperStyle={{ fontSize: "12px", paddingTop: "10px" }}
+                  />
                 </PieChart>
               </ResponsiveContainer>
             </div>
           </div>
-                   
+
+          {/* Recent Activity Card - Added to fill space */}
+          <div className="bg-[var(--surface)] p-6 rounded-xl shadow-md border border-[var(--border)] col-span-1 lg:col-span-2 xl:col-span-2 transition-all hover:shadow-lg">
+            <h2 className={chartTitle}>Recent Activity</h2>
+            <div className="space-y-4">
+              <div className="flex items-center border-b border-[var(--border)] pb-3">
+                <div className="p-2 bg-[var(--blue-highlight)] rounded-lg mr-4">
+                  <UserCheck size={20} className="text-[var(--accent)]" />
+                </div>
+                <div>
+                  <p className="text-[var(--text-primary)] font-medium">
+                    New candidate shortlisted
+                  </p>
+                  <p className="text-[var(--text-secondary)] text-sm">
+                    Frontend Developer • 15 minutes ago
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center border-b border-[var(--border)] pb-3">
+                <div className="p-2 bg-[var(--blue-highlight)] rounded-lg mr-4">
+                  <FileText size={20} className="text-[var(--accent)]" />
+                </div>
+                <div>
+                  <p className="text-[var(--text-primary)] font-medium">
+                    12 new resumes uploaded
+                  </p>
+                  <p className="text-[var(--text-secondary)] text-sm">
+                    Data Scientist • 2 hours ago
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center">
+                <div className="p-2 bg-[var(--blue-highlight)] rounded-lg mr-4">
+                  <AlertCircle size={20} className="text-red-400" />
+                </div>
+                <div>
+                  <p className="text-[var(--text-primary)] font-medium">
+                    Interview scheduling failed
+                  </p>
+                  <p className="text-[var(--text-secondary)] text-sm">
+                    Backend Developer • 5 hours ago
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </main>
     </div>

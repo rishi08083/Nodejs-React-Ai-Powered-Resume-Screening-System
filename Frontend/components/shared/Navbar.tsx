@@ -1,7 +1,7 @@
 "use client";
 
 import { Menu, UserRound, LogOut } from "lucide-react";
-import ThemeToggle from "./theme/ThemeToggle";
+import ThemeToggle from "../theme/ThemeToggle";
 import { useState } from "react";
 
 export default function Navbar({
