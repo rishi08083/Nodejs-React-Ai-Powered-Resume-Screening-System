@@ -16,6 +16,7 @@ module.exports = (app) => {
           "http://localhost:3000",
           "http://localhost:3001",
           "http://181.214.44.15:3001",
+          "https://rs-fe.rishi.publicvm.com",
           // Add your production domain when ready
         ];
 
@@ -47,12 +48,14 @@ module.exports = (app) => {
             "http://localhost:3000",
             "http://localhost:3001",
             "http://181.214.44.15:3001",
+            "https://rs-fe.rishi.publicvm.com",
           ],
           connectSrc: [
             "'self'",
             "http://localhost:3000",
             "http://localhost:3001",
             "http://181.214.44.15:3001",
+            "https://rs-fe.rishi.publicvm.com",
           ],
           objectSrc: ["'none'"],
           imgSrc: ["'self'", "data:"],
