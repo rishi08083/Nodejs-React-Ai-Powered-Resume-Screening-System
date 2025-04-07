@@ -8,7 +8,11 @@ const { Op, where } = require("sequelize");
 const viewRecruiterReq = async (req, res) => {
   try {
     const users = await db.Users.findAll({
-      attributes: ["id", "name", "email", "role", "is_active"],
+      where: { 
+        is_active: "pending",
+        is_verified: true
+      },
+      attributes: ["id", "name", "email", "role"],
     });
     res.status(200).json({
       status: "success",
@@ -23,6 +27,7 @@ const viewRecruiterReq = async (req, res) => {
     });
   }
 };
+
 const approveRecruiterReq = async (req, res) => {
   try {
     const { email } = req.body;

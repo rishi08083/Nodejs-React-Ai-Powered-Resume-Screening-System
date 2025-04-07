@@ -16,8 +16,11 @@ const {
 const {
   forgetPassword,
   resetPassword,
-  verifyOtp,
 } = require("../controllers/authControllers/forgetResetContoller");
+
+const {
+  verifyToken
+} = require('../controllers/authControllers/verifyToken');
 
 const {
   validateRegister,
@@ -34,6 +37,7 @@ router.delete("/reject-recruiter-req", rejectRecruiterReq);
 
 router.post("/forget-password", forgetPassword);
 router.post("/reset-password", resetPassword);
-router.post("/verify-otp", verifyOtp);
+
+router.post("/verify-otp", verifyToken);
 
 module.exports = router;
