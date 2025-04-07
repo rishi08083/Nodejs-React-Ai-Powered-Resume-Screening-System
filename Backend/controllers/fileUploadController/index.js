@@ -76,9 +76,9 @@ exports.uploadResumes = async (req, res) => {
     const parsingErrors = await parseResumes(uploadedFiles, job_id, user_id);
 
     if (parsingErrors.length > 0) {
-      return res.status(207).json({
+      return res.status(400).json({
         status: "partial_success",
-        message: "Some files uploaded, but errors occurred during parsing",
+        message: "errors occurred during parsing",
         data: { files: uploadedFiles },
         errors: parsingErrors,
       });
@@ -209,8 +209,29 @@ const parseResumes = async (uploadedFiles, job_id, user_id) => {
           });
         }
       } catch (error) {
-        console.error(`Error parsing file ${file.fileName}:`, error.message);
-        errors.push({ file: file.fileName, error: error.message });
+        if (error.response && error.response.data) {
+          const errorData = error.response.data;
+          // console.error({
+          //   status: errorData.status || "error",
+          //   message: errorData.message || "API request failed",
+          //   error: {
+          //     details: errorData.error?.details || error.message,
+          //   },
+          //   code: errorData.code || error.response.status, // Include the code from response
+            
+          // });
+          // console.error(`Error parsing file ${file.fileName}:`, error.message);
+          errors.push({ file: file.fileName, error: errorData.message });
+        } else {
+          console.error({
+            status: "error",
+            message: "Network or unknown error",
+            error: {
+              details: error.message,
+            },
+            code: null,
+          });
+        };
       }
     }
 
