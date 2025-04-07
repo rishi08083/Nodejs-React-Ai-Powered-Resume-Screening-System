@@ -187,7 +187,16 @@ const UploadForm = () => {
           setSuccessMessage("Files uploaded successfully.");
         } else {
           const errorData = await response.json();
-          setErrorMessage(errorData.message || "Failed to upload the files.");
+          const errorMsg = errorData.errors.map(
+            (error: { file: string; error: string }) => {
+              return `${error.file} ${error.error}`;
+            }
+          );
+            setErrorMessage(
+            `${errorData.message}   
+             ${errorMsg.join("\n")}` || 
+              "Failed to upload the files."
+            );
         }
         setIsLoading(false);
       }, 500);
