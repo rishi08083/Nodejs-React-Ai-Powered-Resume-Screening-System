@@ -6,6 +6,8 @@ import React, {
   ChangeEvent,
   useMemo,
 } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 type Job = {
   title: string;
@@ -125,11 +127,19 @@ const UploadForm = () => {
     });
 
     if (invalidFiles.length > 0) {
-      setErrorMessage(
-        `Invalid file types: ${invalidFiles.join(
-          ", "
-        )}. Please upload PDF, DOCX, or JPG files.`
-      );
+      const errorMsg = `Invalid file types: ${invalidFiles.join(
+        ", "
+      )}. Please upload PDF, DOCX, or JPG ,JPEG files.`;
+      setErrorMessage(errorMsg);
+      toast.error(errorMsg, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
     } else {
       setErrorMessage("");
     }
@@ -142,20 +152,50 @@ const UploadForm = () => {
     if (selectedFiles) {
       handleFile(selectedFiles);
     }
+    // Reset the input value so the same file can be selected again
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
   const handleRemoveFile = (index: number) => {
     setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
+    // Reset the file input so the same file can be selected again
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
   const handleUpload = async () => {
+    setSuccessMessage(null);
+    setErrorMessage("");
     if (!selectedJob) {
-      setErrorMessage("Please select a job before uploading files.");
+      const errorMsg = "Please select a job before uploading files.";
+      setErrorMessage(errorMsg);
+      toast.error(errorMsg, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
       return;
     }
 
     if (files.length === 0) {
-      setErrorMessage("No files selected for upload.");
+      const errorMsg = "No files selected for upload.";
+      setErrorMessage(errorMsg);
+      toast.error(errorMsg, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
       return;
     }
 
@@ -184,7 +224,21 @@ const UploadForm = () => {
         if (response.ok) {
           setFiles([]);
           setErrorMessage("");
-          setSuccessMessage("Files uploaded successfully.");
+          const successMsg = "Files uploaded successfully.";
+          setSuccessMessage(successMsg);
+          toast.success(successMsg, {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
+          // Reset file input after successful upload
+          if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+          }
         } else {
           const errorData = await response.json();
           const errorMsg = errorData.errors.map(
@@ -192,17 +246,35 @@ const UploadForm = () => {
               return `${error.file} ${error.error}`;
             }
           );
-            setErrorMessage(
+          const fullErrorMsg =
             `${errorData.message}   
-             ${errorMsg.join("\n")}` || 
-              "Failed to upload the files."
-            );
+             ${errorMsg.join("\n")}` || "Failed to upload the files.";
+          setErrorMessage(fullErrorMsg);
+          toast.error(fullErrorMsg, {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
         }
         setIsLoading(false);
       }, 500);
     } catch (error) {
       console.error("Error uploading files:", error);
-      setErrorMessage("An error occurred while uploading the files.");
+      const errorMsg = "An error occurred while uploading the files.";
+      setErrorMessage(errorMsg);
+      toast.error(errorMsg, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
       setIsLoading(false);
     }
   };
@@ -224,6 +296,7 @@ const UploadForm = () => {
 
   return (
     <div className="max-w-2/3 mt-17 mx-auto p-6 bg-[var(--surface)] shadow-lg rounded-lg transition-all duration-300 hover:shadow-xl relative border border-[var(--border)]">
+      <ToastContainer />
       <h1 className="text-2xl font-bold mb-6 text-center text-[var(--accent)]">
         <span className="inline-block mr-2">📤</span>
         Upload Bulk Resumes
@@ -316,26 +389,9 @@ const UploadForm = () => {
           </label>
         </div>
         <p className="mt-4 text-xs text-[var(--text-secondary)] opacity-70">
-          Supported formats: PDF, DOCX, JPG
+          Supported formats: PDF, DOCX, JPG ,JPEG
         </p>
       </div>
-
-      {errorMessage && (
-        <div className="mt-4 p-4 bg-red-900 bg-opacity-20 text-red-400 rounded-lg border border-red-500 animate-pulse">
-          <div className="flex items-center">
-            <span className="mr-2">⚠️</span>
-            {errorMessage}
-          </div>
-        </div>
-      )}
-      {successMessage && (
-        <div className="mt-4 p-4 bg-green-900 bg-opacity-20 text-green-400 rounded-lg border border-green-500">
-          <div className="flex items-center">
-            <span className="mr-2">✔️</span>
-            {successMessage}
-          </div>
-        </div>
-      )}
 
       {files.length > 0 && (
         <div className="mt-6 bg-[var(--surface-lighter)] p-4 rounded-lg border border-[var(--border)]">

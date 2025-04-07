@@ -163,7 +163,7 @@ const ListJobs = () => {
           Available Job Positions
         </h1>
         <p className="text-[var(--text-secondary)] mt-2">
-          Browse our current openings and upload RCD
+          Browse our current openings and upload Role Clarity Documents
         </p>
       </div>
 
@@ -234,9 +234,9 @@ const ListJobs = () => {
                       >
                         <Upload className="h-4 w-4" />
                         {job.is_rcd_uploaded ? (
-                          <span>Update RCD</span>
+                          <span>Update Role Clarity Document</span>
                         ) : (
-                          <span>Upload RCD</span>
+                          <span>Upload Role Clarity Document</span>
                         )}
                       </motion.button>
 
@@ -278,7 +278,7 @@ const ListJobs = () => {
             >
               <div className="bg-[var(--accent)] p-6">
                 <h2 className="text-xl font-bold text-[var(--dark-bg)]">
-                  Upload RCD for {selectedJob.title}
+                  Upload Role Clarity Document for {selectedJob.title}
                 </h2>
                 <p className="text-[var(--dark-bg)] opacity-80 mt-1 text-sm">
                   Experience required: {selectedJob.experience_required}
@@ -300,7 +300,7 @@ const ListJobs = () => {
 
                 <div className="mb-6">
                   <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">
-                    Upload RCD documents
+                    Upload Role Clarity Documents
                   </label>
                   <div
                     className={`border-2 ${
