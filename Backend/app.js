@@ -8,7 +8,7 @@ securityMiddleware(app);
 app.use(express.json());
 app.use(morgan("dev"));
 require('./cron-job/screenCandidate.js'); 
-require('./cron-job/dailyMailScheduler.js')
+// require('./cron-job/dailyMailScheduler.js')
 
 // Routes
 const indexRouter = require("./routes/indexRoutes");
