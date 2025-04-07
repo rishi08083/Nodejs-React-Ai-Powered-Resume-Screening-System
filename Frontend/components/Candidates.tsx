@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo,useRef } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { motion } from "framer-motion";
 import {
   fetchJobs,
@@ -31,10 +31,9 @@ type Candidate = {
   };
 };
 
-const UploadForm = () => {
+const CandidateList = () => {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [selectedJob, setSelectedJob] = useState<string>("");
-  const [resumeUrl, setResumeUrl] = useState<string>("");
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -49,31 +48,6 @@ const UploadForm = () => {
   >(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const candidatesPerPage = 10;
-
-  useEffect(() => {
-    const getJobDetails = async () => {
-      try {
-        const response = await fetch(`${BASE_URL}/job/view`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.getItem("token"),
-          },
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setJobs(data.data);
-        } else {
-          const errorData = await response.json();
-          throw new Error(errorData.message);
-        }
-      } catch (error) {
-        console.log(error, "error");
-      }
-    };
-    getJobDetails();
-  }, []);
 
   useEffect(() => {
     const getJobDetails = async () => {
@@ -165,28 +139,26 @@ const UploadForm = () => {
   const get_resume = async (candidateId: string, e) => {
     try {
       e.preventDefault();
-      const response = await fetch(
-        `${BASE_URL}/upload/get-resume/${candidateId}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.getItem("token"),
-          },
+          const response = await fetch(`${BASE_URL}/upload/get-resume/${candidateId}`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + localStorage.getItem("token"),
+            },
+          });
+    
+          if (response.ok) {
+            const data = await response.json();
+            // setResumeUrl(data.data.resume_url);
+            console.log(data.data.resume_url, "resume url data");
+                    
+          } else {
+            const errorData = await response.json();
+            throw new Error(errorData.message);
+          }
+        } catch (error) {
+          console.log(error, "error");
         }
-      );
-
-      if (response.ok) {
-        const data = await response.json();
-        setResumeUrl(data.data.resume_url);
-        window.open(data.data.resume_url, "_blank", "noopener,noreferrer");
-      } else {
-        const errorData = await response.json();
-        throw new Error(errorData.message);
-      }
-    } catch (error) {
-      console.log(error, "error");
-    }
   };
 
   const handleDeleteCandidate = async (candidateId: string) => {
@@ -244,7 +216,7 @@ const UploadForm = () => {
 
       // Call the backend API to check compatibility
       const response = await fetch(`${BASE_URL}/screening/screen_candidate`, {
-        method: "POST", // Assuming it's a POST request
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: "Bearer " + localStorage.getItem("token"),
@@ -284,17 +256,13 @@ const UploadForm = () => {
     setSelectedFeedback(null);
   };
 
-
   const [isOpen, setIsOpen] = useState<string | null>(null);
   const dropdownRef = useRef(null);
 
   // Close dropdown when clicked outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target)
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsOpen(null);
       }
     };
@@ -400,11 +368,10 @@ const UploadForm = () => {
                     onClick={(e) => {
                       get_resume(candidate.id, e);
                     }}
-                    href={resumeUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-yellow-600 underline hover:text-yellow-800"
-                  >
+                    >
                     View Resume
                   </a>
                 </td>
@@ -434,43 +401,47 @@ const UploadForm = () => {
                 </td>
                 <td className="px-4 py-4 text-sm text-gray-600 relative">
                   <div
-                  ref={dropdownRef}
-                  className="relative inline-block text-left"
+                    ref={dropdownRef}
+                    className="relative inline-block text-left"
                   >
-                  <button
-                    onClick={() => setIsOpen((prev) => (prev === candidate.id ? null : candidate.id))}
-                    className="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-3 py-1 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none"
-                    aria-haspopup="true"
-                    aria-expanded={isOpen === candidate.id}
-                  >
-                    &#x22EE;
-                  </button>
+                    <button
+                      onClick={() =>
+                        setIsOpen((prev) =>
+                          prev === candidate.id ? null : candidate.id
+                        )
+                      }
+                      className="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-3 py-1 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none"
+                      aria-haspopup="true"
+                      aria-expanded={isOpen === candidate.id}
+                    >
+                      &#x22EE;
+                    </button>
 
                     {isOpen === candidate.id && (
-                    <div
-                      className="absolute right-10 top-[-10px] mt-2 w-32 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-1000"
-                      tabIndex={-1}
-                      onClick={(e) => e.stopPropagation()}
-                      style={{ zIndex: 1000 }}
-                    >
                       <div
-                      className="py-1"
-                      role="menu"
-                      aria-orientation="vertical"
-                      aria-labelledby="options-menu"
+                        className="absolute right-10 top-[-10px] mt-2 w-32 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-1000"
+                        tabIndex={-1}
+                        onClick={(e) => e.stopPropagation()}
+                        style={{ zIndex: 1000 }}
                       >
-                      <button
-                        onClick={() => {
-                        handleDeleteCandidate(candidate.id);
-                        setIsOpen(null);
-                        }}
-                        className="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 w-full text-left"
-                        role="menuitem"
-                      >
-                        Delete
-                      </button>
+                        <div
+                          className="py-1"
+                          role="menu"
+                          aria-orientation="vertical"
+                          aria-labelledby="options-menu"
+                        >
+                          <button
+                            onClick={() => {
+                              handleDeleteCandidate(candidate.id);
+                              setIsOpen(null);
+                            }}
+                            className="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 w-full text-left"
+                            role="menuitem"
+                          >
+                            Delete
+                          </button>
+                        </div>
                       </div>
-                    </div>
                     )}
                   </div>
                 </td>
@@ -545,4 +516,4 @@ const UploadForm = () => {
   );
 };
 
-export default React.memo(UploadForm);
+export default React.memo(CandidateList);

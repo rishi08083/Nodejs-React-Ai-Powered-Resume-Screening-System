@@ -4,7 +4,10 @@ import { useState, ChangeEvent, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { fetchRecruiterRegister } from "../../../api-services/recruiterService";
-
+import { ToastContainer, toast } from "react-toastify";
+import GoogleSignIn from "../../../components/auth/GoogleAuth";
+import ThemeToggle from "../../../components/theme/ThemeToggle";
+import Image from "next/image";
 interface FormData {
   name: string;
   email: string;
@@ -42,6 +45,7 @@ export default function RecruiterRegister() {
 
     if (formData.password !== formData.confirmPassword) {
       setMessage(["Passwords do not match!"]);
+      toast.error("Passwords do not match!");
       setIsError(true);
       setIsOpen(true);
       setTimeout(() => {
@@ -52,20 +56,21 @@ export default function RecruiterRegister() {
 
     try {
       const response = await fetchRecruiterRegister(formData);
-      console.log("response =---=", response);
 
       if (response?.status === "success") {
         setMessage([response.message || "Recruiter Request successful!"]);
+        toast.success(response.message || "Recruiter Request successful!");
         setIsError(false);
         setIsOpen(true);
         setTimeout(() => {
-          router.push("/login");
+          router.push("/register-verification");
         }, 2000);
       } else {
         const errorMessages = handleErrors(response?.error?.details);
         setMessage(
-          errorMessages || [response?.message || "An error occurred."],
+          errorMessages || [response?.message || "An error occurred."]
         );
+        toast.error(errorMessages || response?.message || "An error occurred");
         setIsError(true);
         setIsOpen(true);
         setTimeout(() => {
@@ -75,6 +80,7 @@ export default function RecruiterRegister() {
     } catch (error) {
       console.error("Error:", error);
       setMessage(["An unexpected error occurred. Please try again."]);
+      toast.error("An unexpected error occurred. Please try again.");
       setIsError(true);
       setIsOpen(true);
       setTimeout(() => {
@@ -85,7 +91,10 @@ export default function RecruiterRegister() {
 
   const handleErrors = (errors: { msg: string }[] | undefined): string[] => {
     if (Array.isArray(errors) && errors.length > 0) {
-      return errors.map((error) => error.msg);
+      return errors.map((error) => {
+        toast.error(error.msg);
+        return error.msg;
+      });
     }
     return ["An unknown error occurred."];
   };
@@ -95,13 +104,24 @@ export default function RecruiterRegister() {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50 font-sans">
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-r from-yellow-400 to-yellow-300 items-center justify-center">
+    <div className="flex min-h-screen bg-[var(--surface)] font-sans relative">
+      <ToastContainer theme="dark" />
+
+      {/* Theme Toggle in top right corner */}
+      <div className="absolute top-4 right-4 z-10">
+        <ThemeToggle />
+      </div>
+
+      {/* Left side decorative panel */}
+      <div className="hidden lg:flex lg:w-1/2 bg-[var(--dark-surface)] items-center justify-center">
         <div className="max-w-md text-center">
-          <h1 className="text-4xl font-bold text-white mb-6">
-            Welcome to ATS System
-          </h1>
-          <p className="text-white text-lg">
+          <Image
+            src="/freelancer3.svg"
+            width={600}
+            height={600}
+            alt="Welcome"
+          />
+          <p className="text-[var(--dark-text-secondary)] text-lg">
             Register as a recruiter to access powerful hiring tools and find the
             best talent for your organization.
           </p>
@@ -109,90 +129,21 @@ export default function RecruiterRegister() {
         </div>
       </div>
 
+      {/* Right side registration form */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
         <div className="w-full max-w-md">
-          <div className="bg-white p-8 rounded-xl shadow-lg">
+          <div className="bg-[var(--surface)] p-8 rounded-xl shadow-lg border border-[var(--border)]">
             <div className="flex justify-center mb-6">
               <div className="w-32 h-12 relative">
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-2xl font-bold text-yellow-500"></span>
+                  <span className="text-2xl font-bold text-[var(--accent)]"></span>
                 </div>
               </div>
             </div>
 
-            <h1 className="text-3xl font-bold text-center text-gray-800 mb-8">
+            <h1 className="text-3xl font-bold text-center text-[var(--text-primary)] mb-8">
               Recruiter Registration
             </h1>
-
-            <div
-              className={`transition-all duration-500 ease-in-out ${
-                isOpen && message
-                  ? "opacity-100 max-h-40 mb-6"
-                  : "opacity-0 max-h-0 overflow-hidden"
-              }`}
-            >
-              <div
-                className={`border-l-4 p-4 rounded ${
-                  isError
-                    ? "bg-red-50 border-red-500"
-                    : "bg-green-50 border-green-500"
-                }`}
-              >
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <svg
-                      className={`h-5 w-5 ${isError ? "text-red-500" : "text-green-500"}`}
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </div>
-                  <div className="ml-3">
-                    {Array.isArray(message) ? (
-                      <ul className="list-disc pl-5">
-                        {message.map((msg, index) => (
-                          <li
-                            key={index}
-                            className={`text-sm list-none ${isError ? "text-red-700" : "text-green-700"}`}
-                          >
-                            {msg}
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p
-                        className={`text-sm ${isError ? "text-red-700" : "text-green-700"}`}
-                      >
-                        {message}
-                      </p>
-                    )}
-                  </div>
-                  <button
-                    onClick={onClose}
-                    className={`ml-auto ${isError ? "text-red-500 hover:text-red-700" : "text-green-500 hover:text-green-700"} focus:outline-none`}
-                  >
-                    <svg
-                      className="h-4 w-4"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-            </div>
 
             <form onSubmit={handleSubmit}>
               <div className="mb-6 relative">
@@ -200,8 +151,8 @@ export default function RecruiterRegister() {
                   htmlFor="name"
                   className={`absolute left-3 transition-all duration-300 pointer-events-none ${
                     isFocused.name || formData.name
-                      ? "-top-2.5 text-xs font-medium text-yellow-500 bg-white px-1"
-                      : "top-3 text-gray-500"
+                      ? "-top-2.5 text-xs font-medium text-[var(--accent)] bg-[var(--surface)] px-1"
+                      : "top-3 text-[var(--text-secondary)]"
                   }`}
                 >
                   Full Name
@@ -210,9 +161,11 @@ export default function RecruiterRegister() {
                   type="text"
                   id="name"
                   name="name"
-                  className="w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition-colors duration-300 ease-in-out bg-white text-gray-800"
+                  className="w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition-colors duration-300 ease-in-out bg-[var(--surface)] text-[var(--text-primary)]"
                   style={{
-                    borderColor: isFocused.name ? "#FFD700" : "#E5E7EB",
+                    borderColor: isFocused.name
+                      ? "var(--accent)"
+                      : "var(--border)",
                   }}
                   value={formData.name}
                   onChange={handleChange}
@@ -231,8 +184,8 @@ export default function RecruiterRegister() {
                   htmlFor="email"
                   className={`absolute left-3 transition-all duration-300 pointer-events-none ${
                     isFocused.email || formData.email
-                      ? "-top-2.5 text-xs font-medium text-yellow-500 bg-white px-1"
-                      : "top-3 text-gray-500"
+                      ? "-top-2.5 text-xs font-medium text-[var(--accent)] bg-[var(--surface)] px-1"
+                      : "top-3 text-[var(--text-secondary)]"
                   }`}
                 >
                   Email Address
@@ -241,9 +194,11 @@ export default function RecruiterRegister() {
                   type="email"
                   id="email"
                   name="email"
-                  className="w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition-colors duration-300 ease-in-out bg-white text-gray-800"
+                  className="w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition-colors duration-300 ease-in-out bg-[var(--surface)] text-[var(--text-primary)]"
                   style={{
-                    borderColor: isFocused.email ? "#FFD700" : "#E5E7EB",
+                    borderColor: isFocused.email
+                      ? "var(--accent)"
+                      : "var(--border)",
                   }}
                   value={formData.email}
                   onChange={handleChange}
@@ -262,8 +217,8 @@ export default function RecruiterRegister() {
                   htmlFor="password"
                   className={`absolute left-3 transition-all duration-300 pointer-events-none ${
                     isFocused.password || formData.password
-                      ? "-top-2.5 text-xs font-medium text-yellow-500 bg-white px-1"
-                      : "top-3 text-gray-500"
+                      ? "-top-2.5 text-xs font-medium text-[var(--accent)] bg-[var(--surface)] px-1"
+                      : "top-3 text-[var(--text-secondary)]"
                   }`}
                 >
                   Password
@@ -272,9 +227,11 @@ export default function RecruiterRegister() {
                   type={showPassword ? "text" : "password"}
                   id="password"
                   name="password"
-                  className="w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition-colors duration-300 ease-in-out bg-white text-gray-800"
+                  className="w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition-colors duration-300 ease-in-out bg-[var(--surface)] text-[var(--text-primary)]"
                   style={{
-                    borderColor: isFocused.password ? "#FFD700" : "#E5E7EB",
+                    borderColor: isFocused.password
+                      ? "var(--accent)"
+                      : "var(--border)",
                   }}
                   value={formData.password}
                   onChange={handleChange}
@@ -289,7 +246,7 @@ export default function RecruiterRegister() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-3 text-gray-500 hover:text-gray-700 focus:outline-none"
+                  className="absolute right-3 top-3 text-[var(--text-secondary)] hover:text-[var(--text-primary)] focus:outline-none"
                 >
                   {showPassword ? "Hide" : "Show"}
                 </button>
@@ -300,8 +257,8 @@ export default function RecruiterRegister() {
                   htmlFor="confirmPassword"
                   className={`absolute left-3 transition-all duration-300 pointer-events-none ${
                     isFocused.confirmPassword || formData.confirmPassword
-                      ? "-top-2.5 text-xs font-medium text-yellow-500 bg-white px-1"
-                      : "top-3 text-gray-500"
+                      ? "-top-2.5 text-xs font-medium text-[var(--accent)] bg-[var(--surface)] px-1"
+                      : "top-3 text-[var(--text-secondary)]"
                   }`}
                 >
                   Confirm Password
@@ -310,11 +267,11 @@ export default function RecruiterRegister() {
                   type={showConfirmPassword ? "text" : "password"}
                   id="confirmPassword"
                   name="confirmPassword"
-                  className="w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition-colors duration-300 ease-in-out bg-white text-gray-800"
+                  className="w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition-colors duration-300 ease-in-out bg-[var(--surface)] text-[var(--text-primary)]"
                   style={{
                     borderColor: isFocused.confirmPassword
-                      ? "#FFD700"
-                      : "#E5E7EB",
+                      ? "var(--accent)"
+                      : "var(--border)",
                   }}
                   value={formData.confirmPassword}
                   onChange={handleChange}
@@ -332,7 +289,7 @@ export default function RecruiterRegister() {
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-3 text-gray-500 hover:text-gray-700 focus:outline-none"
+                  className="absolute right-3 top-3 text-[var(--text-secondary)] hover:text-[var(--text-primary)] focus:outline-none"
                 >
                   {showConfirmPassword ? "Hide" : "Show"}
                 </button>
@@ -340,18 +297,21 @@ export default function RecruiterRegister() {
 
               <button
                 type="submit"
-                className="w-full bg-yellow-400 text-white font-medium py-3 rounded-lg hover:bg-yellow-500 transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-lg"
+                className="w-full bg-[var(--accent)] text-[var(--dark-bg)] font-medium py-3 rounded-lg hover:bg-[var(--accent-hover)] transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-lg mb-6"
               >
                 Register
               </button>
+              <GoogleSignIn onSuccess={() => {}} onError={() => {}} />
             </form>
 
             <div className="mt-6 flex flex-col items-center space-y-4">
-              <div className="w-full border-t border-gray-200 my-2"></div>
-              <p className="text-gray-600">Already have an account?</p>
+              <div className="w-full border-t border-[var(--border)] my-2"></div>
+              <p className="text-[var(--text-secondary)]">
+                Already have an account?
+              </p>
               <Link
                 href="/login"
-                className="w-full bg-white border-2 border-yellow-400 text-yellow-500 font-medium py-2.5 rounded-lg text-center hover:bg-yellow-50 transition-colors duration-300"
+                className="w-full bg-transparent border-2 border-[var(--accent)] text-[var(--accent)] font-medium py-2.5 rounded-lg text-center hover:bg-[var(--accent-hover)] hover:bg-opacity-10 transition-colors duration-300"
               >
                 Sign In
               </Link>

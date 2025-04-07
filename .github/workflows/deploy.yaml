@@ -58,6 +58,7 @@ jobs:
         run: |
           echo "Fetching frontend environment variables..."
           echo "${{ vars.FRONTEND_ENV }}" > frontend.env
+          echo "${{ vars.FRONTEND_ENV }}" > Frontend/.env
           echo "This is the content of the frontend.env file:"
           cat frontend.env
 
@@ -80,4 +81,6 @@ jobs:
             cd Internship-2025/Resume-Screening-App
             docker compose build frontend
             docker compose up -d --force-recreate frontend
-            docker system prune -af
+            docker system prune -af 
+
+            

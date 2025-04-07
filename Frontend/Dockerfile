@@ -13,11 +13,6 @@ RUN npm install
 # Copy the rest of the application files
 COPY . .
 
-# Rename and copy environment variables for Next.js production mode
-RUN echo "NEXT_PUBLIC_API_URL=http://181.214.44.15:3000" > .env.production
-RUN echo "NEXT_PUBLIC_BASE_URL=http://181.214.44.15:3000/api" >> .env.production
-
-
 # Build the Next.js app (now uses the correct environment variables)
 RUN npm run build
 
@@ -33,10 +28,10 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 # Copy environment variables
-COPY --from=builder /app/.env.production ./.env.production
+COPY --from=builder /app/.env ./.env
 
 # Expose the port Next.js will run on
-EXPOSE 3001
+EXPOSE 3000
 
 # Start the Next.js server
-CMD ["npx", "next", "start", "-p", "3001"]
+CMD ["npm","start"]
