@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useAuth } from "../../lib/auth";
-import Sidebar from "../../components/Sidebar";
-import Navbar from "../../components/Navbar";
+import Sidebar from "../../components/shared/Sidebar";
+import Navbar from "../../components/shared/Navbar";
 import { useRouter } from "next/navigation";
 
 export default function DashboardLayout({

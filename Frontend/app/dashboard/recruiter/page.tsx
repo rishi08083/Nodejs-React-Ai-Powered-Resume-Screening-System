@@ -158,9 +158,9 @@ export default function AdminDashboard() {
 
   return (
     <div className="bg-[var(--bg)] min-h-screen text-[var(--text-primary)]">
-      <main className="container mx-auto px-4 py-6">
-        <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
-        
+      <main className="container mx-auto px-4 ">
+        <h1 className="text-3xl font-bold mb-6">Recruiter Dashboard</h1>
+
         {/* KPI Stats Row */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <StatCard
@@ -196,39 +196,6 @@ export default function AdminDashboard() {
         {/* Row 1: Main Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           {/* Candidate Screening Outcome */}
-          <div className="bg-[var(--surface)] p-6 rounded-lg shadow-lg border border-[var(--border)]">
-            <h2 className={chartTitle}>Candidate Screening Outcome</h2>
-            <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={screeningOutcomeData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={100}
-                    paddingAngle={5}
-                    dataKey="value"
-                    label={({ name, value, percent }) => 
-                      `${name}: ${value} (${(percent * 100).toFixed(0)}%)`
-                    }
-                  >
-                    {screeningOutcomeData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "var(--surface)",
-                      borderColor: "var(--border)",
-                    }}
-                    labelStyle={{ color: "var(--text-primary)" }}
-                  />
-                  <Legend layout="vertical" verticalAlign="middle" align="right" />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
 
           {/* Resumes Parsed Over Time */}
           <div className="bg-[var(--surface)] p-6 rounded-lg shadow-lg border border-[var(--border)]">
@@ -290,17 +257,17 @@ export default function AdminDashboard() {
                       />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid 
-                    strokeDasharray="3 3" 
-                    stroke="var(--border)" 
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    stroke="var(--border)"
                     vertical={false}
                   />
-                  <XAxis 
-                    dataKey="date" 
+                  <XAxis
+                    dataKey="date"
                     stroke="var(--text-secondary)"
                     tick={{ fontSize: 12 }}
                   />
-                  <YAxis 
+                  <YAxis
                     stroke="var(--text-secondary)"
                     tick={{ fontSize: 12 }}
                   />
@@ -322,6 +289,43 @@ export default function AdminDashboard() {
               </ResponsiveContainer>
             </div>
           </div>
+          <div className="bg-[var(--surface)] p-6 rounded-lg shadow-lg border border-[var(--border)]">
+            <h2 className={chartTitle}>Candidate Screening Outcome</h2>
+            <div className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={screeningOutcomeData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={100}
+                    paddingAngle={5}
+                    dataKey="value"
+                    label={({ name, value, percent }) =>
+                      `${name}: ${value} (${(percent * 100).toFixed(0)}%)`
+                    }
+                  >
+                    {screeningOutcomeData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "var(--surface)",
+                      borderColor: "var(--border)",
+                    }}
+                    labelStyle={{ color: "var(--text-primary)" }}
+                  />
+                  <Legend
+                    layout="vertical"
+                    verticalAlign="middle"
+                    align="right"
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
         </div>
 
         {/* Row 2: Bar Charts */}
@@ -336,19 +340,19 @@ export default function AdminDashboard() {
                   layout="vertical"
                   margin={{ left: 60 }}
                 >
-                  <CartesianGrid 
-                    strokeDasharray="3 3" 
-                    stroke="var(--border)" 
-                    horizontal={false} 
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    stroke="var(--border)"
+                    horizontal={false}
                   />
-                  <XAxis 
-                    type="number" 
+                  <XAxis
+                    type="number"
                     stroke="var(--text-secondary)"
                     tick={{ fontSize: 12 }}
                   />
-                  <YAxis 
-                    dataKey="name" 
-                    type="category" 
+                  <YAxis
+                    dataKey="name"
+                    type="category"
                     stroke="var(--text-secondary)"
                     tick={{ fontSize: 12 }}
                     width={80}
@@ -360,7 +364,12 @@ export default function AdminDashboard() {
                     }}
                     labelStyle={{ color: "var(--text-primary)" }}
                   />
-                  <Bar dataKey="count" fill="var(--accent)" barSize={20} radius={[0, 4, 4, 0]} />
+                  <Bar
+                    dataKey="count"
+                    fill="var(--accent)"
+                    barSize={20}
+                    radius={[0, 4, 4, 0]}
+                  />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -372,16 +381,13 @@ export default function AdminDashboard() {
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={scoreDistributionData}>
-                  <CartesianGrid 
-                    strokeDasharray="3 3" 
-                    stroke="var(--border)" 
-                  />
-                  <XAxis 
-                    dataKey="range" 
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                  <XAxis
+                    dataKey="range"
                     stroke="var(--text-secondary)"
                     tick={{ fontSize: 12 }}
                   />
-                  <YAxis 
+                  <YAxis
                     stroke="var(--text-secondary)"
                     tick={{ fontSize: 12 }}
                   />
@@ -392,17 +398,19 @@ export default function AdminDashboard() {
                     }}
                     labelStyle={{ color: "var(--text-primary)" }}
                   />
-                  <Bar 
-                    dataKey="count" 
-                    radius={[4, 4, 0, 0]}
-                    barSize={40}
-                  >
-                    {
-                      scoreDistributionData.map((entry, index) => {
-                        const colors = ["#ef4444", "#f59e0b", "#facc15", "#84cc16", "#4ade80"];
-                        return <Cell key={`cell-${index}`} fill={colors[index]} />;
-                      })
-                    }
+                  <Bar dataKey="count" radius={[4, 4, 0, 0]} barSize={40}>
+                    {scoreDistributionData.map((entry, index) => {
+                      const colors = [
+                        "#ef4444",
+                        "#f59e0b",
+                        "#facc15",
+                        "#84cc16",
+                        "#4ade80",
+                      ];
+                      return (
+                        <Cell key={`cell-${index}`} fill={colors[index]} />
+                      );
+                    })}
                   </Bar>
                 </BarChart>
               </ResponsiveContainer>
@@ -424,7 +432,9 @@ export default function AdminDashboard() {
                     cy="50%"
                     outerRadius={80}
                     dataKey="value"
-                    label={({ name, percent }) => `${(percent * 100).toFixed(0)}%`}
+                    label={({ name, percent }) =>
+                      `${(percent * 100).toFixed(0)}%`
+                    }
                   >
                     {jobDistributionData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
@@ -436,9 +446,16 @@ export default function AdminDashboard() {
                       borderColor: "var(--border)",
                     }}
                     labelStyle={{ color: "var(--text-primary)" }}
-                    formatter={(value, name, props) => [`${value} candidates`, props.payload.name]}
+                    formatter={(value, name, props) => [
+                      `${value} candidates`,
+                      props.payload.name,
+                    ]}
                   />
-                  <Legend layout="vertical" verticalAlign="bottom" align="center" />
+                  <Legend
+                    layout="vertical"
+                    verticalAlign="bottom"
+                    align="center"
+                  />
                 </PieChart>
               </ResponsiveContainer>
             </div>

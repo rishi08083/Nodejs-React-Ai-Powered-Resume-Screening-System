@@ -14,7 +14,7 @@ import {
   UserRound,
   X,
 } from "lucide-react";
-import { useTheme } from "../lib/themeContext";
+import { useTheme } from "../../lib/themeContext";
 
 const recruiterLinks = [
   {

@@ -229,7 +229,7 @@ const ListJobs = () => {
                       <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        className="px-3 py-2 bg-[var(--accent)] font-medium rounded-lg hover:bg-[var(--accent-hover)] text-[var(--text-primary)] transition-colors duration-200 shadow-md hover:shadow-lg flex items-center space-x-1"
+                        className="px-3 py-2 bg-[var(--accent)] font-medium rounded-lg hover:bg-[var(--accent-hover)] text-[var(--bg)] transition-colors duration-200 shadow-md hover:shadow-lg flex items-center space-x-1"
                         onClick={() => handleViewButtonClick(job)}
                       >
                         <Upload className="h-4 w-4" />

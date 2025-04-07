@@ -311,7 +311,7 @@ export default function RecruiterRegister() {
               </p>
               <Link
                 href="/login"
-                className="w-full bg-transparent border-2 border-[var(--accent)] text-[var(--accent)] font-medium py-2.5 rounded-lg text-center hover:bg-[var(--accent-hover)] hover:bg-opacity-10 transition-colors duration-300"
+                className="w-full bg-transparent border-2 border-[var(--accent)] text-[var(--accent)] font-medium py-2.5 rounded-lg text-center hover:bg-[var(--accent-hover)] hover:text-[var(--bg)] hover:bg-opacity-10 transition-colors duration-300"
               >
                 Sign In
               </Link>

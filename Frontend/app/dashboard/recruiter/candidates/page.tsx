@@ -340,7 +340,7 @@ const CandidateList = () => {
           <div className="overflow-x-auto">
             <table className="min-w-full table-auto border-collapse">
               <thead>
-                <tr className="bg-[var(--accent)] border-b border-[var(--border)]">
+                <tr className="bg-[var(--bg)] border-b border-[var(--border)]">
                   <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
                     Candidate Name
                   </th>
@@ -374,7 +374,7 @@ const CandidateList = () => {
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.05, duration: 0.4 }}
-                    className="border-b border-[var(--border)] hover:bg-[var(--accent-hover)] transition-all duration-300"
+                    className="border-b border-[var(--border)] hover:bg-[var(--bg)] transition-all duration-300"
                   >
                     <td className="px-6 py-4 text-sm font-medium text-[var(--text-primary)]">
                       {candidate.name}
@@ -417,7 +417,7 @@ const CandidateList = () => {
                     {/* Compatibility Score */}
                     <td className="px-6 py-4 text-sm">
                       {candidate.match_score !== null &&
-                        candidate.match_score !== undefined ? (
+                      candidate.match_score !== undefined ? (
                         <motion.button
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
@@ -458,8 +458,8 @@ const CandidateList = () => {
                     {/* Feedback Button */}
                     <td className="px-6 py-4 text-sm">
                       {candidate.match_score !== null &&
-                        candidate.match_score !== undefined &&
-                        candidate.is_screened ? (
+                      candidate.match_score !== undefined &&
+                      candidate.is_screened ? (
                         <motion.button
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
@@ -480,9 +480,7 @@ const CandidateList = () => {
                     {/* Recommended */}
                     <td className="px-6 py-4 text-sm">
                       {candidate.feedback?.feedback.experience_match ? (
-                        <span className="text-green-400 font-medium">
-                          Yes
-                        </span>
+                        <span className="text-green-400 font-medium">Yes</span>
                       ) : (
                         <span className="text-red-400 font-medium">No</span>
                       )}
@@ -586,9 +584,9 @@ const CandidateList = () => {
                 No Candidates Found
               </h3>
               <p className="text-[var(--text-secondary)] max-w-md">
-                {selectedJob ? 
-                  "No candidates have applied for this job position yet. Check back later or select another job." : 
-                  "Please select a job from the dropdown to view candidates."}
+                {selectedJob
+                  ? "No candidates have applied for this job position yet. Check back later or select another job."
+                  : "Please select a job from the dropdown to view candidates."}
               </p>
             </motion.div>
           </div>
@@ -613,10 +611,11 @@ const CandidateList = () => {
               onClick={() => paginate(number + 1)}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
-              className={`px-4 py-2 rounded-lg shadow-md transition-all duration-300 ${currentPage === number + 1
-                ? "bg-[var(--accent)] text-[var(--dark-bg)] font-medium"
-                : "bg-[var(--surface)] text-[var(--text-secondary)] border border-[var(--border)] hover:border-[var(--accent)] hover:text-[var(--accent)]"
-                }`}
+              className={`px-4 py-2 rounded-lg shadow-md transition-all duration-300 ${
+                currentPage === number + 1
+                  ? "bg-[var(--accent)] text-[var(--dark-bg)] font-medium"
+                  : "bg-[var(--surface)] text-[var(--text-secondary)] border border-[var(--border)] hover:border-[var(--accent)] hover:text-[var(--accent)]"
+              }`}
             >
               {number + 1}
             </motion.button>
