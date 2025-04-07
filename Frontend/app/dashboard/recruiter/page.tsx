@@ -159,7 +159,7 @@ export default function AdminDashboard() {
   return (
     <div className="bg-[var(--bg)] min-h-screen text-[var(--text-primary)]">
       <main className="container mx-auto px-4 ">
-        <h1 className="text-3xl font-bold mb-6">Recruiter Dashboard</h1>
+        <h1 className="text-3xl font-bold mb-6">Recruiter Dashboard (Coming Soon)</h1>
 
         {/* KPI Stats Row */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">

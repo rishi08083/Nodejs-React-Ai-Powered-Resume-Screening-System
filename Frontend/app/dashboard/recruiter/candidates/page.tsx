@@ -455,33 +455,31 @@ const CandidateList = () => {
                       {candidate.phone_number}
                     </td>
                     <td className="px-6 py-4 text-sm">
-                      <motion.a
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={(e) => {
-                          get_resume(candidate.id, e);
-                        }}
-                        href={resumeUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-[var(--accent)] hover:text-[var(--black)] transition-colors duration-300 flex items-center gap-1"
+                      <button
+                      onClick={(e) => {
+                        get_resume(candidate.id, e);
+                      }}
+                      className="px-3 py-2 bg-[var(--border)] text-[var(--text-primary)] font-medium rounded-lg hover:bg-[var(--blue-highlight)] transition-colors duration-200 shadow-md hover:shadow-lg flex items-center space-x-1"
+                      tabIndex={0}
+                      style={{ transform: "none" }}
                       >
-                        <svg
-                          className="h-4 w-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M15 13l-3 3m0 0l-3-3m3 3V8m0 13a9 9 0 110-18 9 9 0 010 18z"
-                          ></path>
-                        </svg>
-                        View Resume
-                      </motion.a>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="lucide lucide-eye h-4 w-4"
+                      >
+                        <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                      </svg>
+                      <span>View</span>
+                      </button>
                     </td>
                     {/* Compatibility Score */}
                     <td className="px-6 py-4 text-sm">
@@ -814,7 +812,7 @@ const CandidateList = () => {
                 <div className="p-3 bg-[var(--dark-bg)] rounded-lg border border-[var(--border)] flex items-center justify-between">
                   <p className="text-[var(--text-primary)]">
                     <span className="text-[var(--text-secondary)]">
-                      RCD Skill Match:
+                      Role Clarity Document :
                     </span>{" "}
                     {selectedFeedback.RCD_Skill_Match.toFixed(2)}
                   </p>

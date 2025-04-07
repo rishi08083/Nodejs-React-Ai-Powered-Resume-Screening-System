@@ -488,10 +488,10 @@ const CandidateList = () => {
               <strong>Combined Score:</strong> {selectedFeedback.Combined_Score}
             </p>
             <p className="text-gray-600">
-              <strong>JD Skill Match:</strong> {selectedFeedback.JD_Skill_Match}
+              <strong>Job Description :</strong> {selectedFeedback.JD_Skill_Match}
             </p>
             <p className="text-gray-600">
-              <strong>RCD Skill Match:</strong>{" "}
+              <strong>Role Clarity Document :</strong>{" "}
               {selectedFeedback.RCD_Skill_Match}
             </p>
             <p className="text-gray-600">
