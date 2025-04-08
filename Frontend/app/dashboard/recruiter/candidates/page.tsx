@@ -740,7 +740,7 @@ const CandidateList = () => {
               </motion.button>
             </div>
 
-            {/* Recommended/Not Recommended Title */}
+            {/* Recommended/Not Recommended Title
             <div className="text-center mb-6">
               {selectedFeedback?.is_recommended === "YES" ? (
                 <h3 className="text-xl font-bold text-green-500">
@@ -755,7 +755,7 @@ const CandidateList = () => {
                   Pending Recommendation
                 </h3>
               )}
-            </div>
+            </div> */}
 
             <div className="space-y-4">
               <div className="p-3 bg-[var(--blue-highlight)] rounded-lg flex items-center justify-between">
@@ -763,7 +763,7 @@ const CandidateList = () => {
                   <span className="text-[var(--accent)]">
                     Compatibility Score:
                   </span>{" "}
-                  {selectedFeedback.Combined_Score.toFixed(2)}
+                  {`${selectedFeedback.Combined_Score.toFixed(2)}%`}
                 </p>
                 <div className="relative group">
                   <svg
@@ -780,86 +780,89 @@ const CandidateList = () => {
                       d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"
                     ></path>
                   </svg>
-                  <div className="absolute left-6 top-0 hidden group-hover:block bg-[var(--surface)] text-[var(--text-secondary)] text-sm p-2 rounded shadow-lg border border-[var(--border)]">
+                  <div className="absolute z-10 left-6 top-0 hidden group-hover:block bg-[var(--surface)] text-[var(--text-secondary)] text-sm p-2 rounded shadow-lg border border-[var(--border)]">
                     The overall compatibility score of the candidate.
                   </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="p-3 bg-[var(--dark-bg)] rounded-lg border border-[var(--border)] flex items-center justify-between">
+                <div className="p-3 bg-[var(--dark-bg)] rounded-lg border border-[var(--border)]">
+                <h3 className="text-[var(--text-primary)] font-medium mb-4">
+                  Match 
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-3 bg-[var(--surface)] rounded-lg border border-[var(--border)] flex items-center justify-between">
                   <p className="text-[var(--text-primary)]">
                     <span className="text-[var(--text-secondary)]">
-                      Job Description Match:
+                    Job Description Match:
                     </span>{" "}
-                    {selectedFeedback.JD_Skill_Match.toFixed(2)}
+                    {`${selectedFeedback.JD_Skill_Match.toFixed(2)}%`}
                   </p>
                   <div className="relative group">
                     <svg
-                      className="h-5 w-5 text-[var(--text-secondary)] cursor-pointer"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5 text-[var(--text-secondary)] cursor-pointer"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"
-                      ></path>
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"
+                    ></path>
                     </svg>
-                    <div className="absolute left-6 top-0 hidden group-hover:block bg-[var(--surface)] text-[var(--text-secondary)] text-sm p-2 rounded shadow-lg border border-[var(--border)]">
-                      The match percentage based on the job description skills.
+                    <div className="absolute z-10 left-6 top-0 hidden group-hover:block bg-[var(--surface)] text-[var(--text-secondary)] text-sm p-2 rounded shadow-lg border border-[var(--border)]">
+                    The match percentage based on the job description skills.
                     </div>
                   </div>
-                </div>
-                <div className="p-3 bg-[var(--dark-bg)] rounded-lg border border-[var(--border)] flex items-center justify-between">
+                  </div>
+                  <div className="p-3 bg-[var(--surface)] rounded-lg border border-[var(--border)] flex items-center justify-between">
                   <p className="text-[var(--text-primary)]">
                     <span className="text-[var(--text-secondary)]">
-                      Role Clarity Document :
+                    Role Clarity Document:
                     </span>{" "}
-                    {selectedFeedback.RCD_Skill_Match.toFixed(2)}
+                    {`${selectedFeedback.RCD_Skill_Match.toFixed(2)}%`}
                   </p>
                   <div className="relative group">
                     <svg
-                      className="h-5 w-5 text-[var(--text-secondary)] cursor-pointer"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5 text-[var(--text-secondary)] cursor-pointer"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"
-                      ></path>
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"
+                    ></path>
                     </svg>
-                    <div className="absolute left-6 top-0 hidden group-hover:block bg-[var(--surface)] text-[var(--text-secondary)] text-sm p-2 rounded shadow-lg border border-[var(--border)]">
-                      The match percentage based on the role clarity document
-                      given with job description.
+                    <div className="absolute z-10 left-6 top-0 hidden group-hover:block bg-[var(--surface)] text-[var(--text-secondary)] text-sm p-2 rounded shadow-lg border border-[var(--border)]">
+                    The match percentage based on the role clarity document
+                    given with job description.
                     </div>
                   </div>
+                  </div>
                 </div>
-              </div>
-
-              <div className="p-3 bg-[var(--dark-bg)] rounded-lg border border-[var(--border)] flex items-center justify-between">
-                <p className="text-[var(--text-primary)]">
+                <div className="p-3 bg-[var(--surface)] rounded-lg border border-[var(--border)] flex items-center justify-between mt-4">
+                  <p className="text-[var(--text-primary)]">
                   <span className="text-[var(--text-secondary)]">
                     Experience Match:
                   </span>{" "}
                   <span
                     className={
-                      selectedFeedback.feedback.experience_match
-                        ? "text-green-400"
-                        : "text-red-400"
+                    selectedFeedback.feedback.experience_match
+                      ? "text-green-400"
+                      : "text-red-400"
                     }
                   >
                     {selectedFeedback.feedback.experience_match ? "Yes" : "No"}
                   </span>
-                </p>
-                <div className="relative group">
+                  </p>
+                  <div className="relative group">
                   <svg
                     className="h-5 w-5 text-[var(--text-secondary)] cursor-pointer"
                     fill="none"
@@ -868,23 +871,24 @@ const CandidateList = () => {
                     xmlns="http://www.w3.org/2000/svg"
                   >
                     <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"
                     ></path>
                   </svg>
-                  <div className="absolute left-6 top-0 hidden group-hover:block bg-[var(--surface)] text-[var(--text-secondary)] text-sm p-2 rounded shadow-lg border border-[var(--border)]">
+                  <div className="absolute z-10 left-6 top-0 hidden group-hover:block bg-[var(--surface)] text-[var(--text-secondary)] text-sm p-2 rounded shadow-lg border border-[var(--border)]">
                     Indicates whether the candidate's experience matches the job
                     requirements.
                   </div>
+                  </div>
                 </div>
-              </div>
+                </div>
 
-              <div className="p-4 bg-[var(--dark-bg)] rounded-lg border border-[var(--border)]">
+              <div className="p-4 bg-[var(--dark-bg)] rounded-lg border border-[var(--border)] ">
                 <div className="text-[var(--text-secondary)] mb-1 flex items-center">
                   Recommendation
-                  <div className="relative group ml-2">
+                  <div className="relative group ml-2" >
                     <svg
                       className="h-5 w-5 text-[var(--text-secondary)] cursor-pointer"
                       fill="none"
@@ -899,13 +903,13 @@ const CandidateList = () => {
                         d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"
                       ></path>
                     </svg>
-                    <div className="absolute left-6 top-0 hidden group-hover:block bg-[var(--surface)] text-[var(--text-secondary)] text-sm p-2 rounded shadow-lg border border-[var(--border)]">
+                    <div className="absolute z-10 left-6 top-0 hidden group-hover:block bg-[var(--surface)] text-[var(--text-secondary)] text-sm p-2 rounded shadow-lg border border-[var(--border)] ">
                       The system's recommendation based on the candidate's
                       profile skills and experience.
                     </div>
                   </div>
                 </div>
-                <p className="text-[var(--text-primary)]">
+                <p className="relative z-0 max-h-40 overflow-y-scroll text-[var(--text-primary)] scrollbar-thin scrollbar-thumb-[var(--border)] scrollbar-track-[var(--dark-bg)] shadow-inner rounded-lg p-4 bg-[var(--surface)] border border-[var(--border)]">
                   {selectedFeedback.feedback.Feedback ||
                     selectedFeedback.feedback.feedback}
                 </p>
