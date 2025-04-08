@@ -60,12 +60,32 @@ const recruiterRegister = async (req, res) => {
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: email,
-      subject: "Email Verification",
-      text: `Here is your OTP: ${token}`,
-      html: `<p>Enter this OTP ${token} to verify your email.</p>`,
+      subject: "Verify your email address",
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
+          <h2 style="text-align: center; color: #333;">Email Verification</h2>
+          <p>Hello <strong>${name}</strong>,</p>
+          <p>Thank you for registering. To complete your sign up, please verify your email address by entering the OTP below:</p>
+          <div style="text-align: center; margin: 30px 0;">
+            <span style="font-size: 32px; font-weight: bold; letter-spacing: 8px; color: #2c3e50;">${token}</span>
+          </div>
+          <p>This OTP is valid for <strong>10 minutes</strong>. Do not share this code with anyone.</p>
+          <p>If you didn't request this, you can safely ignore this email.</p>
+          <br />
+          <p>Best regards,</p>
+          <p><strong>Promact Team</strong></p>
+          <hr style="margin: 40px 0; border-top: 2px solid #d8a31a;" />
+          <div style="background-color: #111; padding: 20px; color: #fff; border-radius: 8px;">
+            <p style="font-size: 14px; margin: 0 0 10px;"><strong>Website:</strong> <a href="https://promactinfo.com" style="color: #d8a31a; text-decoration: none;">promactinfo.com</a></p>
+            <div style="margin-top: 15px; background-color: #fff; padding: 10px; border-radius: 4px;">
+              <img src='https://promact.hiringbull.com/Home/GetImage?handler=CompanyLogo&companyId=305' alt="Promact Tagline" style="max-width: 100%; height: auto;" />
+            </div>
+          </div>
+          <p style="font-size: 11px; color: #aaa; text-align: center; margin-top: 20px;">This is an automated message. Please do not reply to this email.</p>
+        </div>
+      `
     };
-    await transporter.sendMail(mailOptions);
-
+    
     const user = await db.Users.create({
       name,
       email,
@@ -80,6 +100,8 @@ const recruiterRegister = async (req, res) => {
       message: "Recruiter registered successfully",
       data: { user },
     });
+
+    await transporter.sendMail(mailOptions);
   } catch (error) {
     res.status(500).json({
       status: "error",
