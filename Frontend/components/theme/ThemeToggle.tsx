@@ -1,4 +1,5 @@
 // components/ThemeToggle.js
+import { Moon, Sun } from "lucide-react";
 import { useTheme } from "../../lib/themeContext";
 
 const ThemeToggle = () => {
@@ -10,7 +11,7 @@ const ThemeToggle = () => {
       className="p-2 rounded-full bg-dark-surface dark:bg-light-surface text-dark-text-primary dark:text-light-text-primary"
       aria-label={`Toggle ${theme === "dark" ? "light" : "dark"} mode`}
     >
-      {theme === "dark" ? "☀️" : "🌙"}
+      {theme === "dark" ? <Sun /> : <Moon />}
     </button>
   );
 };

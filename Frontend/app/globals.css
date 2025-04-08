@@ -363,7 +363,7 @@ main {
 }
 
 .logout-confirm-button:hover {
-  background-color: var(--dark-accent-hover);
+  background-color: var(--accent-hover);
 }
 
 /* Media queries for responsive design */
