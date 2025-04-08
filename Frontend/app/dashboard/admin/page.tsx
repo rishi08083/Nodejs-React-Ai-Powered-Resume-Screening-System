@@ -178,7 +178,7 @@ export default function AdminDashboard() {
     <div className="bg-[var(--bg)] min-h-screen text-[var(--text-primary)]">
       <main className="container mx-auto px-4">
         <h1 className="text-3xl font-bold mb-8 text-[var(--text-primary)]">
-          Admin Dashboard
+          Admin Dashboard (Coming Soon)
         </h1>
 
         {/* KPI Stats Row */}

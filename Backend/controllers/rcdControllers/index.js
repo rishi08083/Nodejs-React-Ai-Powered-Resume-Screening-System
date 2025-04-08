@@ -84,7 +84,7 @@ exports.uploadRCD = async (req, res) => {
     console.error("Error uploading RCDs:", error);
     res.status(500).json({
       status: "error",
-      message: "RCD upload failed",
+      message: "Role Clarity Document upload failed",
       error: { details: error.message },
     });
   }
@@ -123,7 +123,7 @@ exports.getRCD = async (req, res) => {
       data: { documents: [signedUrl] },
     });
   } catch (error) {
-    console.error("Error retrieving RCDs:", error);
+    console.error("Error retrieving Role Clarity Document:", error);
     res.status(500).json({
       status: "error",
       message: "Failed to retrieve Role Clarity Document",

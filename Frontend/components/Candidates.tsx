@@ -21,6 +21,9 @@ type Candidate = {
     feedback: {
       experience_match: boolean;
       recommendation: string;
+      feedback: {
+        Feedback: string;
+      };
     };
   };
 };
@@ -113,6 +116,7 @@ const CandidateList = () => {
 
       if (response.ok) {
         const data = await response.json();
+        console.log(data, "feedback data");
         setCompatibilityResponses((prev) => ({
           ...prev,
           [candidateId]: data.data[0].rating || "0",
@@ -280,7 +284,7 @@ const CandidateList = () => {
     <div className="w-full p-4 bg-gray-50">
       <div className="mb-6">
         <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
-          Candidate List
+        Screened Candidate List
         </h1>
         <p className="text-gray-600 mt-2">
           Search and manage candidates for your job postings.
@@ -488,10 +492,10 @@ const CandidateList = () => {
               <strong>Combined Score:</strong> {selectedFeedback.Combined_Score}
             </p>
             <p className="text-gray-600">
-              <strong>JD Skill Match:</strong> {selectedFeedback.JD_Skill_Match}
+              <strong>Job Description :</strong> {selectedFeedback.JD_Skill_Match}
             </p>
             <p className="text-gray-600">
-              <strong>RCD Skill Match:</strong>{" "}
+              <strong>Role Clarity Document :</strong>{" "}
               {selectedFeedback.RCD_Skill_Match}
             </p>
             <p className="text-gray-600">
@@ -501,6 +505,10 @@ const CandidateList = () => {
             <p className="text-gray-600">
               <strong>Recommendation:</strong>{" "}
               {selectedFeedback.feedback.recommendation}
+            </p>
+            <p className="text-gray-600">
+              <strong>Feedback:</strong>{" "}
+              {selectedFeedback.feedback.feedback.Feedback}
             </p>
             <button
               onClick={closeModal}

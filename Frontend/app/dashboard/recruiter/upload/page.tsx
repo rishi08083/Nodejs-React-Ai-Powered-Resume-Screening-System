@@ -389,7 +389,7 @@ const UploadForm = () => {
           </label>
         </div>
         <p className="mt-4 text-xs text-[var(--text-secondary)] opacity-70">
-          Supported formats: PDF, DOCX, JPG ,JPEG
+          Supported formats: PDF, DOCX, and IMAGES
         </p>
       </div>
 
