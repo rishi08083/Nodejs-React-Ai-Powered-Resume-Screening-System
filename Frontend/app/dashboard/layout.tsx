@@ -5,7 +5,7 @@ import { useAuth } from "../../lib/auth";
 import Sidebar from "../../components/shared/Sidebar";
 import Navbar from "../../components/shared/Navbar";
 import { useRouter } from "next/navigation";
-
+import LogOutModal from "../../components/shared/LogOut";
 export default function DashboardLayout({
   children,
 }: {
@@ -54,30 +54,35 @@ export default function DashboardLayout({
   return (
     <div className="dashboard-container">
       {isLogoutModalOpen && (
-        <div className="logout-modal-overlay">
-          <div className="logout-modal">
-            <h2>Confirm Logout</h2>
-            <p>Are you sure you want to log out?</p>
-            <div className="logout-modal-buttons">
-              <button
-                onClick={() => setIsLogoutModalOpen(false)}
-                className="cancel-button"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={async () => {
-                  await logout();
-                  navigate.push("/login");
-                  setIsLogoutModalOpen(false);
-                }}
-                className="logout-confirm-button"
-              >
-                Logout
-              </button>
-            </div>
-          </div>
-        </div>
+        // <div className="logout-modal-overlay">
+        //   <div className="logout-modal">
+        //     <h2>Confirm Logout</h2>
+        //     <p>Are you sure you want to log out?</p>
+        //     <div className="logout-modal-buttons">
+        //       <button
+        //         onClick={() => setIsLogoutModalOpen(false)}
+        //         className="cancel-button"
+        //       >
+        //         Cancel
+        //       </button>
+        //       <button
+        //         onClick={async () => {
+        //           await logout();
+        //           navigate.push("/login");
+        //           setIsLogoutModalOpen(false);
+        //         }}
+        //         className="logout-confirm-button"
+        //       >
+        //         Logout
+        //       </button>
+        //     </div>
+        //   </div>
+        // </div>
+        <LogOutModal
+          setIsLogoutModalOpen={setIsLogoutModalOpen}
+          logout={logout}
+          navigate={navigate}
+        />
       )}
 
       <Navbar
@@ -85,6 +90,7 @@ export default function DashboardLayout({
         setIsSidebarOpen={setIsSidebarOpen}
         isSidebarOpen={isSidebarOpen}
         setIsLogoutModalOpen={setIsLogoutModalOpen}
+        isLogOutModal={isLogoutModalOpen}
       />
 
       <Sidebar
