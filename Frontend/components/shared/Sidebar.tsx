@@ -37,11 +37,6 @@ const recruiterLinks = [
     label: "Candidates",
     icon: <Book className="sidebar-icon" />,
   },
-  {
-    href: "/dashboard/recruiter/profile",
-    label: "Profile",
-    icon: <UserRound className="sidebar-icon" />,
-  },
 ];
 
 const adminLinks = [
@@ -117,13 +112,13 @@ export default function Sidebar({
           ))}
         </nav>
 
-        <button
+        {/* <button
           className="sidebar-logout-btn"
           onClick={() => setIsLogoutModalOpen(true)}
         >
           <LogOut className="sidebar-icon" />
           <span>Logout</span>
-        </button>
+        </button> */}
       </aside>
     </>
   );
