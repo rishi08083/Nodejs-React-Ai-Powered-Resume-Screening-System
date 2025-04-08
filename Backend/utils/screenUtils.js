@@ -39,7 +39,7 @@ module.exports.getCandidateDetails = async (candidate_id) => {
     const skillNames = candidate_skills.flatMap((skill) => skill.skill_names);
 
     // Get job titles from experience
-    const experienceTitles = candidate_experience.map((exp) => exp.job_titles);
+    const experienceTitles = candidate_experience.map((exp) => exp.job_titles || "").filter(Boolean);
 
     // Extract file key from rcd_url
     const rcd_file_key = job_detail_candidate.rcd_url
