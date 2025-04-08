@@ -19,6 +19,7 @@ export default function GoogleSignIn({ onSuccess, onError }) {
           onError("Google login failed");
         }}
       />
+      (Coming Soon)
     </GoogleOAuthProvider>
   );
 }

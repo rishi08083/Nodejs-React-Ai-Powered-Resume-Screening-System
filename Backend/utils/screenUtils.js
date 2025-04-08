@@ -87,6 +87,7 @@ module.exports.saveScreeningResult = async (resultData) => {
     missing_skills,
     is_deleted,
     feedback_json,
+    is_recommended,
   } = resultData;
 
   try {

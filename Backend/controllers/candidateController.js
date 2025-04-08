@@ -68,6 +68,7 @@ module.exports.listCandidate = async (req, res) => {
 
     const candidates = await db.Candidates.findAll({
       where: { job_id: parseInt(job_id), is_deleted: false },
+      order: [["createdAt", "DESC"]],
     });
     if (candidates.length === 0) {
       return res.status(200).json({

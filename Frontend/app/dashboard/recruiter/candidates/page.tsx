@@ -25,7 +25,8 @@ type Candidate = {
     RCD_Skill_Match: number;
     feedback: {
       experience_match: boolean;
-      recommendation: string;
+      feedback: string;
+      Feedback: string;
     };
     is_recommended?: string;
   };
@@ -281,11 +282,11 @@ const CandidateList = () => {
         className="mb-8"
       >
         <h1 className="text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-2">
-          Candidate List
+          Screened Candidate List
         </h1>
         <div className="h-1 w-24 bg-[var(--accent)] rounded-full mb-4"></div>
         <p className="text-[var(--text-secondary)] mt-2">
-          Search and manage candidates for your job postings.
+          Find and view candidates for job postings.
         </p>
       </motion.div>
 
@@ -337,7 +338,7 @@ const CandidateList = () => {
               </option>
             ))}
           </select>
-          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[var(--text-secondary)]">
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[var(--text-secondary)] bg-[var(--accent)] rounded-r-lg ">
             <svg
               className="h-5 w-5"
               fill="none"
@@ -356,7 +357,11 @@ const CandidateList = () => {
         </div>
         <div className="relative w-full md:w-1/4">
           <select
-            className="w-full p-2 pl-4 border rounded-lg shadow-md appearance-none focus:outline-none focus:ring-2 focus:ring-[var(--accent)] bg-[var(--surface)] border-[var(--border)] text-[var(--text-primary)] transition-all duration-300"
+            className={`w-full p-2 pl-4 border rounded-lg shadow-md appearance-none focus:outline-none focus:ring-2 ${
+              selectedJob
+                ? "focus:ring-[var(--accent)] bg-[var(--surface)] border-[var(--border)] text-[var(--text-primary)]"
+                : "bg-gray-200 border-gray-300 text-gray-400 cursor-not-allowed"
+            } transition-all duration-300`}
             value={selectedRecommendation}
             onChange={(e) => {
               const value = e.target.value;
@@ -372,14 +377,14 @@ const CandidateList = () => {
                 setCandidates(filtered);
               }
             }}
-            disabled={!selectedJob}
+            disabled={!selectedJob} // Disable when no job is selected
           >
             <option value="">Recommendation</option>
             <option value="YES">Yes</option>
             <option value="NO">No</option>
           </select>
 
-          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[var(--text-secondary)]">
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[var(--text-secondary)] bg-[var(--accent)] rounded-r-lg">
             <svg
               className="h-5 w-5"
               fill="none"
@@ -456,29 +461,29 @@ const CandidateList = () => {
                     </td>
                     <td className="px-6 py-4 text-sm">
                       <button
-                      onClick={(e) => {
-                        get_resume(candidate.id, e);
-                      }}
-                      className="px-3 py-2 bg-[var(--border)] text-[var(--text-primary)] font-medium rounded-lg hover:bg-[var(--blue-highlight)] transition-colors duration-200 shadow-md hover:shadow-lg flex items-center space-x-1"
-                      tabIndex={0}
-                      style={{ transform: "none" }}
+                        onClick={(e) => {
+                          get_resume(candidate.id, e);
+                        }}
+                        className="px-3 py-2 bg-[var(--border)] text-[var(--text-primary)] font-medium rounded-lg hover:bg-[var(--blue-highlight)] transition-colors duration-200 shadow-md hover:shadow-lg flex items-center space-x-1"
+                        tabIndex={0}
+                        style={{ transform: "none" }}
                       >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="lucide lucide-eye h-4 w-4"
-                      >
-                        <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"></path>
-                        <circle cx="12" cy="12" r="3"></circle>
-                      </svg>
-                      <span>View</span>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="lucide lucide-eye h-4 w-4"
+                        >
+                          <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"></path>
+                          <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                        <span>View</span>
                       </button>
                     </td>
                     {/* Compatibility Score */}
@@ -785,7 +790,7 @@ const CandidateList = () => {
                 <div className="p-3 bg-[var(--dark-bg)] rounded-lg border border-[var(--border)] flex items-center justify-between">
                   <p className="text-[var(--text-primary)]">
                     <span className="text-[var(--text-secondary)]">
-                      JD Skill Match:
+                      Job Description Match:
                     </span>{" "}
                     {selectedFeedback.JD_Skill_Match.toFixed(2)}
                   </p>
@@ -901,7 +906,8 @@ const CandidateList = () => {
                   </div>
                 </div>
                 <p className="text-[var(--text-primary)]">
-                  {selectedFeedback.feedback.recommendation}
+                  {selectedFeedback.feedback.Feedback ||
+                    selectedFeedback.feedback.feedback}
                 </p>
               </div>
             </div>
