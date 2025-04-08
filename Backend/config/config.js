@@ -23,7 +23,7 @@ const config = {
     //     rejectUnauthorized: false, // Required for Render, AWS, etc.
     //   },
     // },
-    // logging: false,
+    logging: false,
   },
 };
 
