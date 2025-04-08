@@ -9,8 +9,8 @@ const fakeRes = {
 };
 
 // Schedule: Every day at 9:00 AM server time
-cron.schedule('0 9 * * *', async () => {
-  console.log('🕘 Triggering daily recruiter emails at 9AM...');
+cron.schedule('0 9 * * 1', async () => {
+  // console.log('Triggering weekly recruiter emails (every Monday at 9AM)...');
 
   try {
     const recruiters = await db.Users.findAll({
@@ -25,13 +25,13 @@ cron.schedule('0 9 * * *', async () => {
       };
 
       await mailRecruiter(fakeReq, fakeRes);
-      console.log(`📧 Sent email to recruiter: ${recruiter.email}`);
+      // console.log(`Sent email to recruiter: ${recruiter.email}`);
     }
 
-    console.log('✅ All recruiter emails sent successfully.');
+    // console.log('All recruiter emails sent successfully.');
 
   } catch (err) {
-    console.error('❌ Error sending recruiter emails:', err);
+    console.error('Error sending recruiter emails:', err);
   }
 }, {
   timezone: 'Asia/Kolkata'
