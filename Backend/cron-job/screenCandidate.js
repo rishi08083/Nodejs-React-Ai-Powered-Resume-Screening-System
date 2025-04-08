@@ -42,6 +42,7 @@ async function screenCandidate(candidate) {
       status_of: aiResponse.data.status === "success",
       missing_skills: aiResponse.data.missing_skills || [],
       is_deleted: false,
+      is_recommended: aiResponse.data.feedback.Recommendation.toUpperCase() === "YES" ? "YES" : "NO",
       feedback_json: aiResponse.data,
     };
 
@@ -53,7 +54,7 @@ async function screenCandidate(candidate) {
       await saveScreeningResult(payload);
     }
 
-    await db.Candidates.update({ is_screened: true }, { where: { id: candidate_id } });
+    await db.Candidates.update({ is_screened: true ,is_recommended: payload.is_recommended }, { where: { id: candidate_id } });
 
     // console.log(`✅ Candidate ${candidate_id} screened successfully`);
     return true;
