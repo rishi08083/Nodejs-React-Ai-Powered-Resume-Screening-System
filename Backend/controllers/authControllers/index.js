@@ -4,6 +4,7 @@ const db = require("../../models");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 const { Op, where } = require("sequelize");
+
 const adminRegister = async (req, res) => {
   try {
     const { name, email, password, apikey } = req.body;
@@ -38,16 +39,40 @@ const adminRegister = async (req, res) => {
     });
   }
 };
+
+const transporter = nodemailer.createTransport({
+  service: "Gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
+
 const recruiterRegister = async (req, res) => {
   try {
     const { name, email, password } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
+
+    const tokenExpiry = Date.now() + 10 * 60 * 1000;
+    // 4 digit random number in string
+    const token = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Email Verification",
+      text: `Here is your OTP: ${token}`,
+      html: `<p>Enter this OTP ${token} to verify your email.</p>`,
+    };
+    await transporter.sendMail(mailOptions);
 
     const user = await db.Users.create({
       name,
       email,
       password_hash: hashedPassword,
       role: "recruiter",
+      token: token,
+      token_expires: tokenExpiry
     });
 
     res.status(201).json({
@@ -67,7 +92,10 @@ const recruiterRegister = async (req, res) => {
 const userLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await db.Users.findOne({ where: { email } });
+    const user = await db.Users.findOne({ where: { 
+      email,
+      is_verified: true
+    }});
 
     if (!user) {
       return res.status(400).json({

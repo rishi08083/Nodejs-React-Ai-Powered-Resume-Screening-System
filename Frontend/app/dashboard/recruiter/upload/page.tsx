@@ -7,7 +7,8 @@ import React, {
   ChangeEvent,
   useMemo,
 } from "react";
-import styles from "../styles/Home.module.css";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 type Job = {
   title: string;
@@ -127,11 +128,19 @@ const UploadForm = () => {
     });
 
     if (invalidFiles.length > 0) {
-      setErrorMessage(
-        `Invalid file types: ${invalidFiles.join(
-          ", "
-        )}. Please upload PDF, DOCX, or JPG files.`
-      );
+      const errorMsg = `Invalid file types: ${invalidFiles.join(
+        ", "
+      )}. Please upload PDF, DOCX, or JPG ,JPEG files.`;
+      setErrorMessage(errorMsg);
+      toast.error(errorMsg, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
     } else {
       setErrorMessage("");
     }
@@ -144,20 +153,50 @@ const UploadForm = () => {
     if (selectedFiles) {
       handleFile(selectedFiles);
     }
+    // Reset the input value so the same file can be selected again
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
   const handleRemoveFile = (index: number) => {
     setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
+    // Reset the file input so the same file can be selected again
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
   const handleUpload = async () => {
+    setSuccessMessage(null);
+    setErrorMessage("");
     if (!selectedJob) {
-      setErrorMessage("Please select a job before uploading files.");
+      const errorMsg = "Please select a job before uploading files.";
+      setErrorMessage(errorMsg);
+      toast.error(errorMsg, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
       return;
     }
 
     if (files.length === 0) {
-      setErrorMessage("No files selected for upload.");
+      const errorMsg = "No files selected for upload.";
+      setErrorMessage(errorMsg);
+      toast.error(errorMsg, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
       return;
     }
 
@@ -186,16 +225,57 @@ const UploadForm = () => {
         if (response.ok) {
           setFiles([]);
           setErrorMessage("");
-          setSuccessMessage("Files uploaded successfully.");
+          const successMsg = "Files uploaded successfully.";
+          setSuccessMessage(successMsg);
+          toast.success(successMsg, {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
+          // Reset file input after successful upload
+          if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+          }
         } else {
           const errorData = await response.json();
-          setErrorMessage(errorData.message || "Failed to upload the files.");
+          const errorMsg = errorData.errors.map(
+            (error: { file: string; error: string }) => {
+              return `${error.file} ${error.error}`;
+            }
+          );
+          const fullErrorMsg =
+            `${errorData.message}   
+             ${errorMsg.join("\n")}` || "Failed to upload the files.";
+          setErrorMessage(fullErrorMsg);
+          toast.error(fullErrorMsg, {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
         }
         setIsLoading(false);
       }, 500);
     } catch (error) {
       console.error("Error uploading files:", error);
-      setErrorMessage("An error occurred while uploading the files.");
+      const errorMsg = "An error occurred while uploading the files.";
+      setErrorMessage(errorMsg);
+      toast.error(errorMsg, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
       setIsLoading(false);
     }
   };
@@ -216,8 +296,9 @@ const UploadForm = () => {
   };
 
   return (
-    <div className="max-w-2/3 mt-17 mx-auto p-6 bg-[#1b222c] shadow-lg rounded-lg transition-all duration-300 hover:shadow-xl relative border border-[#30363d]">
-      <h1 className="text-2xl font-bold mb-6 text-center text-[#ffb300]">
+    <div className="max-w-2/3 mt-17 mx-auto p-6 bg-[var(--surface)] shadow-lg rounded-lg transition-all duration-300 hover:shadow-xl relative border border-[var(--border)]">
+      <ToastContainer />
+      <h1 className="text-2xl font-bold mb-6 text-center text-[var(--accent)]">
         <span className="inline-block mr-2">📤</span>
         Upload Bulk Resumes
       </h1>
@@ -225,22 +306,28 @@ const UploadForm = () => {
       {/* Custom Dropdown */}
       <div className="relative mb-6" ref={dropdownRef}>
         <div
-          className={`w-full p-3 pl-10 border-2 rounded-lg bg-[#1b222c] border-[#30363d] hover:border-[#ffb300] cursor-pointer transition-all duration-300 flex justify-between items-center ${
-            selectedJob ? "font-medium text-white" : "text-[#8b949e]"
+          className={`w-full p-3 pl-10 border-2 rounded-lg bg-[var(--surface)] border-[var(--border)] hover:border-[var(--accent)] cursor-pointer transition-all duration-300 flex justify-between items-center ${
+            selectedJob
+              ? "font-medium text-[var(--text-primary)]"
+              : "text-[var(--text-secondary)]"
           }`}
           onClick={() => setIsDropdownOpen(!isDropdownOpen)}
         >
           <div className="flex items-center">
-            <span className="absolute left-3 text-[#8b949e]">🔍</span>
+            <span className="absolute left-3 text-[var(--text-secondary)]">
+              🔍
+            </span>
             {selectedJob || "Select a Job Position"}
           </div>
-          <span className="text-[#8b949e]">{isDropdownOpen ? "▲" : "▼"}</span>
+          <span className="text-[var(--text-secondary)]">
+            {isDropdownOpen ? "▲" : "▼"}
+          </span>
         </div>
 
         {isDropdownOpen && (
-          <div className="absolute z-10 w-full mt-1 bg-[#1b222c] border border-[#30363d] rounded-lg shadow-lg max-h-60 overflow-y-auto">
+          <div className="absolute z-10 w-full mt-1 bg-[var(--surface)] border border-[var(--border)] rounded-lg shadow-lg max-h-60 overflow-y-auto">
             <div
-              className="p-3 hover:bg-[#252e3a] cursor-pointer transition-colors duration-200 border-l-4 border-transparent hover:border-[#ffb300] text-[#8b949e] hover:text-white"
+              className="p-3 hover:bg-[var(--surface-lighter)] cursor-pointer transition-colors duration-200 border-l-4 border-transparent hover:border-[var(--accent)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
               onClick={() => {
                 setSelectedJob("");
                 setIsDropdownOpen(false);
@@ -251,7 +338,7 @@ const UploadForm = () => {
             {jobs.map((job, index) => (
               <div
                 key={index}
-                className="p-3 hover:bg-[#252e3a] cursor-pointer transition-colors duration-200 border-l-4 border-transparent hover:border-[#ffb300] text-[#8b949e] hover:text-white"
+                className="p-3 hover:bg-[var(--surface-lighter)] cursor-pointer transition-colors duration-200 border-l-4 border-transparent hover:border-[var(--accent)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
                 onClick={() => {
                   setSelectedJob(job.title);
                   setJobId(job.id);
@@ -268,8 +355,8 @@ const UploadForm = () => {
       <div
         className={`border-2 border-dashed rounded-lg p-8 text-center transition-all duration-300 ${
           isDragging
-            ? "border-[#ffb300] bg-[#252e3a] scale-105"
-            : "border-[#30363d] hover:border-[#ffb300] hover:bg-[#252e3a]"
+            ? "border-[var(--accent)] bg-[var(--surface-lighter)] scale-105"
+            : "border-[var(--border)] hover:border-[var(--accent)] hover:bg-[var(--surface-lighter)]"
         }`}
         onDrop={handleDrop}
         onDragOver={(e) => e.preventDefault()}
@@ -278,8 +365,10 @@ const UploadForm = () => {
       >
         <div className="flex flex-col items-center justify-center">
           <span className="text-4xl mb-3">📁</span>
-          <p className="text-[#8b949e] mb-2">Drag & drop files here</p>
-          <p className="text-[#6e7681] mb-3">or</p>
+          <p className="text-[var(--text-secondary)] mb-2">
+            Drag & drop files here
+          </p>
+          <p className="text-[var(--text-secondary)] opacity-70 mb-3">or</p>
           <input
             type="file"
             multiple={true}
@@ -292,7 +381,7 @@ const UploadForm = () => {
           <label htmlFor="file-input" className="cursor-pointer">
             <button
               type="button"
-              className="px-6 py-3 bg-[#ffb300] text-[#0e151f] rounded-lg hover:bg-[#ffc133] transform hover:-translate-y-1 transition-all duration-300 flex items-center"
+              className="px-6 py-3 bg-[var(--accent)] text-[var(--dark-bg)] rounded-lg hover:bg-[var(--accent-hover)] transform hover:-translate-y-1 transition-all duration-300 flex items-center"
               onClick={() => fileInputRef.current?.click()}
             >
               <span className="mr-2">📂</span>
@@ -300,31 +389,14 @@ const UploadForm = () => {
             </button>
           </label>
         </div>
-        <p className="mt-4 text-xs text-[#6e7681]">
-          Supported formats: PDF, DOCX, JPG
+        <p className="mt-4 text-xs text-[var(--text-secondary)] opacity-70">
+          Supported formats: PDF, DOCX, and IMAGES
         </p>
       </div>
 
-      {errorMessage && (
-        <div className="mt-4 p-4 bg-red-900 bg-opacity-20 text-red-400 rounded-lg border border-red-500 animate-pulse">
-          <div className="flex items-center">
-            <span className="mr-2">⚠️</span>
-            {errorMessage}
-          </div>
-        </div>
-      )}
-      {successMessage && (
-        <div className="mt-4 p-4 bg-green-900 bg-opacity-20 text-green-400 rounded-lg border border-green-500">
-          <div className="flex items-center">
-            <span className="mr-2">✔️</span>
-            {successMessage}
-          </div>
-        </div>
-      )}
-
       {files.length > 0 && (
-        <div className="mt-6 bg-[#252e3a] p-4 rounded-lg border border-[#30363d]">
-          <h2 className="text-lg font-semibold mb-3 flex items-center text-white">
+        <div className="mt-6 bg-[var(--surface-lighter)] p-4 rounded-lg border border-[var(--border)]">
+          <h2 className="text-lg font-semibold mb-3 flex items-center text-[var(--text-primary)]">
             <span className="mr-2">📋</span>
             Selected Files:
           </h2>
@@ -332,20 +404,22 @@ const UploadForm = () => {
             {files.map((file, index) => (
               <li
                 key={index}
-                className="flex items-center justify-between p-3 bg-[#1b222c] rounded border border-[#30363d] hover:border-[#ffb300] transition-all duration-200"
+                className="flex items-center justify-between p-3 bg-[var(--surface)] rounded border border-[var(--border)] hover:border-[var(--accent)] transition-all duration-200"
               >
                 <div className="flex items-center">
                   <span className="text-xl mr-3">{getFileIcon(file.name)}</span>
                   <div>
-                    <p className="text-white font-medium">{file.name}</p>
-                    <p className="text-xs text-[#8b949e]">
+                    <p className="text-[var(--text-primary)] font-medium">
+                      {file.name}
+                    </p>
+                    <p className="text-xs text-[var(--text-secondary)]">
                       {(file.size / 1024).toFixed(2)} KB
                     </p>
                   </div>
                 </div>
                 <button
                   onClick={() => handleRemoveFile(index)}
-                  className="text-[#8b949e] hover:text-red-500 transition-colors duration-200"
+                  className="text-[var(--text-secondary)] hover:text-red-500 transition-colors duration-200"
                 >
                   ❌
                 </button>
@@ -354,7 +428,7 @@ const UploadForm = () => {
           </ul>
           <button
             type="button"
-            className="mt-5 w-full px-6 py-3 bg-[#ffb300] text-[#0e151f] rounded-lg hover:bg-[#ffc133] transform hover:-translate-y-1 transition-all duration-300 flex items-center justify-center disabled:opacity-70 disabled:transform-none"
+            className="mt-5 w-full px-6 py-3 bg-[var(--accent)] text-[var(--dark-bg)] rounded-lg hover:bg-[var(--accent-hover)] transform hover:-translate-y-1 transition-all duration-300 flex items-center justify-center disabled:opacity-70 disabled:transform-none"
             onClick={handleUpload}
             disabled={isLoading}
           >
@@ -367,23 +441,25 @@ const UploadForm = () => {
       {/* Full-screen Loading Overlay */}
       {isLoading && (
         <div className="fixed inset-0  bg-opacity-90 flex items-center justify-center z-50">
-          <div className="bg-[#1b222c] p-8 rounded-xl shadow-2xl max-w-md w-full transform transition-all duration-300 scale-105 border border-[#30363d]">
+          <div className="bg-[var(--surface)] p-8 rounded-xl shadow-2xl max-w-md w-full transform transition-all duration-300 scale-105 border border-[var(--border)]">
             <div className="flex flex-col items-center">
               <div className="text-6xl mb-6 animate-bounce">⏳</div>
-              <h3 className="text-2xl font-bold text-[#ffb300] mb-4">
+              <h3 className="text-2xl font-bold text-[var(--accent)] mb-4">
                 Uploading Files
               </h3>
-              <p className="text-[#8b949e] mb-6 text-center">
+              <p className="text-[var(--text-secondary)] mb-6 text-center">
                 Please wait while we process your files...
               </p>
 
-              <div className="w-full bg-[#30363d] rounded-full h-4 mb-3">
+              <div className="w-full bg-[var(--border)] rounded-full h-4 mb-3">
                 <div
-                  className="bg-[#ffb300] h-4 rounded-full transition-all duration-300"
+                  className="bg-[var(--accent)] h-4 rounded-full transition-all duration-300"
                   style={{ width: `${uploadProgress}%` }}
                 ></div>
               </div>
-              <p className="text-[#ffb300] font-medium">{uploadProgress}%</p>
+              <p className="text-[var(--accent)] font-medium">
+                {uploadProgress}%
+              </p>
             </div>
           </div>
         </div>

@@ -21,15 +21,16 @@ type Candidate = {
     feedback: {
       experience_match: boolean;
       recommendation: string;
+      feedback: {
+        Feedback: string;
+      };
     };
   };
 };
 
 const CandidateList = () => {
-  const fileTypes = ["pdf", "docx", "jpg", "jpeg"];
   const [jobs, setJobs] = useState<Job[]>([]);
   const [selectedJob, setSelectedJob] = useState<string>("");
-  const [resumeUrl, setResumeUrl] = useState<string>("");
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -44,44 +45,6 @@ const CandidateList = () => {
   >(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const candidatesPerPage = 10;
-  const [jobId, setJobId] = useState("");
-
-  // Resume upload state
-  const [files, setFiles] = useState<File[]>([]);
-  const [errorMessage, setErrorMessage] = useState<string>("");
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isDragging, setIsDragging] = useState<boolean>(false);
-  const [uploadProgress, setUploadProgress] = useState<number>(0);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [showUploadModal, setShowUploadModal] = useState<boolean>(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
-
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
-
-  useEffect(() => {
-    const getJobDetails = async () => {
-      try {
-        const response = await fetch(`${BASE_URL}/job/view`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.getItem("token"),
-          },
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setJobs(data.data);
-        } else {
-          const errorData = await response.json();
-          throw new Error(errorData.message);
-        }
-      } catch (error) {
-        console.log(error, "error");
-      }
-    };
-    getJobDetails();
-  }, []);
 
   useEffect(() => {
     const getJobDetails = async () => {
@@ -112,8 +75,6 @@ const CandidateList = () => {
 
   useEffect(() => {
     const getCandidates = async () => {
-      if (!selectedJob) return;
-
       try {
         const response = await fetch(
           `${BASE_URL}/candidates/list/${selectedJob}`,
@@ -140,23 +101,6 @@ const CandidateList = () => {
     getCandidates();
   }, [selectedJob]);
 
-  // Simulate progress for loader
-  useEffect(() => {
-    if (isLoading) {
-      const timer = setInterval(() => {
-        setUploadProgress((prevProgress) => {
-          const newProgress = prevProgress + 5;
-          return newProgress >= 95 ? 95 : newProgress;
-        });
-      }, 300);
-
-      return () => {
-        clearInterval(timer);
-        setUploadProgress(0);
-      };
-    }
-  }, [isLoading]);
-
   const get_feedback = async (candidateId: string) => {
     try {
       const response = await fetch(
@@ -172,6 +116,7 @@ const CandidateList = () => {
 
       if (response.ok) {
         const data = await response.json();
+        console.log(data, "feedback data");
         setCompatibilityResponses((prev) => ({
           ...prev,
           [candidateId]: data.data[0].rating || "0",
@@ -189,35 +134,37 @@ const CandidateList = () => {
     }
   };
 
-  const get_resume = async (candidateId: string, e: React.MouseEvent) => {
+  const get_resume = async (candidateId: string, e) => {
     try {
       e.preventDefault();
-      const response = await fetch(
-        `${BASE_URL}/upload/get-resume/${candidateId}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.getItem("token"),
-          },
-        }
-      );
+          const response = await fetch(`${BASE_URL}/upload/get-resume/${candidateId}`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + localStorage.getItem("token"),
+            },
+          });
+    
+          if (response.ok) {
+            const data = await response.json();
+            console.log(data.data.resume_url, "resume url data");
+            window.open(data.data.resume_url, "_blank", "noopener,noreferrer");
 
-      if (response.ok) {
-        const data = await response.json();
-        setResumeUrl(data.data.resume_url);
-        window.open(data.data.resume_url, "_blank", "noopener,noreferrer");
-      } else {
-        const errorData = await response.json();
-        throw new Error(errorData.message);
-      }
-    } catch (error) {
-      console.log(error, "error");
-    }
+                    
+          } else {
+            const errorData = await response.json();
+            throw new Error(errorData.message);
+          }
+        } catch (error) {
+          console.log(error, "error");
+        }
+
   };
 
   const handleDeleteCandidate = async (candidateId: string) => {
     try {
+      console.log(candidateId, "candidate id to delete");
+      
       const response = await fetch(
         `${BASE_URL}/candidates/delete/${candidateId}`,
         {
@@ -234,7 +181,7 @@ const CandidateList = () => {
         setCandidates((prevCandidates) =>
           prevCandidates.filter((candidate) => candidate.id !== candidateId)
         );
-        console.log("Candidate deleted successfully");
+       
       } else {
         const errorData = await response.json();
         throw new Error(errorData.message);
@@ -271,7 +218,7 @@ const CandidateList = () => {
 
       // Call the backend API to check compatibility
       const response = await fetch(`${BASE_URL}/screening/screen_candidate`, {
-        method: "POST", // Assuming it's a POST request
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: "Bearer " + localStorage.getItem("token"),
@@ -311,150 +258,6 @@ const CandidateList = () => {
     setSelectedFeedback(null);
   };
 
-  // Resume upload functionality
-  const getFileExtension = (filename: string): string => {
-    return filename.split(".").pop()?.toLowerCase() || "";
-  };
-
-  const handleDragEnter = (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    setIsDragging(false);
-  };
-
-  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    setIsDragging(false);
-    const droppedFiles = event.dataTransfer.files;
-    handleFile(droppedFiles);
-  };
-
-  const handleFile = (selectedFiles: FileList) => {
-    const validFiles: File[] = [];
-    const invalidFiles: string[] = [];
-
-    Array.from(selectedFiles).forEach((file) => {
-      const extension = getFileExtension(file.name);
-      if (fileTypes.includes(extension)) {
-        validFiles.push(file);
-      } else {
-        invalidFiles.push(file.name);
-      }
-    });
-
-    if (invalidFiles.length > 0) {
-      setErrorMessage(
-        `Invalid file types: ${invalidFiles.join(
-          ", "
-        )}. Please upload PDF, DOCX, or JPG files.`
-      );
-    } else {
-      setErrorMessage("");
-    }
-
-    setFiles((prevFiles) => [...prevFiles, ...validFiles]);
-  };
-
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFiles = event.target.files;
-    if (selectedFiles) {
-      handleFile(selectedFiles);
-    }
-  };
-
-  const handleRemoveFile = (index: number) => {
-    setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
-  };
-
-  const handleUpload = async () => {
-    if (!selectedJob) {
-      setErrorMessage("Please select a job before uploading files.");
-      return;
-    }
-
-    if (files.length === 0) {
-      setErrorMessage("No files selected for upload.");
-      return;
-    }
-
-    setIsLoading(true);
-    setUploadProgress(0);
-
-    const formData = new FormData();
-    files.forEach((file) => formData.append("resume-files", file));
-    formData.append("job_id", selectedJob);
-
-    try {
-      const response = await fetch(`${BASE_URL}/upload/upload-resume`, {
-        method: "POST",
-        headers: {
-          Authorization: "Bearer " + localStorage.getItem("token"),
-        },
-        body: formData,
-      });
-
-      setUploadProgress(100);
-
-      setTimeout(async () => {
-        if (response.ok) {
-          setFiles([]);
-          setErrorMessage("");
-          setSuccessMessage("Files uploaded successfully.");
-
-          // Refresh candidates list
-          const candidatesResponse = await fetch(
-            `${BASE_URL}/candidates/list/${selectedJob}`,
-            {
-              method: "GET",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: "Bearer " + localStorage.getItem("token"),
-              },
-            }
-          );
-
-          if (candidatesResponse.ok) {
-            const data = await candidatesResponse.json();
-            setCandidates(data.data.candidates);
-          }
-
-          // Close the modal after 2 seconds
-          setTimeout(() => {
-            setShowUploadModal(false);
-            setSuccessMessage(null);
-          }, 2000);
-        } else {
-          const errorData = await response.json();
-          setErrorMessage(errorData.message || "Failed to upload the files.");
-        }
-        setIsLoading(false);
-      }, 500);
-    } catch (error) {
-      console.error("Error uploading files:", error);
-      setErrorMessage("An error occurred while uploading the files.");
-      setIsLoading(false);
-    }
-  };
-
-  const getFileIcon = (filename: string) => {
-    const extension = getFileExtension(filename);
-    switch (extension) {
-      case "pdf":
-        return "📄";
-      case "docx":
-        return "📝";
-      case "jpg":
-      case "jpeg":
-        return "🖼️";
-      default:
-        return "📎";
-    }
-  };
-
   const [isOpen, setIsOpen] = useState<string | null>(null);
   const dropdownRef = useRef(null);
 
@@ -479,24 +282,13 @@ const CandidateList = () => {
 
   return (
     <div className="w-full p-4 bg-gray-50">
-      <div className="mb-6 flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
-            Candidate List
-          </h1>
-          <p className="text-gray-600 mt-2">
-            Search and manage candidates for your job postings.
-          </p>
-        </div>
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => setShowUploadModal(true)}
-          className="px-4 py-2 bg-yellow-400 text-white rounded-lg shadow-md hover:bg-yellow-500 transition-colors duration-200"
-        >
-          <span className="inline-block mr-2">📤</span>
-          Upload Multiple Resumes
-        </motion.button>
+      <div className="mb-6">
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
+        Screened Candidate List
+        </h1>
+        <p className="text-gray-600 mt-2">
+          Search and manage candidates for your job postings.
+        </p>
       </div>
 
       {/* Search and Filter */}
@@ -520,8 +312,8 @@ const CandidateList = () => {
             </option>
           ))}
         </select>
-        <span className="text-gray-600">{isDropdownOpen ? "▲" : "▼"}</span>
       </div>
+
       {/* Candidate Table */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -575,12 +367,14 @@ const CandidateList = () => {
                 </td>
                 <td className="px-4 py-4 text-sm">
                   <a
-                    onClick={(e) => get_resume(candidate.id, e)}
-                    href={resumeUrl}
+                    onClick={(e) => {
+                      get_resume(candidate.id, e);
+                    }}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-yellow-600 underline hover:text-yellow-800"
-                  >
+
+                    className="text-yellow-600 underline hover:text-yellow-800 cursor-pointer"
+                    >
                     View Resume
                   </a>
                 </td>
@@ -688,7 +482,7 @@ const CandidateList = () => {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          className="fixed inset-0 bg-tranparent  bg-opacity-50 flex items-center justify-center z-50"
         >
           <div className="bg-white rounded-lg shadow-lg p-6 w-1/2">
             <h2 className="text-xl font-bold text-gray-800 mb-4">
@@ -698,10 +492,10 @@ const CandidateList = () => {
               <strong>Combined Score:</strong> {selectedFeedback.Combined_Score}
             </p>
             <p className="text-gray-600">
-              <strong>JD Skill Match:</strong> {selectedFeedback.JD_Skill_Match}
+              <strong>Job Description :</strong> {selectedFeedback.JD_Skill_Match}
             </p>
             <p className="text-gray-600">
-              <strong>RCD Skill Match:</strong>{" "}
+              <strong>Role Clarity Document :</strong>{" "}
               {selectedFeedback.RCD_Skill_Match}
             </p>
             <p className="text-gray-600">
@@ -712,6 +506,10 @@ const CandidateList = () => {
               <strong>Recommendation:</strong>{" "}
               {selectedFeedback.feedback.recommendation}
             </p>
+            <p className="text-gray-600">
+              <strong>Feedback:</strong>{" "}
+              {selectedFeedback.feedback.feedback.Feedback}
+            </p>
             <button
               onClick={closeModal}
               className="mt-4 px-4 py-2 bg-red-400 text-white rounded-lg shadow hover:bg-red-500"
@@ -720,227 +518,6 @@ const CandidateList = () => {
             </button>
           </div>
         </motion.div>
-      )}
-
-      {/* Upload Resume Modal */}
-      {showUploadModal && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="fixed inset-0 backdrop-blur-sm bg-opacity-50 flex items-center justify-center z-50"
-        >
-          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold text-gray-800">
-                Upload Multiple Resumes
-              </h2>
-              <button
-                onClick={() => {
-                  setShowUploadModal(false);
-                  setFiles([]);
-                  setErrorMessage("");
-                  setSuccessMessage(null);
-                }}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                ✕
-              </button>
-            </div>
-
-            {/* Job Selection
-            <div className="mb-4">
-              <select
-                className="w-full p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                value={selectedJob}
-                onChange={(e) => setSelectedJob(e.target.value)}
-              >
-                <option value="">Select a Job</option>
-                {jobs.map((job) => (
-                  <option key={job.id} value={job.id}>
-                    {job.title}
-                  </option>
-                ))}
-              </select>
-            </div> */}
-            <div className="relative mb-6" ref={dropdownRef}>
-              <div
-                className={`w-full p-3 pl-10 border-2 rounded-lg text-gray-700 bg-yellow-50 border-yellow-300 hover:border-yellow-500 cursor-pointer transition-all duration-300 flex justify-between items-center ${
-                  selectedJob ? "font-medium" : "text-gray-500"
-                }`}
-                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              >
-                <div className="flex items-center">
-                  <span className="absolute left-3 text-gray-600">🔍</span>
-                  {selectedJob || "Select a Job Position"}
-                </div>
-                <span className="text-gray-600">
-                  {isDropdownOpen ? "▲" : "▼"}
-                </span>
-              </div>
-
-              {isDropdownOpen && (
-                <div className="absolute z-10 w-full mt-1 bg-white border border-yellow-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                  <div
-                    className="p-3 hover:bg-yellow-100 cursor-pointer transition-colors duration-200 border-l-4 border-transparent hover:border-yellow-500"
-                    onClick={() => {
-                      setSelectedJob("");
-                      setJobId("");
-                      setIsDropdownOpen(false);
-                    }}
-                  >
-                    Select a Job Position
-                  </div>
-                  {jobs.map((job) => (
-                    <div
-                      key={job.id}
-                      className="p-3 hover:bg-yellow-100 cursor-pointer transition-colors duration-200 border-l-4 border-transparent hover:border-yellow-500"
-                      onClick={() => {
-                        setSelectedJob(job.title);
-                        setJobId(job.id);
-                        setIsDropdownOpen(false);
-                      }}
-                    >
-                      {job.title}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Drag and Drop Area */}
-            <div
-              className={`border-2 border-dashed rounded-lg p-8 text-center transition-all duration-300 ${
-                isDragging
-                  ? "border-yellow-500 bg-yellow-50 scale-105"
-                  : "border-gray-300 hover:border-yellow-500 hover:bg-yellow-50"
-              }`}
-              onDrop={handleDrop}
-              onDragOver={(e) => e.preventDefault()}
-              onDragEnter={handleDragEnter}
-              onDragLeave={handleDragLeave}
-            >
-              <div className="flex flex-col items-center justify-center">
-                <span className="text-4xl mb-3">📁</span>
-                <p className="text-gray-600 mb-2">Drag & drop files here</p>
-                <p className="text-gray-500 mb-3">or</p>
-                <input
-                  type="file"
-                  multiple={true}
-                  accept=".pdf,.docx,.jpg,.jpeg"
-                  ref={fileInputRef}
-                  onChange={handleFileSelect}
-                  className="hidden"
-                  id="file-input"
-                />
-                <label htmlFor="file-input" className="cursor-pointer">
-                  <button
-                    type="button"
-                    className="px-6 py-3 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transform hover:-translate-y-1 transition-all duration-300 flex items-center"
-                    onClick={() => fileInputRef.current?.click()}
-                  >
-                    <span className="mr-2">📂</span>
-                    Select Files
-                  </button>
-                </label>
-              </div>
-              <p className="mt-4 text-xs text-gray-500">
-                Supported formats: PDF, DOCX, JPG, JPEG
-              </p>
-            </div>
-
-            {/* Error Message */}
-            {errorMessage && (
-              <div className="mt-4 p-4 bg-red-50 text-red-700 rounded-lg border border-red-200 animate-pulse">
-                <div className="flex items-center">
-                  <span className="mr-2">⚠️</span>
-                  {errorMessage}
-                </div>
-              </div>
-            )}
-
-            {/* Success Message */}
-            {successMessage && (
-              <div className="mt-4 p-4 bg-green-50 text-green-700 rounded-lg border border-green-200">
-                <div className="flex items-center">
-                  <span className="mr-2">✅</span>
-                  {successMessage}
-                </div>
-              </div>
-            )}
-
-            {/* Selected Files */}
-            {files.length > 0 && (
-              <div className="mt-6 bg-gray-50 p-4 rounded-lg border border-gray-100">
-                <h3 className="text-lg font-semibold mb-3 flex items-center">
-                  <span className="mr-2">📋</span>
-                  Selected Files:
-                </h3>
-                <ul className="space-y-2 max-h-48 overflow-y-auto">
-                  {files.map((file, index) => (
-                    <li
-                      key={index}
-                      className="flex items-center justify-between p-3 bg-white rounded border border-gray-200 hover:border-yellow-300 transition-all duration-200"
-                    >
-                      <div className="flex items-center">
-                        <span className="text-xl mr-3">
-                          {getFileIcon(file.name)}
-                        </span>
-                        <div>
-                          <p className="text-gray-800 font-medium">
-                            {file.name}
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            {(file.size / 1024).toFixed(2)} KB
-                          </p>
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => handleRemoveFile(index)}
-                        className="text-gray-400 hover:text-red-500 transition-colors duration-200"
-                      >
-                        ❌
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-                <button
-                  type="button"
-                  className="mt-5 w-full px-6 py-3 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transform hover:-translate-y-1 transition-all duration-300 flex items-center justify-center disabled:opacity-70 disabled:transform-none"
-                  onClick={handleUpload}
-                  disabled={isLoading}
-                >
-                  <span className="mr-2">📤</span>
-                  Upload Files
-                </button>
-              </div>
-            )}
-          </div>
-        </motion.div>
-      )}
-
-      {/* Loading Overlay */}
-      {isLoading && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-8 rounded-xl shadow-2xl max-w-md w-full transform transition-all duration-300 scale-105">
-            <div className="flex flex-col items-center">
-              <div className="text-6xl mb-6 animate-bounce">⏳</div>
-              <h3 className="text-2xl font-bold text-yellow-700 mb-4">
-                Uploading Files
-              </h3>
-              <p className="text-gray-600 mb-6 text-center">
-                Please wait while we process your files...
-              </p>
-
-              <div className="w-full bg-gray-200 rounded-full h-4 mb-3">
-                <div
-                  className="bg-yellow-500 h-4 rounded-full transition-all duration-300"
-                  style={{ width: `${uploadProgress}%` }}
-                ></div>
-              </div>
-              <p className="text-yellow-600 font-medium">{uploadProgress}%</p>
-            </div>
-          </div>
-        </div>
       )}
     </div>
   );

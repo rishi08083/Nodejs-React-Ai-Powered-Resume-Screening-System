@@ -65,7 +65,10 @@ exports.validateRegister = [
     .custom(async (email) => {
       const existingUser = await db.Users.findOne({ where: { email } });
       if (existingUser) {
-        throw new Error("Email already exists");
+
+        if(existingUser.is_verified) throw new Error("Email already exists");
+        
+        else await existingUser.destroy();
       }
       return true;
     }),

@@ -9,6 +9,7 @@ const path = require("path");
 const crypto = require("crypto");
 const db = require("../../models");
 require("dotenv").config();
+const { generateToken } = require("../../utils/tokenGeneration");
 
 // AWS S3 Configuration
 const s3 = new S3Client({
@@ -75,9 +76,9 @@ exports.uploadResumes = async (req, res) => {
     const parsingErrors = await parseResumes(uploadedFiles, job_id, user_id);
 
     if (parsingErrors.length > 0) {
-      return res.status(207).json({
+      return res.status(400).json({
         status: "partial_success",
-        message: "Some files uploaded, but errors occurred during parsing",
+        message: "errors occurred during parsing",
         data: { files: uploadedFiles },
         errors: parsingErrors,
       });
@@ -88,7 +89,6 @@ exports.uploadResumes = async (req, res) => {
       message: "Files uploaded and parsed successfully",
       data: { files: uploadedFiles },
     });
-
   } catch (error) {
     console.error("Error uploading files:", error);
     res.status(500).json({
@@ -98,7 +98,6 @@ exports.uploadResumes = async (req, res) => {
     });
   }
 };
-
 
 exports.getResume = async (req, res) => {
   try {
@@ -142,7 +141,6 @@ exports.getResume = async (req, res) => {
 const parseResumes = async (uploadedFiles, job_id, user_id) => {
   try {
     const errors = [];
-    
     for (let i = 0; i < uploadedFiles.length; i++) {
       const file = uploadedFiles[i];
       let aiEndpoint;
@@ -161,8 +159,17 @@ const parseResumes = async (uploadedFiles, job_id, user_id) => {
       }
 
       try {
+        // Generate a token for authentication
+        const token = await generateToken();
         const aiResponse = await axios.post(
-          `${process.env.AI_BACKEND_URL}${aiEndpoint}?file_key=${file.fileName}`
+          `${process.env.AI_BACKEND_URL}${aiEndpoint}?file_key=${file.fileName}`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
         );
 
         const candidate = await db.Candidates.create({
@@ -176,7 +183,9 @@ const parseResumes = async (uploadedFiles, job_id, user_id) => {
           user_id: user_id,
         });
 
-        await candidate.createSkill({ skill_names: aiResponse.data.data.skills });
+        await candidate.createSkill({
+          skill_names: aiResponse.data.data.skills,
+        });
 
         for (let exp of aiResponse.data.data.experience) {
           const startDate = exp.start_date ? new Date(exp.start_date) : null;
@@ -200,8 +209,29 @@ const parseResumes = async (uploadedFiles, job_id, user_id) => {
           });
         }
       } catch (error) {
-        console.error(`Error parsing file ${file.fileName}:`, error.message);
-        errors.push({ file: file.fileName, error: error.message });
+        if (error.response && error.response.data) {
+          const errorData = error.response.data;
+          // console.error({
+          //   status: errorData.status || "error",
+          //   message: errorData.message || "API request failed",
+          //   error: {
+          //     details: errorData.error?.details || error.message,
+          //   },
+          //   code: errorData.code || error.response.status, // Include the code from response
+            
+          // });
+          // console.error(`Error parsing file ${file.fileName}:`, error.message);
+          errors.push({ file: file.fileName, error: errorData.message });
+        } else {
+          console.error({
+            status: "error",
+            message: "Network or unknown error",
+            error: {
+              details: error.message,
+            },
+            code: null,
+          });
+        };
       }
     }
 
@@ -211,4 +241,3 @@ const parseResumes = async (uploadedFiles, job_id, user_id) => {
     return [{ error: "An unexpected error occurred during parsing." }];
   }
 };
-

@@ -8,10 +8,8 @@ export default function GoogleSignIn({ onSuccess, onError }) {
         theme="filled_black"
         onSuccess={async (credentialResponse) => {
           try {
-            // Decode the JWT credential
             const decoded = jwtDecode(credentialResponse.credential);
             console.log(decoded);
-            // Send user data to your Node.js server
           } catch (error) {
             console.error("Authentication error:", error);
             onError(error.message);
@@ -21,6 +19,7 @@ export default function GoogleSignIn({ onSuccess, onError }) {
           onError("Google login failed");
         }}
       />
+      (Coming Soon)
     </GoogleOAuthProvider>
   );
 }

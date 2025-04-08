@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   AreaChart,
   Area,
@@ -15,6 +15,7 @@ import {
   PieChart,
   Pie,
   Cell,
+  Legend,
 } from "recharts";
 import {
   Users,
@@ -26,43 +27,58 @@ import {
   ChevronDown,
   ChevronUp,
   UserCheck,
+  X,
+  AlertCircle,
+  HelpCircle,
 } from "lucide-react";
+import axios from "axios";
 
-// Sample data for the charts
-const candidateTrendsData = [
-  { name: "Jan 1", candidates: 8 },
-  { name: "Jan 2", candidates: 12 },
-  { name: "Jan 3", candidates: 10 },
-  { name: "Jan 4", candidates: 15 },
-  { name: "Jan 5", candidates: 18 },
-  { name: "Jan 6", candidates: 14 },
-  { name: "Jan 7", candidates: 16 },
-  { name: "Jan 8", candidates: 19 },
-  { name: "Jan 9", candidates: 22 },
-  { name: "Jan 10", candidates: 17 },
-  { name: "Jan 11", candidates: 25 },
-  { name: "Jan 12", candidates: 21 },
-  { name: "Jan 13", candidates: 18 },
-  { name: "Jan 14", candidates: 24 },
+// Sample data - replace with actual API calls in useEffect
+const screeningOutcomeData = [
+  { name: "Shortlisted", value: 120, color: "#4ade80" },
+  { name: "Rejected", value: 85, color: "#ef4444" },
+  { name: "On Hold", value: 45, color: "#f59e0b" },
+  { name: "Needs Review", value: 30, color: "#8b5cf6" },
 ];
 
-const candidateSourceData = [
-  { name: "LinkedIn", value: 40 },
-  { name: "Job Board", value: 25 },
-  { name: "Referral", value: 20 },
-  { name: "Company Site", value: 10 },
-  { name: "Other", value: 5 },
+const resumesParsedData = [
+  { date: "Mar 1", count: 5 },
+  { date: "Mar 2", count: 8 },
+  { date: "Mar 3", count: 12 },
+  { date: "Mar 4", count: 15 },
+  { date: "Mar 5", count: 10 },
+  { date: "Mar 6", count: 18 },
+  { date: "Mar 7", count: 20 },
+  { date: "Mar 8", count: 25 },
+  { date: "Mar 9", count: 22 },
+  { date: "Mar 10", count: 28 },
 ];
 
-const screeningStatusData = [
-  { name: "Passed", count: 68 },
-  { name: "Failed", count: 42 },
-  { name: "No Show", count: 15 },
-  { name: "Rescheduled", count: 25 },
+const topSkillsData = [
+  { name: "JavaScript", count: 85 },
+  { name: "Python", count: 65 },
+  { name: "React", count: 55 },
+  { name: "SQL", count: 48 },
+  { name: "Java", count: 42 },
+  { name: "Node.js", count: 38 },
+  { name: "Docker", count: 25 },
 ];
 
-const COLORS = ["#ffb300", "#ffc133", "#ffd066", "#ffde99", "#ffeccc"];
-const SCREENING_COLORS = ["#4ade80", "#ef4444", "#8b5cf6", "#3b82f6"];
+const jobDistributionData = [
+  { name: "Frontend Developer", value: 35, color: "#3b82f6" },
+  { name: "Backend Developer", value: 42, color: "#8b5cf6" },
+  { name: "Data Scientist", value: 28, color: "#10b981" },
+  { name: "DevOps Engineer", value: 20, color: "#f59e0b" },
+  { name: "Product Manager", value: 15, color: "#ef4444" },
+];
+
+const scoreDistributionData = [
+  { range: "0-20", count: 15 },
+  { range: "21-40", count: 28 },
+  { range: "41-60", count: 42 },
+  { range: "61-80", count: 65 },
+  { range: "81-100", count: 20 },
+];
 
 // Type definitions
 type StatCardProps = {
@@ -73,10 +89,30 @@ type StatCardProps = {
   changeDirection?: "up" | "down";
 };
 
-type TimeframeOptions = "day" | "week" | "month";
+type TimeframeOptions = "week" | "month" | "year";
 
-export default function RecruiterDashboard() {
-  const [timeframe, setTimeframe] = useState<TimeframeOptions>("week");
+export default function AdminDashboard() {
+  const [timeframe, setTimeframe] = useState<TimeframeOptions>("month");
+  const [dashboardData, setDashboardData] = useState({
+    totalResumes: 280,
+    shortlisted: 120,
+    rejected: 85,
+    avgScore: 68,
+  });
+
+  // Add actual API call here when ready
+  useEffect(() => {
+    // Example API call structure
+    // const fetchDashboardData = async () => {
+    //   try {
+    //     const response = await axios.get('/api/admin/dashboard-stats');
+    //     setDashboardData(response.data);
+    //   } catch (error) {
+    //     console.error('Error fetching dashboard data:', error);
+    //   }
+    // };
+    // fetchDashboardData();
+  }, []);
 
   // Stat card component
   const StatCard = ({
@@ -86,19 +122,21 @@ export default function RecruiterDashboard() {
     change,
     changeDirection,
   }: StatCardProps) => (
-    <div className="bg-gray-900 p-6 rounded-lg shadow-lg">
+    <div className="bg-[var(--surface)] p-6 rounded-lg shadow-lg border border-[var(--border)]">
       <div className="flex justify-between items-start">
         <div>
-          <h3 className="text-dark-text-secondary text-sm font-medium mb-1">
+          <h3 className="text-[var(--text-secondary)] text-sm font-medium mb-1">
             {title}
           </h3>
           <div className="flex items-baseline">
-            <h2 className="text-dark-text-primary text-2xl font-bold">
+            <h2 className="text-[var(--text-primary)] text-2xl font-bold">
               {value}
             </h2>
             {change !== undefined && (
               <span
-                className={`ml-2 text-sm ${changeDirection === "up" ? "text-yellow-400" : "text-red-400"} flex items-center`}
+                className={`ml-2 text-sm ${
+                  changeDirection === "up" ? "text-green-400" : "text-red-400"
+                } flex items-center`}
               >
                 {changeDirection === "up" ? (
                   <ChevronUp size={16} />
@@ -110,142 +148,179 @@ export default function RecruiterDashboard() {
             )}
           </div>
         </div>
-        <div className="p-2 bg-dark-blue-highlight rounded-lg">{icon}</div>
+        <div className="p-2 bg-[var(--blue-highlight)] rounded-lg">{icon}</div>
       </div>
     </div>
   );
 
   // Chart titles style
-  const chartTitle = "text-dark-text-primary font-medium text-lg mb-4";
+  const chartTitle = "text-[var(--text-primary)] font-medium text-lg mb-4";
 
   return (
-    <div className="bg-dark-bg min-h-screen text-dark-text-primary">
-      <main className="container mx-auto">
-        {/* Stats Row */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-6">
+    <div className="bg-[var(--bg)] min-h-screen text-[var(--text-primary)]">
+      <main className="container mx-auto px-4 ">
+        <h1 className="text-3xl font-bold mb-6">Recruiter Dashboard (Coming Soon)</h1>
+
+        {/* KPI Stats Row */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <StatCard
-            title="Open Jobs"
-            value="42"
-            icon={<Briefcase size={24} className="text-dark-accent" />}
-            change={3.5}
+            title="Total Resumes Uploaded"
+            value={dashboardData.totalResumes}
+            icon={<FileText size={24} className="text-[var(--accent)]" />}
+            change={12.5}
             changeDirection="up"
           />
           <StatCard
-            title="Active Candidates"
-            value="187"
-            icon={<Users size={24} className="text-dark-accent" />}
-            change={8.2}
+            title="Candidates Shortlisted"
+            value={dashboardData.shortlisted}
+            icon={<CheckCircle size={24} className="text-green-400" />}
+            change={8.3}
             changeDirection="up"
           />
           <StatCard
-            title="Scheduled Interviews"
-            value="28"
-            icon={<Calendar size={24} className="text-dark-accent" />}
-            change={5.7}
-            changeDirection="up"
-          />
-          <StatCard
-            title="Screening Success Rate"
-            value="62%"
-            icon={<UserCheck size={24} className="text-dark-accent" />}
-            change={2.1}
+            title="Candidates Rejected"
+            value={dashboardData.rejected}
+            icon={<X size={24} className="text-red-400" />}
+            change={3.1}
             changeDirection="down"
+          />
+          <StatCard
+            title="Avg. Screening Score"
+            value={`${dashboardData.avgScore}%`}
+            icon={<UserCheck size={24} className="text-[var(--accent)]" />}
+            change={2.4}
+            changeDirection="up"
           />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
-          <div className="lg:col-span-2 bg-gray-900 p-6 rounded-lg shadow-lg">
+        {/* Row 1: Main Charts */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          {/* Candidate Screening Outcome */}
+
+          {/* Resumes Parsed Over Time */}
+          <div className="bg-[var(--surface)] p-6 rounded-lg shadow-lg border border-[var(--border)]">
             <div className="flex justify-between items-center mb-4">
-              <h2 className={chartTitle}>Candidate Trends</h2>
-              <div className="flex bg-dark-surface-lighter rounded-lg overflow-hidden">
+              <h2 className={chartTitle}>Resumes Parsed Over Time</h2>
+              <div className="flex bg-[var(--surface-lighter)] rounded-lg overflow-hidden">
                 <button
-                  className={`px-3 py-1 text-sm ${timeframe === "day" ? "bg-dark-accent text-dark-bg" : "text-dark-text-secondary"}`}
-                  onClick={() => setTimeframe("day")}
-                >
-                  Day
-                </button>
-                <button
-                  className={`px-3 py-1 text-sm ${timeframe === "week" ? "bg-dark-accent text-dark-bg" : "text-dark-text-secondary"}`}
+                  className={`px-3 py-1 text-sm ${
+                    timeframe === "week"
+                      ? "bg-[var(--accent)] text-[var(--dark-bg)]"
+                      : "text-[var(--text-secondary)]"
+                  }`}
                   onClick={() => setTimeframe("week")}
                 >
                   Week
                 </button>
                 <button
-                  className={`px-3 py-1 text-sm ${timeframe === "month" ? "bg-dark-accent text-dark-bg" : "text-dark-text-secondary"}`}
+                  className={`px-3 py-1 text-sm ${
+                    timeframe === "month"
+                      ? "bg-[var(--accent)] text-[var(--dark-bg)]"
+                      : "text-[var(--text-secondary)]"
+                  }`}
                   onClick={() => setTimeframe("month")}
                 >
                   Month
                 </button>
+                <button
+                  className={`px-3 py-1 text-sm ${
+                    timeframe === "year"
+                      ? "bg-[var(--accent)] text-[var(--dark-bg)]"
+                      : "text-[var(--text-secondary)]"
+                  }`}
+                  onClick={() => setTimeframe("year")}
+                >
+                  Year
+                </button>
               </div>
             </div>
-            <div className="h-80">
+            <div className="h-72">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={candidateTrendsData}>
+                <AreaChart data={resumesParsedData}>
                   <defs>
                     <linearGradient
-                      id="colorCandidates"
+                      id="colorParsed"
                       x1="0"
                       y1="0"
                       x2="0"
                       y2="1"
                     >
-                      <stop offset="5%" stopColor="#ffb300" stopOpacity={0.8} />
-                      <stop offset="95%" stopColor="#ffb300" stopOpacity={0} />
+                      <stop
+                        offset="5%"
+                        stopColor="var(--accent)"
+                        stopOpacity={0.8}
+                      />
+                      <stop
+                        offset="95%"
+                        stopColor="var(--accent)"
+                        stopOpacity={0}
+                      />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#30363d" />
-                  <XAxis dataKey="name" stroke="#8b949e" />
-                  <YAxis stroke="#8b949e" />
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    stroke="var(--border)"
+                    vertical={false}
+                  />
+                  <XAxis
+                    dataKey="date"
+                    stroke="var(--text-secondary)"
+                    tick={{ fontSize: 12 }}
+                  />
+                  <YAxis
+                    stroke="var(--text-secondary)"
+                    tick={{ fontSize: 12 }}
+                  />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "#161b22",
-                      borderColor: "#30363d",
+                      backgroundColor: "var(--surface)",
+                      borderColor: "var(--border)",
                     }}
-                    labelStyle={{ color: "#ffffff" }}
+                    labelStyle={{ color: "var(--text-primary)" }}
                   />
                   <Area
                     type="monotone"
-                    dataKey="candidates"
-                    stroke="#ffb300"
+                    dataKey="count"
+                    stroke="var(--accent)"
                     fillOpacity={1}
-                    fill="url(#colorCandidates)"
+                    fill="url(#colorParsed)"
                   />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
           </div>
-
-          <div className="bg-gray-900 p-6 rounded-lg shadow-lg">
-            <h2 className={chartTitle}>Candidate Sources</h2>
-            <div className="h-72">
+          <div className="bg-[var(--surface)] p-6 rounded-lg shadow-lg border border-[var(--border)]">
+            <h2 className={chartTitle}>Candidate Screening Outcome</h2>
+            <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
-                    data={candidateSourceData}
+                    data={screeningOutcomeData}
                     cx="50%"
                     cy="50%"
                     innerRadius={60}
-                    outerRadius={80}
-                    fill="#8884d8"
+                    outerRadius={100}
                     paddingAngle={5}
                     dataKey="value"
-                    label={({ name, percent }) =>
-                      `${name} ${(percent * 100).toFixed(0)}%`
+                    label={({ name, value, percent }) =>
+                      `${name}: ${value} (${(percent * 100).toFixed(0)}%)`
                     }
                   >
-                    {candidateSourceData.map((entry, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={COLORS[index % COLORS.length]}
-                      />
+                    {screeningOutcomeData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "#161b22",
-                      borderColor: "#30363d",
+                      backgroundColor: "var(--surface)",
+                      borderColor: "var(--border)",
                     }}
-                    labelStyle={{ color: "#ffffff" }}
+                    labelStyle={{ color: "var(--text-primary)" }}
+                  />
+                  <Legend
+                    layout="vertical"
+                    verticalAlign="middle"
+                    align="right"
                   />
                 </PieChart>
               </ResponsiveContainer>
@@ -253,88 +328,136 @@ export default function RecruiterDashboard() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <div className="bg-gray-900 p-6 rounded-lg shadow-lg">
-            <h2 className={chartTitle}>Screening Results</h2>
-            <div className="h-64">
+        {/* Row 2: Bar Charts */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          {/* Top Skills Across Candidates */}
+          <div className="bg-[var(--surface)] p-6 rounded-lg shadow-lg border border-[var(--border)]">
+            <h2 className={chartTitle}>Top Skills Across Candidates</h2>
+            <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={screeningStatusData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#30363d" />
-                  <XAxis dataKey="name" stroke="#8b949e" />
-                  <YAxis stroke="#8b949e" />
+                <BarChart
+                  data={topSkillsData}
+                  layout="vertical"
+                  margin={{ left: 60 }}
+                >
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    stroke="var(--border)"
+                    horizontal={false}
+                  />
+                  <XAxis
+                    type="number"
+                    stroke="var(--text-secondary)"
+                    tick={{ fontSize: 12 }}
+                  />
+                  <YAxis
+                    dataKey="name"
+                    type="category"
+                    stroke="var(--text-secondary)"
+                    tick={{ fontSize: 12 }}
+                    width={80}
+                  />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "#161b22",
-                      borderColor: "#30363d",
+                      backgroundColor: "var(--surface)",
+                      borderColor: "var(--border)",
                     }}
-                    labelStyle={{ color: "#ffffff" }}
+                    labelStyle={{ color: "var(--text-primary)" }}
                   />
-                  <Bar dataKey="count">
-                    {screeningStatusData.map((entry, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={SCREENING_COLORS[index % SCREENING_COLORS.length]}
-                      />
-                    ))}
-                  </Bar>
+                  <Bar
+                    dataKey="count"
+                    fill="var(--accent)"
+                    barSize={20}
+                    radius={[0, 4, 4, 0]}
+                  />
                 </BarChart>
               </ResponsiveContainer>
             </div>
           </div>
 
-          <div className="lg:col-span-2 bg-gray-900 p-6 rounded-lg shadow-lg">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className={chartTitle}>
-                Upcoming Interviews{" "}
-                <span className="text-dark-accent">(8)</span>
-              </h2>
-              <button className="px-3 py-1 bg-dark-accent hover:bg-dark-accent-hover text-dark-bg rounded text-sm transition-colors duration-300">
-                View All
-              </button>
+          {/* Screening Score Distribution */}
+          <div className="bg-[var(--surface)] p-6 rounded-lg shadow-lg border border-[var(--border)]">
+            <h2 className={chartTitle}>Screening Score Distribution</h2>
+            <div className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={scoreDistributionData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                  <XAxis
+                    dataKey="range"
+                    stroke="var(--text-secondary)"
+                    tick={{ fontSize: 12 }}
+                  />
+                  <YAxis
+                    stroke="var(--text-secondary)"
+                    tick={{ fontSize: 12 }}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "var(--surface)",
+                      borderColor: "var(--border)",
+                    }}
+                    labelStyle={{ color: "var(--text-primary)" }}
+                  />
+                  <Bar dataKey="count" radius={[4, 4, 0, 0]} barSize={40}>
+                    {scoreDistributionData.map((entry, index) => {
+                      const colors = [
+                        "#ef4444",
+                        "#f59e0b",
+                        "#facc15",
+                        "#84cc16",
+                        "#4ade80",
+                      ];
+                      return (
+                        <Cell key={`cell-${index}`} fill={colors[index]} />
+                      );
+                    })}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
             </div>
-            <div className="divide-y divide-dark-border">
-              {[1, 2, 3, 4].map((item) => (
-                <div
-                  key={item}
-                  className="py-3 flex justify-between items-center"
-                >
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-dark-surface-lighter rounded-full flex items-center justify-center text-dark-accent">
-                      {["AJ", "ML", "TW", "KP"][item - 1]}
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-medium">
-                        {
-                          [
-                            "Alex Johnson",
-                            "Maria Lopez",
-                            "Thomas Wright",
-                            "Kelly Patterson",
-                          ][item - 1]
-                        }
-                      </h3>
-                      <p className="text-xs text-dark-text-secondary">
-                        {
-                          [
-                            "Senior Developer • Today, 2:00 PM",
-                            "UX Designer • Tomorrow, 10:30 AM",
-                            "Project Manager • Tomorrow, 3:15 PM",
-                            "Marketing Specialist • Apr 6, 11:00 AM",
-                          ][item - 1]
-                        }
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex space-x-2">
-                    <button className="p-1 px-3 bg-yellow-600 hover:bg-gray-700 rounded text-xs transition-colors duration-300">
-                      View
-                    </button>
-                    <button className="p-1 px-3 bg-gray-600 hover:bg-gray-700 rounded text-xs transition-colors duration-300">
-                      Reschedule
-                    </button>
-                  </div>
-                </div>
-              ))}
+          </div>
+        </div>
+
+        {/* Row 3: Pie Chart and Stats Table */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Job-wise Candidate Distribution */}
+          <div className="bg-[var(--surface)] p-6 rounded-lg shadow-lg border border-[var(--border)]">
+            <h2 className={chartTitle}>Job-wise Candidate Distribution</h2>
+            <div className="h-72">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={jobDistributionData}
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={80}
+                    dataKey="value"
+                    label={({ name, percent }) =>
+                      `${(percent * 100).toFixed(0)}%`
+                    }
+                  >
+                    {jobDistributionData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "var(--surface)",
+                      borderColor: "var(--border)",
+                    }}
+                    labelStyle={{ color: "var(--text-primary)" }}
+                    formatter={(value, name, props) => [
+                      `${value} candidates`,
+                      props.payload.name,
+                    ]}
+                  />
+                  <Legend
+                    layout="vertical"
+                    verticalAlign="bottom"
+                    align="center"
+                  />
+                </PieChart>
+              </ResponsiveContainer>
             </div>
           </div>
         </div>

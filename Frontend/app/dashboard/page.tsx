@@ -5,14 +5,22 @@ import { useState, useEffect } from "react";
 
 export default function Dashboard() {
   const navigate = useRouter();
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   useEffect(() => {
-    if (user.role === "admin") {
-      navigate.push("/dashboard/admin");
+    if (!loading) {
+      if (user != null) {
+        if (user.role === "admin") {
+          navigate.push("/dashboard/admin");
+        } else {
+          navigate.push("/dashboard/recruiter");
+        }
+      } else {
+        return;
+      }
     } else {
-      navigate.push("/dashboard/recruiter");
+      return;
     }
-  }, []);
+  }, [loading, user, navigate]);
 
   return (
     <div>

@@ -128,6 +128,7 @@ const ListJobs = () => {
       setIsLoading(false);
     }
   };
+
   const handlercdRedirect = async (id) => {
     try {
       const response = await fetch(
@@ -141,7 +142,6 @@ const ListJobs = () => {
       );
       if (response.ok) {
         const data = await response.json();
-        // redirect to new web page
         window.open(data.data.documents);
       } else {
         const errorData = await response.json();
@@ -152,29 +152,28 @@ const ListJobs = () => {
     }
   };
 
-  // Fetch jobs from the API
   useEffect(() => {
     getJobDetails();
   }, []);
 
   return (
-    <div className="w-full p-2 bg-[#0e151f] text-[#ffffff] mt-16">
+    <div className="w-full p-2 bg-[var(--bg)] text-[var(--text-primary)] mt-16">
       <div className="mb-6">
-        <h1 className="text-2xl md:text-3xl font-bold text-[#ffffff]">
+        <h1 className="text-2xl md:text-3xl font-bold text-[var(--text-primary)]">
           Available Job Positions
         </h1>
-        <p className="text-[#8b949e] mt-2">
-          Browse our current openings and upload RCD
+        <p className="text-[var(--text-secondary)] mt-2">
+          Browse our current openings and upload Role Clarity Documents
         </p>
       </div>
 
       {isLoading ? (
         <div className="flex justify-center items-center h-64">
-          <div className="w-12 h-12 rounded-full border-4 border-[#ffb300] border-t-transparent animate-spin"></div>
+          <div className="w-12 h-12 rounded-full border-4 border-[var(--accent)] border-t-transparent animate-spin"></div>
         </div>
       ) : jobError ? (
         <div
-          className="bg-[#1b222c] border border-red-500 text-red-400 px-4 py-3 rounded relative"
+          className="bg-[var(--surface)] border border-red-500 text-red-400 px-4 py-3 rounded relative"
           role="alert"
         >
           <strong className="font-bold">Error: </strong>
@@ -185,23 +184,23 @@ const ListJobs = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="bg-[#1b222c] rounded-xl shadow-xl overflow-scroll"
+          className="bg-[var(--surface)] rounded-xl shadow-xl overflow-scroll"
           style={{ boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.3)" }}
         >
           <div className="overflow-scroll">
             <table className="min-w-full table-auto border-collapse">
               <thead>
-                <tr className=" bg-[#0e151f]  border-b border-[#30363d]">
-                  <th className="px-4 py-4 text-left text-sm font-semibold text-[#ffffff]">
+                <tr className="bg-[var(--dark-bg)] border-b border-[var(--border)]">
+                  <th className="px-4 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
                     Title
                   </th>
-                  <th className="px-4 py-4 text-left text-sm font-semibold text-[#ffffff]">
+                  <th className="px-4 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
                     Experience
                   </th>
-                  <th className="px-4 py-4 text-left text-sm font-semibold text-[#ffffff]">
+                  <th className="px-4 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
                     Openings
                   </th>
-                  <th className="px-4 py-4 text-left text-sm font-semibold text-[#ffffff]">
+                  <th className="px-4 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
                     Actions
                   </th>
                 </tr>
@@ -213,31 +212,31 @@ const ListJobs = () => {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: index * 0.1 }}
-                    className="border-b border-[#30363d] hover:bg-[#0e151f] transition-colors duration-200"
+                    className="border-b border-[var(--border)] hover:bg-[var(--dark-bg)] transition-colors duration-200"
                   >
-                    <td className="px-4 py-4 text-sm font-medium text-[#ffffff]">
+                    <td className="px-4 py-4 text-sm font-medium text-[var(--text-primary)]">
                       {job.title}
                     </td>
-                    <td className="px-4 py-4 text-sm text-[#8b949e]">
+                    <td className="px-4 py-4 text-sm text-[var(--text-secondary)]">
                       {job.experience_required}
                     </td>
                     <td className="px-4 py-4 text-sm">
-                      <span className="px-2 py-1 bg-[#ffb300] bg-opacity-20 text-amber-950 rounded-full text-xs font-medium">
-                        {job.openings} positions
+                      <span className="px-2 py-1  bg-opacity-20 text-[var(--dark-bg)] rounded-full text-xs font-medium">
+                        {job.openings}
                       </span>
                     </td>
                     <td className="px-4 py-4 text-sm flex space-x-2">
                       <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        className="px-3 py-2 bg-[#ffb300] text-black font-medium rounded-lg hover:bg-[#ffc133] transition-colors duration-200 shadow-md hover:shadow-lg flex items-center space-x-1"
+                        className="px-3 py-2 bg-[var(--accent)] font-medium rounded-lg hover:bg-[var(--accent-hover)] text-[var(--bg)] transition-colors duration-200 shadow-md hover:shadow-lg flex items-center space-x-1"
                         onClick={() => handleViewButtonClick(job)}
                       >
                         <Upload className="h-4 w-4" />
                         {job.is_rcd_uploaded ? (
-                          <span>Update RCD</span>
+                          <span>Update Role Clarity Document</span>
                         ) : (
-                          <span>Upload RCD</span>
+                          <span>Upload Role Clarity Document</span>
                         )}
                       </motion.button>
 
@@ -247,7 +246,7 @@ const ListJobs = () => {
                         onClick={() => {
                           handlercdRedirect(job.id);
                         }}
-                        className="px-3 py-2 bg-[#30363d] text-[#ffffff] font-medium rounded-lg hover:bg-[#1f6feb33] transition-colors duration-200 shadow-md hover:shadow-lg flex items-center space-x-1"
+                        className="px-3 py-2 bg-[var(--border)] text-[var(--text-primary)] font-medium rounded-lg hover:bg-[var(--blue-highlight)] transition-colors duration-200 shadow-md hover:shadow-lg flex items-center space-x-1"
                       >
                         <Eye className="h-4 w-4" />
                         <span>View</span>
@@ -268,20 +267,20 @@ const ListJobs = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 flex items-center justify-center bg-opacity-70 p-4 z-50"
+            className="fixed inset-0   flex items-center justify-center  p-4 z-50"
           >
             <motion.div
               initial={{ scale: 0.9, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.9, y: 20 }}
-              className="bg-[#1b222c] rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
+              className=" bg-[var(--surface)] rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
               style={{ boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)" }}
             >
-              <div className="bg-[#ffb300] p-6">
-                <h2 className="text-xl font-bold text-black">
-                  Upload RCD for {selectedJob.title}
+              <div className="bg-[var(--accent)] p-6">
+                <h2 className="text-xl font-bold text-[var(--dark-bg)]">
+                  Upload Role Clarity Document for {selectedJob.title}
                 </h2>
-                <p className="text-[#0e151f] mt-1 text-sm">
+                <p className="text-[var(--dark-bg)] opacity-80 mt-1 text-sm">
                   Experience required: {selectedJob.experience_required}
                 </p>
               </div>
@@ -300,21 +299,21 @@ const ListJobs = () => {
                 )}
 
                 <div className="mb-6">
-                  <label className="block text-sm font-medium text-[#ffffff] mb-2">
-                    Upload RCD documents
+                  <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">
+                    Upload Role Clarity Documents
                   </label>
                   <div
                     className={`border-2 ${
                       uploadStatus === "error"
                         ? "border-red-500"
-                        : "border-dashed border-[#ffb300] border-opacity-50"
-                    } rounded-lg p-6 text-center hover:border-[#ffb300] transition-colors duration-200`}
+                        : "border-dashed border-[var(--accent)] border-opacity-50"
+                    } rounded-lg p-6 text-center hover:border-[var(--accent)] transition-colors duration-200`}
                   >
-                    <FileText className="mx-auto h-12 w-12 text-[#ffb300]" />
-                    <p className="mt-2 text-sm text-[#8b949e]">
+                    <FileText className="mx-auto h-12 w-12 text-[var(--accent)]" />
+                    <p className="mt-2 text-sm text-[var(--text-secondary)]">
                       Drag and drop your file here, or
                       <span
-                        className="text-[#ffb300] font-medium cursor-pointer"
+                        className="text-[var(--accent)] font-medium cursor-pointer"
                         onClick={() => {
                           inputRef.current?.click();
                         }}
@@ -324,7 +323,9 @@ const ListJobs = () => {
                         {fileName && fileName}
                       </span>
                     </p>
-                    <p className="mt-1 text-xs text-[#8b949e]">PDF 10MB</p>
+                    <p className="mt-1 text-xs text-[var(--text-secondary)]">
+                      PDF 10MB
+                    </p>
                     <input
                       type="file"
                       className="hidden"
@@ -338,9 +339,9 @@ const ListJobs = () => {
                 </div>
 
                 {uploadStatus === "uploading" && (
-                  <div className="w-full bg-[#30363d] rounded-full h-2.5 mb-4">
+                  <div className="w-full bg-[var(--border)] rounded-full h-2.5 mb-4">
                     <div
-                      className="bg-[#ffb300] h-2.5 rounded-full"
+                      className="bg-[var(--accent)] h-2.5 rounded-full"
                       style={{ width: `${uploadProgress}%` }}
                     ></div>
                   </div>
@@ -350,7 +351,7 @@ const ListJobs = () => {
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="px-4 py-2 bg-[#30363d] text-[#8b949e] font-medium rounded-lg hover:bg-[#1f6feb33] transition-colors duration-200"
+                    className="px-4 py-2 bg-[var(--border)] text-[var(--text-secondary)] font-medium rounded-lg hover:bg-[var(--blue-highlight)] transition-colors duration-200"
                     onClick={() => {
                       setShowModal(false);
                       setUploadStatus("idle");
@@ -363,10 +364,10 @@ const ListJobs = () => {
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className={`px-4 py-2 text-black font-medium rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg ${
+                    className={`px-4 py-2 text-[var(--dark-bg)] font-medium rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg ${
                       uploadStatus === "uploading"
-                        ? "bg-[#ffb300] opacity-70 cursor-not-allowed"
-                        : "bg-[#ffb300] hover:bg-[#ffc133]"
+                        ? "bg-[var(--accent)] opacity-70 cursor-not-allowed"
+                        : "bg-[var(--accent)] hover:bg-[var(--accent-hover)]"
                     }`}
                     onClick={handleUploadRCD}
                     disabled={uploadStatus === "uploading"}

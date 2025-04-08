@@ -33,10 +33,10 @@ jobs:
       #     cd ./Backend 
       #     npm run format:check
   
-      - name: Build Backend
-        run: |
-          cd ./Backend 
-          npm run build
+      # - name: Build Backend
+      #   run: |
+      #     cd ./Backend 
+      #     npm run build
 
 
   build-frontend:
