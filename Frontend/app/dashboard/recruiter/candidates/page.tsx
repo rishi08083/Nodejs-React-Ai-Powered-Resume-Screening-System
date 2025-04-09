@@ -552,23 +552,27 @@ const CandidateList = () => {
           </svg>
         </div>
         <div className="relative w-full md:w-1/3 h-12">
-          <select
+            <select
             className="w-full h-full p-3 pl-4 border rounded-lg shadow-md appearance-none focus:outline-none focus:ring-2 focus:ring-[var(--accent)] bg-[var(--surface)] border-[var(--border)] text-[var(--text-primary)] transition-all duration-300"
             value={selectedJob}
             onChange={(e) => {
               setSelectedJob(e.target.value);
               setCandidates(originalCandidates); // Reset candidates when job changes
             }}
-          >
+            >
             <option value="" disabled>
               Select a Job
             </option>
-            {jobs.map((job) => (
+            {jobs.map((job, index) => (
               <option key={job.id} value={job.id}>
-                {job.title}
+              {job.title}
               </option>
             ))}
-          </select>
+            </select>
+            {jobs.length > 0 && selectedJob === "" && (() => {
+              setSelectedJob(jobs[0].id); 
+              return null; 
+            })()}
           <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[var(--text-secondary)] bg-[var(--accent)] rounded-r-lg">
             <svg
               className="h-5 w-5"
