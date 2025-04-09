@@ -16,7 +16,7 @@ const mailRecruiter = async (req, res) => {
 
         // Fetch candidates along with their job titles
         const candidates = await db.Candidates.findAll({
-            where: { is_recommended: "YES" },
+            where: { is_recommended: "YES", user_id: user.id},
             attributes: ["name", "email", "phone_number", "job_id", "match_score"],
             include: [{
                 model: db.Jobs,
@@ -32,7 +32,7 @@ const mailRecruiter = async (req, res) => {
             to: user.user.email,
             subject: "Recommended Candidates List",
             text: `Candidates List`,
-            html: generateEmailTemplate(candidates),
+            html: generateEmailTemplate(candidates, user.user.name),
         };
     
         transporter.sendMail(mailOptions);
@@ -49,9 +49,9 @@ const mailRecruiter = async (req, res) => {
             error: { details: error.message },
         });
     }
-}
+};
 
-const generateEmailTemplate = (candidates) => {
+const generateEmailTemplate = (candidates, name) => {
     const branding = `
       <hr style="margin: 40px 0; border-top: 2px solid #d8a31a;" />
       <div style="background-color: #fff; padding: 20px; color: #000; border-radius: 8px;">
@@ -85,7 +85,7 @@ const generateEmailTemplate = (candidates) => {
     if (!candidates || candidates.length === 0) {
       return `
         ${containerStart}
-          <p>Hello <strong>Recruiter</strong>,</p>
+          <p>Hello <strong>${name}</strong>,</p>
           <p>We hope you're doing well. As part of our resume screening process, we checked for candidates matching your job requirements.</p>
           <p style="margin-top: 20px;">Currently, there are no candidates that meet the matching criteria for your job listings.</p>
           <p>We will continue monitoring applications and notify you when suitable candidates are found.</p>
@@ -93,7 +93,7 @@ const generateEmailTemplate = (candidates) => {
   
           <p style="margin-top: 30px;">
             You can also view the full candidate list directly on the ATS platform by visiting the following link:<br/>
-            <a href="https://rs-fe.rishi.publicvm.com/login?redirect=/dashboard/recruiter/candidates" 
+            <a href="https://rs-fe.rishi.publicvm.com/dashboard/recruiter/candidates" 
                 style="color: #d8a31a; text-decoration: none;">
                 View Candidates on ATS Platform
             </a>
@@ -157,7 +157,7 @@ const generateEmailTemplate = (candidates) => {
   
     return `
       ${containerStart}
-        <p>Hello <strong>Recruiter</strong>,</p>
+        <p>Hello <strong>${name}</strong>,</p>
         <p>We hope you're doing well. Based on the recent screening, we've identified a list of recommended candidates who closely match the job requirements. Please find the detailed list below, categorized by job roles.</p>
   
         <h2 style="text-align: center; color: #333; margin-top: 40px;">📌 Recommended Candidates List</h2>
@@ -166,7 +166,7 @@ const generateEmailTemplate = (candidates) => {
         
         <p style="margin-top: 30px;">
             You can also view the full candidate list directly on the ATS platform by visiting the following link:
-            <a href="https://rs-fe.rishi.publicvm.com/login?redirect=/dashboard/recruiter/candidates" 
+            <a href="https://rs-fe.rishi.publicvm.com/dashboard/recruiter/candidates" 
                 style="color: #d8a31a; text-decoration: none;">
                 View Candidates on ATS Platform
             </a>
