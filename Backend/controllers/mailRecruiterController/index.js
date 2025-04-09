@@ -16,8 +16,8 @@ const mailRecruiter = async (req, res) => {
 
         // Fetch candidates along with their job titles
         const candidates = await db.Candidates.findAll({
-            where: { match_score: { [Op.gte]: 40 } },
-            attributes: ["name", "email", "phone_number", "job_id"],
+            where: { is_recommended: "YES" },
+            attributes: ["name", "email", "phone_number", "job_id", "match_score"],
             include: [{
                 model: db.Jobs,
                 as: "jobs",
@@ -90,7 +90,7 @@ const generateEmailTemplate = (candidates) => {
           <p style="margin-top: 20px;">Currently, there are no candidates that meet the matching criteria for your job listings.</p>
           <p>We will continue monitoring applications and notify you when suitable candidates are found.</p>
           <br />
-
+  
           <p style="margin-top: 30px;">
             You can also view the full candidate list directly on the ATS platform by visiting the following link:<br/>
             <a href="https://rs-fe.rishi.publicvm.com/login?redirect=/dashboard/recruiter/candidates" 
@@ -98,7 +98,7 @@ const generateEmailTemplate = (candidates) => {
                 View Candidates on ATS Platform
             </a>
         </p>
-
+  
         <br />
         <p>Best regards,</p>
         <p><strong>ATS Team</strong></p>
@@ -114,10 +114,18 @@ const generateEmailTemplate = (candidates) => {
       return acc;
     }, {});
   
+    const columnWidths = {
+      name: '25%',
+      score: '15%',
+      email: '35%',
+      phone: '25%'
+    };
+  
     const jobSections = Object.entries(candidatesByJob).map(([jobTitle, candidates]) => {
       const rows = candidates.map(candidate => `
         <tr>
           <td style="border: 1px solid #ddd; padding: 10px;">${candidate.name}</td>
+          <td style="border: 1px solid #ddd; padding: 10px;">${candidate.match_score}%</td>
           <td style="border: 1px solid #ddd; padding: 10px;">${candidate.email}</td>
           <td style="border: 1px solid #ddd; padding: 10px;">${candidate.phone_number}</td>
         </tr>
@@ -125,10 +133,17 @@ const generateEmailTemplate = (candidates) => {
   
       return `
         <h3 style="color: #2c3e50; margin-top: 30px;">➡️ ${jobTitle}</h3>
-        <table style="border-collapse: collapse; width: 100%; margin-top: 10px;">
+        <table style="border-collapse: collapse; width: 100%; margin-top: 10px; table-layout: fixed;">
+          <colgroup>
+            <col style="width: ${columnWidths.name};" />
+            <col style="width: ${columnWidths.score};" />
+            <col style="width: ${columnWidths.email};" />
+            <col style="width: ${columnWidths.phone};" />
+          </colgroup>
           <thead>
             <tr style="background-color: #f4f4f4;">
               <th style="border: 1px solid #ddd; padding: 10px; text-align: left;">Name</th>
+              <th style="border: 1px solid #ddd; padding: 10px; text-align: left;">Match Score</th>
               <th style="border: 1px solid #ddd; padding: 10px; text-align: left;">Email</th>
               <th style="border: 1px solid #ddd; padding: 10px; text-align: left;">Phone Number</th>
             </tr>
@@ -156,13 +171,13 @@ const generateEmailTemplate = (candidates) => {
                 View Candidates on ATS Platform
             </a>
         </p>
-
+  
         <br />
         <p>Best regards,</p>
         <p><strong>ATS Team</strong></p>
         ${branding}
       ${containerEnd}
     `;
-  };   
+  };  
 
 module.exports = {mailRecruiter};
