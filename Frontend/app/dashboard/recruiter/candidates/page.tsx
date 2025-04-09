@@ -184,30 +184,29 @@ const CandidateList = () => {
   };
 
   const handleFileSelect = (event: ChangeEvent<HTMLInputElement>) => {
-      event.preventDefault();
-      if (event.target.files === null) return;
-      const selectedFiles = event.target.files;
-      if (selectedFiles) {
-        handleFile(selectedFiles);
-      }
-      if (fileInputRef.current) {
-        fileInputRef.current.value = ""; // Clear the input after selection
-      }
+    event.preventDefault();
+    if (event.target.files === null) return;
+    const selectedFiles = event.target.files;
+    if (selectedFiles) {
+      handleFile(selectedFiles);
+    }
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ""; // Clear the input after selection
+    }
+  };
 
-    };
-  
-    const handleRemoveFile = (index: number) => {
-      setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
-      toast.success("File removed successfully", {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
-    };
+  const handleRemoveFile = (index: number) => {
+    setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
+    toast.success("File removed successfully", {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
+  };
 
   const handleDragEnter = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
@@ -279,7 +278,7 @@ const CandidateList = () => {
         setTimeout(() => {
           setFiles([]);
           setErrorMessage("");
-          
+
           toast.success("Resumes uploaded successfully", {
             position: "top-right",
             autoClose: 5000,
@@ -393,10 +392,18 @@ const CandidateList = () => {
       );
 
       if (response.ok) {
-        setCandidates((prevCandidates) =>
-          prevCandidates.filter((candidate) => candidate.id !== candidateId)
-        );
-        console.log("Candidate deleted successfully");
+        // Use functional update to ensure we work with the latest state
+        setCandidates((prevCandidates) => {
+          const updatedCandidates = prevCandidates.filter(
+            (candidate) => candidate.id !== candidateId
+          );
+          console.log("Updated candidates:", updatedCandidates); // Debug log
+          return updatedCandidates;
+        });
+        setOriginalCandidates((prevOriginal) =>
+          prevOriginal.filter((candidate) => candidate.id !== candidateId)
+        ); // Update originalCandidates too
+        console.log(`Candidate ${candidateId} deleted successfully`);
       } else {
         const errorData = await response.json();
         throw new Error(errorData.message);
@@ -405,7 +412,6 @@ const CandidateList = () => {
       console.error("Error deleting candidate:", error);
     }
   };
-
   const fetchCandidateFeedback = async (candidateId: string) => {
     try {
       const response = await axios.get(
@@ -552,26 +558,28 @@ const CandidateList = () => {
           </svg>
         </div>
         <div className="relative w-full md:w-1/3 h-12">
-            <select
+          <select
             className="w-full h-full p-3 pl-4 border rounded-lg shadow-md appearance-none focus:outline-none focus:ring-2 focus:ring-[var(--accent)] bg-[var(--surface)] border-[var(--border)] text-[var(--text-primary)] transition-all duration-300"
             value={selectedJob}
             onChange={(e) => {
               setSelectedJob(e.target.value);
               setCandidates(originalCandidates); // Reset candidates when job changes
             }}
-            >
+          >
             <option value="" disabled>
               Select a Job
             </option>
             {jobs.map((job, index) => (
               <option key={job.id} value={job.id}>
-              {job.title}
+                {job.title}
               </option>
             ))}
-            </select>
-            {jobs.length > 0 && selectedJob === "" && (() => {
-              setSelectedJob(jobs[0].id); 
-              return null; 
+          </select>
+          {jobs.length > 0 &&
+            selectedJob === "" &&
+            (() => {
+              setSelectedJob(jobs[0].id);
+              return null;
             })()}
           <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[var(--text-secondary)] bg-[var(--accent)] rounded-r-lg">
             <svg
@@ -643,20 +651,29 @@ const CandidateList = () => {
           disabled={!selectedJob}
         >
           <svg
-            className="h-5 w-5 mr-2"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+            className="h-6 w-6 mr-2"
+            fill="#000000"
+            version="1.1"
+            id="Capa_1"
             xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 490.955 490.955"
+            xmlSpace="preserve"
           >
             <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-            ></path>
-          </svg>
-          Upload Resume
+              id="XMLID_448_"
+              d="M445.767,308.42l-53.374-76.49v-20.656v-11.366V97.241c0-6.669-2.604-12.94-7.318-17.645L312.787,7.301
+              C308.073,2.588,301.796,0,295.149,0H77.597C54.161,0,35.103,19.066,35.103,42.494V425.68c0,23.427,19.059,42.494,42.494,42.494
+              h159.307h39.714c1.902,2.54,3.915,5,6.232,7.205c10.033,9.593,23.547,15.576,38.501,15.576c26.935,0-1.247,0,34.363,0
+              c14.936,0,28.483-5.982,38.517-15.576c11.693-11.159,17.348-25.825,17.348-40.29v-40.06c16.216-3.418,30.114-13.866,37.91-28.811
+              C459.151,347.704,457.731,325.554,445.767,308.42z M170.095,414.872H87.422V53.302h175.681v46.752
+              c0,16.655,13.547,30.209,30.209,30.209h46.76v66.377h-0.255v0.039c-17.685-0.415-35.529,7.285-46.934,23.46l-61.586,88.28
+              c-11.965,17.134-13.387,39.284-3.722,57.799c7.795,14.945,21.692,25.393,37.91,28.811v19.842h-10.29H170.095z M410.316,345.771
+              c-2.03,3.866-5.99,6.271-10.337,6.271h-0.016h-32.575v83.048c0,6.437-5.239,11.662-11.659,11.662h-0.017H321.35h-0.017
+              c-6.423,0-11.662-5.225-11.662-11.662v-83.048h-32.574h-0.016c-4.346,0-8.308-2.405-10.336-6.271
+              c-2.012-3.866-1.725-8.49,0.783-12.07l61.424-88.064c2.189-3.123,5.769-4.984,9.57-4.984h0.017c3.802,0,7.38,1.861,9.568,4.984
+              l61.427,88.064C412.04,337.28,412.328,341.905,410.316,345.771z"
+            />
+          </svg>Upload Resume
         </button>
       </motion.div>
 
@@ -1010,70 +1027,75 @@ const CandidateList = () => {
                     </td>
                     {/* Actions Dropdown */}
                     <td className="px-6 py-4 text-sm relative">
-                      <div
-                        ref={dropdownRef}
-                        className="relative inline-block text-left"
+                      <button
+                        onClick={() =>
+                          setIsOpen(
+                            isOpen === candidate.id ? null : candidate.id
+                          )
+                        }
+                        className="px-3 py-2 bg-[var(--border)] text-[var(--text-primary)] font-medium rounded-lg hover:bg-[var(--blue-highlight)] transition-colors duration-200 shadow-md hover:shadow-lg flex items-center space-x-1"
                       >
-                        <motion.button
-                          whileHover={{ scale: 1.1 }}
-                          whileTap={{ scale: 0.9 }}
-                          onClick={() =>
-                            setIsOpen((prev) =>
-                              prev === candidate.id ? null : candidate.id
-                            )
-                          }
-                          className="inline-flex justify-center rounded-md border border-[var(--border)] shadow-sm px-3 py-1 bg-[var(--surface)] text-sm font-medium text-[var(--text-primary)] hover:bg-[var(--border)] focus:outline-none transition-all duration-300"
-                          aria-haspopup="true"
-                          aria-expanded={isOpen === candidate.id}
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="lucide lucide-more-vertical h-4 w-4"
                         >
-                          &#x22EE;
-                        </motion.button>
-
-                        {isOpen === candidate.id && (
-                          <motion.div
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ duration: 0.2 }}
-                            className="absolute right-0 mt-2 w-36 rounded-md shadow-lg bg-[var(--surface)] ring-1 ring-[var(--border)] focus:outline-none z-50"
-                            tabIndex={-1}
-                            onClick={(e) => e.stopPropagation()}
+                          <circle cx="12" cy="12" r="1"></circle>
+                          <circle cx="12" cy="5" r="1"></circle>
+                          <circle cx="12" cy="19" r="1"></circle>
+                        </svg>
+                      </button>
+                      {isOpen === candidate.id && (
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.95 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ duration: 0.2 }}
+                          className="absolute right-0 mt-2 w-36 rounded-md shadow-lg bg-[var(--surface)] ring-1 ring-[var(--border)] focus:outline-none z-50"
+                          tabIndex={-1}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <div
+                            className="py-1"
+                            role="menu"
+                            aria-orientation="vertical"
+                            aria-labelledby="options-menu"
                           >
-                            <div
-                              className="py-1"
-                              role="menu"
-                              aria-orientation="vertical"
-                              aria-labelledby="options-menu"
+                            <button
+                              onClick={() => {
+                                handleDeleteCandidate(candidate.id); // Ensure this uses the correct candidate.id
+                                setIsOpen(null); // Close dropdown after action
+                              }}
+                              className="block w-full px-4 py-2 text-sm text-red-400 hover:bg-[var(--border)] hover:text-red-300 transition-colors duration-300 text-left"
+                              role="menuitem"
                             >
-                              <button
-                                onClick={() => {
-                                  handleDeleteCandidate(candidate.id);
-                                  setIsOpen(null);
-                                }}
-                                className="block w-full px-4 py-2 text-sm text-red-400 hover:bg-[var(--border)] hover:text-red-300 transition-colors duration-300 text-left"
-                                role="menuitem"
-                              >
-                                <div className="flex items-center">
-                                  <svg
-                                    className="mr-2 h-4 w-4"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                  >
-                                    <path
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                      strokeWidth="2"
-                                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                                    ></path>
-                                  </svg>
-                                  Delete
-                                </div>
-                              </button>
-                            </div>
-                          </motion.div>
-                        )}
-                      </div>
+                              <div className="flex items-center">
+                                <svg
+                                  className="mr-2 h-4 w-4"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                  ></path>
+                                </svg>
+                                Delete
+                              </div>
+                            </button>
+                          </div>
+                        </motion.div>
+                      )}
                     </td>
                   </motion.tr>
                 ))}

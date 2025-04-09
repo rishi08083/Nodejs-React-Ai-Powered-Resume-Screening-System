@@ -183,6 +183,12 @@ const parseResumes = async (uploadedFiles, job_id, user_id) => {
           user_id: user_id,
         });
 
+        await candidate.createParsed_resume({
+          resume_obj: aiResponse.data.data,
+          user_id: user_id,
+          is_deleted: false,
+        });
+
         await candidate.createSkill({
           skill_names: aiResponse.data.data.skills,
         });
@@ -218,7 +224,7 @@ const parseResumes = async (uploadedFiles, job_id, user_id) => {
           //     details: errorData.error?.details || error.message,
           //   },
           //   code: errorData.code || error.response.status, // Include the code from response
-            
+
           // });
           // console.error(`Error parsing file ${file.fileName}:`, error.message);
           errors.push({ file: file.fileName, error: errorData.message });
@@ -231,7 +237,7 @@ const parseResumes = async (uploadedFiles, job_id, user_id) => {
             },
             code: null,
           });
-        };
+        }
       }
     }
 

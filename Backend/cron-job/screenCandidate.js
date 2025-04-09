@@ -38,12 +38,21 @@ async function screenCandidate(candidate) {
       candidate_id,
       job_id: candidateDetails.jd.job_id,
       user_id: candidateDetails.user_id,
-      match_score: aiResponse.data.Combined_Score,
+      match_score: aiResponse.data.combined_score, // Updated to match response
       status_of: aiResponse.data.status === "success",
-      missing_skills: aiResponse.data.missing_skills || [],
+      missing_skills: {
+        jd_mismatch: aiResponse.data.feedback.jd_mismatch || [],
+        rcd_mismatch: aiResponse.data.feedback.rcd_mismatch || [],
+      },
       is_deleted: false,
-      is_recommended: aiResponse.data.feedback.Recommendation.toUpperCase() === "YES" ? "YES" : "NO",
-      feedback_json: aiResponse.data,
+      is_recommended: aiResponse.data.feedback.recommendation.toUpperCase() === "YES" ? "YES" : "NO",
+      feedback_json: {
+        experience_match: aiResponse.data.feedback.experience_match,
+        feedback: aiResponse.data.feedback.feedback,
+        jd_match: aiResponse.data.feedback.jd_match,
+        rcd_match: aiResponse.data.feedback.rcd_match,
+        experience_info: aiResponse.data.feedback.experience_info,
+      },
     };
 
     const existing = await db.ScreeningResults.findOne({ where: { candidate_id } });
@@ -76,7 +85,7 @@ async function processQueue() {
     // Get the next unscreened candidate with a lock to prevent duplications
     const candidate = await db.sequelize.transaction(async (t) => {
       const candidate = await db.Candidates.findOne({
-        where: { is_screened: false },
+        where: { is_screened: false, is_deleted: false },
         order: [['createdAt', 'ASC']], // Process oldest first
         lock: true,
         transaction: t
