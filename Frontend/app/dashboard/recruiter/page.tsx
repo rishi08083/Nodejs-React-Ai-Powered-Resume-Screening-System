@@ -195,8 +195,6 @@ export default function AdminDashboard() {
 
         {/* Row 1: Main Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          {/* Candidate Screening Outcome */}
-
           {/* Resumes Parsed Over Time */}
           <div className="bg-[var(--surface)] p-6 rounded-lg shadow-lg border border-[var(--border)]">
             <div className="flex justify-between items-center mb-4">
@@ -317,11 +315,7 @@ export default function AdminDashboard() {
                     }}
                     labelStyle={{ color: "var(--text-primary)" }}
                   />
-                  <Legend
-                    layout="vertical"
-                    verticalAlign="middle"
-                    align="right"
-                  />
+               
                 </PieChart>
               </ResponsiveContainer>
             </div>
@@ -330,51 +324,6 @@ export default function AdminDashboard() {
 
         {/* Row 2: Bar Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          {/* Top Skills Across Candidates */}
-          <div className="bg-[var(--surface)] p-6 rounded-lg shadow-lg border border-[var(--border)]">
-            <h2 className={chartTitle}>Top Skills Across Candidates</h2>
-            <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={topSkillsData}
-                  layout="vertical"
-                  margin={{ left: 60 }}
-                >
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                    stroke="var(--border)"
-                    horizontal={false}
-                  />
-                  <XAxis
-                    type="number"
-                    stroke="var(--text-secondary)"
-                    tick={{ fontSize: 12 }}
-                  />
-                  <YAxis
-                    dataKey="name"
-                    type="category"
-                    stroke="var(--text-secondary)"
-                    tick={{ fontSize: 12 }}
-                    width={80}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "var(--surface)",
-                      borderColor: "var(--border)",
-                    }}
-                    labelStyle={{ color: "var(--text-primary)" }}
-                  />
-                  <Bar
-                    dataKey="count"
-                    fill="var(--accent)"
-                    barSize={20}
-                    radius={[0, 4, 4, 0]}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-
           {/* Screening Score Distribution */}
           <div className="bg-[var(--surface)] p-6 rounded-lg shadow-lg border border-[var(--border)]">
             <h2 className={chartTitle}>Screening Score Distribution</h2>
@@ -416,12 +365,8 @@ export default function AdminDashboard() {
               </ResponsiveContainer>
             </div>
           </div>
-        </div>
-
-        {/* Row 3: Pie Chart and Stats Table */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Job-wise Candidate Distribution */}
-          <div className="bg-[var(--surface)] p-6 rounded-lg shadow-lg border border-[var(--border)]">
+           {/* Job-wise Candidate Distribution */}
+           <div className="bg-[var(--surface)] p-6 rounded-lg shadow-lg border border-[var(--border)]">
             <h2 className={chartTitle}>Job-wise Candidate Distribution</h2>
             <div className="h-72">
               <ResponsiveContainer width="100%" height="100%">
@@ -451,16 +396,14 @@ export default function AdminDashboard() {
                       props.payload.name,
                     ]}
                   />
-                  <Legend
-                    layout="vertical"
-                    verticalAlign="bottom"
-                    align="center"
-                  />
+                 
                 </PieChart>
               </ResponsiveContainer>
             </div>
           </div>
         </div>
+
+        
       </main>
     </div>
   );

@@ -341,12 +341,7 @@ export default function AdminDashboard() {
                     }}
                     labelStyle={{ color: "var(--text-primary)" }}
                   />
-                  <Legend
-                    layout="vertical"
-                    verticalAlign="middle"
-                    align="right"
-                    wrapperStyle={{ fontSize: "12px" }}
-                  />
+                  
                 </PieChart>
               </ResponsiveContainer>
             </div>
@@ -355,55 +350,7 @@ export default function AdminDashboard() {
 
         {/* Row 2: Bar Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          {/* Top Skills Across Candidates */}
-          <div className="bg-[var(--surface)] p-6 rounded-xl shadow-md border border-[var(--border)] transition-all hover:shadow-lg">
-            <h2 className={chartTitle}>Top Skills Across Candidates</h2>
-            <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={topSkillsData}
-                  layout="vertical"
-                  margin={{ left: 60 }}
-                >
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                    stroke="var(--border)"
-                    horizontal={false}
-                  />
-                  <XAxis
-                    type="number"
-                    stroke="var(--text-secondary)"
-                    tick={{ fontSize: 12 }}
-                  />
-                  <YAxis
-                    dataKey="name"
-                    type="category"
-                    stroke="var(--text-secondary)"
-                    tick={{ fontSize: 12 }}
-                    width={80}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "var(--surface)",
-                      borderColor: "var(--border)",
-                      borderRadius: "0.5rem",
-                      boxShadow: "0 4px 6px var(--shadow)",
-                    }}
-                    labelStyle={{ color: "var(--text-primary)" }}
-                    formatter={(value) => [`${value} candidates`, "Count"]}
-                  />
-                  <Bar dataKey="count" radius={[0, 4, 4, 0]} barSize={24}>
-                    {topSkillsData.map((entry, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={`rgba(255, 179, 0, ${1 - index * 0.1})`}
-                      />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
+          
 
           {/* Screening Score Distribution */}
           <div className="bg-[var(--surface)] p-6 rounded-xl shadow-md border border-[var(--border)] transition-all hover:shadow-lg">
@@ -450,10 +397,6 @@ export default function AdminDashboard() {
               </ResponsiveContainer>
             </div>
           </div>
-        </div>
-
-        {/* Row 3: Pie Chart and Stats Table */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Job-wise Candidate Distribution */}
           <div className="bg-[var(--surface)] p-6 rounded-xl shadow-md border border-[var(--border)] col-span-1 lg:col-span-3 xl:col-span-1 transition-all hover:shadow-lg">
             <h2 className={chartTitle}>Job-wise Candidate Distribution</h2>
@@ -497,53 +440,9 @@ export default function AdminDashboard() {
               </ResponsiveContainer>
             </div>
           </div>
-
-          {/* Recent Activity Card - Added to fill space */}
-          <div className="bg-[var(--surface)] p-6 rounded-xl shadow-md border border-[var(--border)] col-span-1 lg:col-span-2 xl:col-span-2 transition-all hover:shadow-lg">
-            <h2 className={chartTitle}>Recent Activity</h2>
-            <div className="space-y-4">
-              <div className="flex items-center border-b border-[var(--border)] pb-3">
-                <div className="p-2 bg-[var(--blue-highlight)] rounded-lg mr-4">
-                  <UserCheck size={20} className="text-[var(--accent)]" />
-                </div>
-                <div>
-                  <p className="text-[var(--text-primary)] font-medium">
-                    New candidate shortlisted
-                  </p>
-                  <p className="text-[var(--text-secondary)] text-sm">
-                    Frontend Developer • 15 minutes ago
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center border-b border-[var(--border)] pb-3">
-                <div className="p-2 bg-[var(--blue-highlight)] rounded-lg mr-4">
-                  <FileText size={20} className="text-[var(--accent)]" />
-                </div>
-                <div>
-                  <p className="text-[var(--text-primary)] font-medium">
-                    12 new resumes uploaded
-                  </p>
-                  <p className="text-[var(--text-secondary)] text-sm">
-                    Data Scientist • 2 hours ago
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center">
-                <div className="p-2 bg-[var(--blue-highlight)] rounded-lg mr-4">
-                  <AlertCircle size={20} className="text-red-400" />
-                </div>
-                <div>
-                  <p className="text-[var(--text-primary)] font-medium">
-                    Interview scheduling failed
-                  </p>
-                  <p className="text-[var(--text-secondary)] text-sm">
-                    Backend Developer • 5 hours ago
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
+
+        
       </main>
     </div>
   );
