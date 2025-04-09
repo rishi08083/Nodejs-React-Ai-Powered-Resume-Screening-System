@@ -1361,9 +1361,13 @@ const CandidateList = () => {
   );
 };
 
-export default React.memo(() => (
+const MemoizedCandidateList = React.memo(() => (
   <>
     <ToastContainer />
     <CandidateList />
   </>
 ));
+
+MemoizedCandidateList.displayName = "MemoizedCandidateList";
+
+export default MemoizedCandidateList;
