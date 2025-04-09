@@ -186,7 +186,7 @@ export default function RecruiterRequests() {
             {isLoading ? (
               <div className="flex justify-center py-12">
                 <div className="animate-pulse flex flex-col items-center">
-                  <div className="w-12 h-12 rounded-full bg-[var(--accent)]/30"></div>
+                  <div className="w-12 h-12 roun ded-full bg-[var(--accent)]/30"></div>
                   <div className="mt-4 text-[var(--accent)]">Loading requests...</div>
                 </div>
               </div>
