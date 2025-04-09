@@ -1,3 +1,5 @@
+'use client';
+
 import { Suspense } from "react";
 
 // Client component defined below
@@ -10,9 +12,6 @@ const LoginWrapper = () => (
 export default function Page() {
   return <LoginWrapper />;
 }
-
-// 👇 Your original Login component, kept exactly as-is but just moved below, and marked as 'use client'
-'use client';
 
 import { useState, ChangeEvent, FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
