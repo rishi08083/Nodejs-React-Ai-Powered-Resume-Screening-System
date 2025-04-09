@@ -37,7 +37,7 @@ export default function Navbar({
 
       <div className="user-actions">
         <UserRound
-          className="user-icon"
+          className="user-icon  cursor-pointer"
           onClick={() => setModalVisible((modalVisible) => !modalVisible)}
         />
 
@@ -46,7 +46,7 @@ export default function Navbar({
       {modalVisible && (
         <div className="absolute z-50 top-14 right-4 w-56 bg-[var(--surface)] border border-[var(--border)] rounded-md shadow-lg overflow-hidden transition-all duration-200 ease-out">
           <div className="p-4 border-b border-[var(--border)]">
-            <div className="flex items-center gap-2 text-[var(--text-primary)]">
+            <div className="flex items-center gap-2 text-[var(--text-primary)] cursor-pointer">
               <UserRound className="w-4 h-4" />
               <span className="font-medium">User Profile</span>
             </div>

@@ -230,7 +230,9 @@ export default function RecruiterRequests() {
                 </tbody>
               </table>
             ) : (
-              <div className="text-center py-4">No {filter} requests found.</div>
+              <div className="text-center py-4">
+                No {filter} requests found.
+              </div>
             )}
           </div>
         </div>
