@@ -14,13 +14,14 @@ const Login = () => {
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
   const [isOpen, setIsOpen] = useState(false);
+
   const [isFocused, setIsFocused] = useState({
     email: false,
     password: false,
   });
 
   const router = useRouter();
-  const { login } = useAuth();
+  const { login, checkAuth } = useAuth();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -153,7 +154,13 @@ const Login = () => {
                 Sign In
               </button>
 
-              <GoogleSignIn onSuccess={() => {}} onError={() => {}} />
+              <GoogleSignIn
+                onSuccess={async (data) => {
+                  await checkAuth();
+                  router.push("/dashboard");
+                }}
+                onError={(err) => toast.error(err || "Google login failed")}
+              />
             </form>
 
             <div className="mt-6 flex flex-col items-center space-y-4">

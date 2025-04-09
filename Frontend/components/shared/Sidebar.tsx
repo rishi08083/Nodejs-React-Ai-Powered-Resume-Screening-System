@@ -28,11 +28,6 @@ const recruiterLinks = [
     icon: <Briefcase className="sidebar-icon" />,
   },
   {
-    href: "/dashboard/recruiter/upload",
-    label: "Upload Resume",
-    icon: <FileUp className="sidebar-icon" />,
-  },
-  {
     href: "/dashboard/recruiter/candidates",
     label: "Candidates",
     icon: <Book className="sidebar-icon" />,
