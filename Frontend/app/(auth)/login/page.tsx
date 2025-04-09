@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, ChangeEvent, FormEvent } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "../../../lib/auth";
@@ -20,15 +20,17 @@ const Login = () => {
   });
 
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { login } = useAuth();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      let data = await login({ email, password });
-      router.push("/dashboard");
-    } catch (err) {
-      toast.error(err.message);
+      const redirectPath = searchParams.get("redirect") || "/dashboard";
+      await login({ email, password });
+      router.push(redirectPath);
+    } catch (err: any) {
+      toast.error(err.message || "Login failed");
       setIsOpen(true);
       setTimeout(() => {
         setIsOpen(false);
@@ -66,7 +68,7 @@ const Login = () => {
           <div className="bg-[var(--surface)] p-8 rounded-xl shadow-lg border border-[var(--border)]">
             <div className="flex justify-center mb-6">
               <div className="w-32 h-12 relative">
-                {/* Logo placeholder */}
+              {/* Logo placeholder */}
                 <div className="absolute inset-0 flex items-center justify-center">
                   <span className="text-2xl font-bold text-[var(--accent)]"></span>
                 </div>
