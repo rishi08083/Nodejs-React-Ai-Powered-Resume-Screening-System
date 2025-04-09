@@ -157,11 +157,12 @@ const ListJobs = () => {
   }, []);
 
   return (
-    <div className="w-full p-2 bg-[var(--bg)] text-[var(--text-primary)] mt-16">
-      <div className="mb-6">
-        <h1 className="text-2xl md:text-3xl font-bold text-[var(--text-primary)]">
+    <div className="w-full p-6 bg-[var(--bg)] mt-14 min-h-screen text-[var(--text-primary)] transition-all duration-300">
+      <div className="mb-8">
+        <h1 className="text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-2">
           Available Job Positions
         </h1>
+        <div className="h-1 w-24 bg-[var(--accent)] rounded-full mb-4"></div>
         <p className="text-[var(--text-secondary)] mt-2">
           Browse our current openings and upload Role Clarity Documents
         </p>

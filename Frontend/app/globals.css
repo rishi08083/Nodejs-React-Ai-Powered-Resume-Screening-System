@@ -84,7 +84,7 @@ body {
   animation: spin 1s infinite linear;
 }
 main {
-  margin-top: 130px;
+  margin-top: 70px;
 }
 
 @keyframes spin {
