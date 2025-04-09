@@ -463,7 +463,7 @@ const CandidateList = () => {
         className="mb-8"
       >
         <h1 className="text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-2">
-          Screened Candidate List
+          Screened Candidates
         </h1>
         <div className="h-1 w-24 bg-[var(--accent)] rounded-full mb-4"></div>
         <p className="text-[var(--text-secondary)] mt-2">
@@ -682,7 +682,7 @@ const CandidateList = () => {
                 </label>
               </div>
               <p className="mt-4 text-xs text-[var(--text-muted)]">
-                Supported formats: PDF, DOCX, JPG
+                Supported formats: PDF, DOCX, Images
               </p>
             </div>
 
