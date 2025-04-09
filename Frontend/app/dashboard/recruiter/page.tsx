@@ -378,7 +378,7 @@ export default function AdminDashboard() {
                     outerRadius={80}
                     dataKey="value"
                     label={({ name, percent }) =>
-                      `${(percent * 100).toFixed(0)}%`
+                      `${(percent * 100).toFixed(0)}% ${name}`
                     }
                   >
                     {jobDistributionData.map((entry, index) => (

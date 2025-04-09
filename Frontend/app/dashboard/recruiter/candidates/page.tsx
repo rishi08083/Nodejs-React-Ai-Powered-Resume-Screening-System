@@ -105,12 +105,10 @@ const CandidateList = () => {
         );
         if (response.ok) {
           const data = await response.json();
-          console.log(data, "response");
           if (data.data) {
             setOriginalCandidates(data.data.candidates);
             setCandidates(() => {
               if (selectedRecommendation === "") return data.data.candidates;
-
               return data.data.candidates.filter(
                 (candidate) =>
                   candidate.is_recommended ===
@@ -129,8 +127,15 @@ const CandidateList = () => {
         console.log(error, "error");
       }
     };
+
     getCandidates();
-  }, [selectedJob]);
+
+    const intervalId = setInterval(() => {
+      getCandidates();
+    }, 6000);
+
+    return () => clearInterval(intervalId);
+  }, [selectedJob, selectedRecommendation]);
 
   const getFileExtension = (filename: string): string => {
     return filename.split(".").pop()?.toLowerCase() || "";
