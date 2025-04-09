@@ -123,8 +123,8 @@ export default function RecruiterRequests() {
   );
 
   return (
-    <div className="min-h-screen bg-[var(--bg)] py-8 px-4 sm:px-6 lg:px-8 text-[var(--text-primary)] mt-10">
-      <div className="max-w-5xl mx-auto">
+    <div className="min-h-screen bg-[var(--bg)] py-8 px-0 sm:px-0 lg:px-0 text-[var(--text-primary)] mt-10">
+      <div className="mx-auto">
         <div className="bg-[var(--surface)] rounded-xl shadow-lg overflow-hidden border border-[var(--border)]">
           {/* Display Message */}
           {message && (
@@ -285,7 +285,7 @@ export default function RecruiterRequests() {
                   No {filter} requests found
                 </h3>
                 <p className="mt-2 text-[var(--text-secondary)]">
-                  There are currently no {filter} recruiter requests to display.
+                  There are no {filter} recruiter requests available at the moment.
                 </p>
               </div>
             )}

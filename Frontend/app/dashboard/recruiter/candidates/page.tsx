@@ -483,129 +483,129 @@ const CandidateList = () => {
         transition={{ duration: 0.5, delay: 0.2 }}
         className="flex flex-col md:flex-row items-center justify-between mb-8 space-y-4 md:space-y-0 md:space-x-4"
       >
-        <div className="relative w-full md:w-1/3 group">
+        <div className="relative w-full md:w-1/3 group h-12">
           <input
-            type="text"
-            placeholder="Search by ID or Name"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full p-3 pl-10 border rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)] bg-[var(--surface)] border-[var(--border)] text-[var(--text-primary)] transition-all duration-300"
+        type="text"
+        placeholder="Search by ID or Name"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        className="w-full h-full p-3 pl-10 border rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)] bg-[var(--surface)] border-[var(--border)] text-[var(--text-primary)] transition-all duration-300"
           />
           <svg
-            className="absolute left-3 top-3.5 h-5 w-5 text-[var(--text-secondary)] group-hover:text-[var(--accent)] transition-colors duration-300"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
+        className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[var(--text-secondary)] group-hover:text-[var(--accent)] transition-colors duration-300"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-            ></path>
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="2"
+          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+        ></path>
           </svg>
         </div>
-        <div className="relative w-full md:w-1/3">
+        <div className="relative w-full md:w-1/3 h-12">
           <select
-            className="w-full p-3 pl-4 border rounded-lg shadow-md appearance-none focus:outline-none focus:ring-2 focus:ring-[var(--accent)] bg-[var(--surface)] border-[var(--border)] text-[var(--text-primary)] transition-all duration-300"
-            value={selectedJob}
-            onChange={(e) => {
-              setSelectedJob(e.target.value);
-              setCandidates(originalCandidates); // Reset candidates when job changes
-            }}
+        className="w-full h-full p-3 pl-4 border rounded-lg shadow-md appearance-none focus:outline-none focus:ring-2 focus:ring-[var(--accent)] bg-[var(--surface)] border-[var(--border)] text-[var(--text-primary)] transition-all duration-300"
+        value={selectedJob}
+        onChange={(e) => {
+          setSelectedJob(e.target.value);
+          setCandidates(originalCandidates); // Reset candidates when job changes
+        }}
           >
-            <option value="" disabled>
-              Select a Job
-            </option>
-            {jobs.map((job) => (
-              <option key={job.id} value={job.id}>
-                {job.title}
-              </option>
-            ))}
+        <option value="" disabled>
+          Select a Job
+        </option>
+        {jobs.map((job) => (
+          <option key={job.id} value={job.id}>
+            {job.title}
+          </option>
+        ))}
           </select>
-          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[var(--text-secondary)] bg-[var(--accent)] rounded-r-lg ">
-            <svg
-              className="h-5 w-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M19 9l-7 7-7-7"
-              ></path>
-            </svg>
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[var(--text-secondary)] bg-[var(--accent)] rounded-r-lg">
+        <svg
+          className="h-5 w-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="M19 9l-7 7-7-7"
+          ></path>
+        </svg>
           </div>
         </div>
-        <div className="relative w-full md:w-1/6">
+        <div className="relative w-full md:w-1/6 h-12">
           <select
-            className={`w-full p-2 pl-4 border rounded-lg shadow-md appearance-none focus:outline-none focus:ring-2 ${
-              selectedJob
-                ? "focus:ring-[var(--accent)] bg-[var(--surface)] border-[var(--border)] text-[var(--text-primary)]"
-                : "bg-gray-200 border-gray-300 text-gray-400 cursor-not-allowed"
-            } transition-all duration-300`}
-            value={selectedRecommendation}
-            onChange={(e) => {
-              const value = e.target.value;
-              setSelectedRecommendation(value);
+        className={`w-full h-full p-2 pl-4 border rounded-lg shadow-md appearance-none focus:outline-none focus:ring-2 ${
+          selectedJob
+            ? "focus:ring-[var(--accent)] bg-[var(--surface)] border-[var(--border)] text-[var(--text-primary)]"
+            : "bg-gray-200 border-gray-300 text-gray-400 cursor-not-allowed"
+        } transition-all duration-300`}
+        value={selectedRecommendation}
+        onChange={(e) => {
+          const value = e.target.value;
+          setSelectedRecommendation(value);
 
-              if (value === "") {
-                setCandidates(originalCandidates);
-              } else {
-                const filtered = originalCandidates.filter(
-                  (candidate) =>
-                    candidate.is_recommended === value.toUpperCase()
-                );
-                setCandidates(filtered);
-              }
-            }}
-            disabled={!selectedJob} // Disable when no job is selected
+          if (value === "") {
+            setCandidates(originalCandidates);
+          } else {
+            const filtered = originalCandidates.filter(
+          (candidate) =>
+            candidate.is_recommended === value.toUpperCase()
+            );
+            setCandidates(filtered);
+          }
+        }}
+        disabled={!selectedJob} // Disable when no job is selected
           >
-            <option value="">Recommendation</option>
-            <option value="YES">Yes</option>
-            <option value="NO">No</option>
+        <option value="">Recommendation</option>
+        <option value="YES">Yes</option>
+        <option value="NO">No</option>
           </select>
 
           <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[var(--text-secondary)] bg-[var(--accent)] rounded-r-lg">
-            <svg
-              className="h-5 w-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M19 9l-7 7-7-7"
-              ></path>
-            </svg>
+        <svg
+          className="h-5 w-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="M19 9l-7 7-7-7"
+          ></path>
+        </svg>
           </div>
         </div>
         <button
           type="button"
-          className="px-4 py-2 bg-[var(--accent)] text-[var(--dark-bg)] rounded-lg flex items-center hover:bg-[var(--accent-hover)] transition-all duration-300 disabled:bg-[var(--border)] disabled:cursor-not-allowed disabled:text-[var(--text-secondary)]"
+          className="h-12 px-4 py-2 bg-[var(--accent)] text-[var(--dark-bg)] rounded-lg flex items-center hover:bg-[var(--accent-hover)] transition-all duration-300 disabled:bg-[var(--border)] disabled:cursor-not-allowed disabled:text-[var(--text-secondary)]"
           onClick={() => setIsUploadModalOpen(true)}
           disabled={!selectedJob}
         >
           <svg
-            className="h-5 w-5 mr-2"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
+        className="h-5 w-5 mr-2"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-            ></path>
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="2"
+          d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+        ></path>
           </svg>
           Upload Resume
         </button>
@@ -788,9 +788,7 @@ const CandidateList = () => {
                   <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
                     Contact
                   </th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
-                    Resume
-                  </th>
+                 
                   <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
                     Compatibility (%)
                   </th>
@@ -799,6 +797,9 @@ const CandidateList = () => {
                   </th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
                     Recommended
+                  </th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
+                    Resume
                   </th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
                     Actions
@@ -823,33 +824,7 @@ const CandidateList = () => {
                     <td className="px-6 py-4 text-sm text-[var(--text-secondary)]">
                       {candidate.phone_number}
                     </td>
-                    <td className="px-6 py-4 text-sm">
-                      <button
-                        onClick={(e) => {
-                          get_resume(candidate.id, e);
-                        }}
-                        className="px-3 py-2 bg-[var(--border)] text-[var(--text-primary)] font-medium rounded-lg hover:bg-[var(--blue-highlight)] transition-colors duration-200 shadow-md hover:shadow-lg flex items-center space-x-1"
-                        tabIndex={0}
-                        style={{ transform: "none" }}
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="lucide lucide-eye h-4 w-4"
-                        >
-                          <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"></path>
-                          <circle cx="12" cy="12" r="3"></circle>
-                        </svg>
-                        <span>View</span>
-                      </button>
-                    </td>
+                    
                     {/* Compatibility Score */}
                     <td className="px-6 py-4 text-sm">
                       {candidate.match_score !== null &&
@@ -925,7 +900,33 @@ const CandidateList = () => {
                         </span>
                       )}
                     </td>
-
+                    <td className="px-6 py-4 text-sm">
+                      <button
+                        onClick={(e) => {
+                          get_resume(candidate.id, e);
+                        }}
+                        className="px-3 py-2 bg-[var(--border)] text-[var(--text-primary)] font-medium rounded-lg hover:bg-[var(--blue-highlight)] transition-colors duration-200 shadow-md hover:shadow-lg flex items-center space-x-1"
+                        tabIndex={0}
+                        style={{ transform: "none" }}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="lucide lucide-eye h-4 w-4"
+                        >
+                          <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"></path>
+                          <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                        <span>View</span>
+                      </button>
+                    </td>
                     {/* Actions Dropdown */}
                     <td className="px-6 py-4 text-sm relative">
                       <div
