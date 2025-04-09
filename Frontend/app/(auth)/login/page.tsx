@@ -1,4 +1,18 @@
-"use client";
+import { Suspense } from "react";
+
+// Client component defined below
+const LoginWrapper = () => (
+  <Suspense fallback={<div>Loading login...</div>}>
+    <Login />
+  </Suspense>
+);
+
+export default function Page() {
+  return <LoginWrapper />;
+}
+
+// 👇 Your original Login component, kept exactly as-is but just moved below, and marked as 'use client'
+'use client';
 
 import { useState, ChangeEvent, FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -46,12 +60,10 @@ const Login = () => {
     <div className="flex min-h-screen bg-[var(--surface)] font-sans relative">
       <ToastContainer theme="dark" />
 
-      {/* Theme Toggle in top right corner */}
       <div className="absolute top-4 right-4 z-10">
         <ThemeToggle />
       </div>
 
-      {/* Left side decorative panel */}
       <div className="hidden lg:flex lg:w-1/2 bg-[var(--dark-surface)] items-center justify-center flex-col pt-4 pl-7">
         <Image src="/freelancer.svg" width={600} height={600} alt="Welcome" />
         <div className="max-w-md text-center">
@@ -62,13 +74,11 @@ const Login = () => {
         </div>
       </div>
 
-      {/* Right side login form */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
         <div className="w-full max-w-md">
           <div className="bg-[var(--surface)] p-8 rounded-xl shadow-lg border border-[var(--border)]">
             <div className="flex justify-center mb-6">
               <div className="w-32 h-12 relative">
-              {/* Logo placeholder */}
                 <div className="absolute inset-0 flex items-center justify-center">
                   <span className="text-2xl font-bold text-[var(--accent)]"></span>
                 </div>
@@ -185,5 +195,3 @@ const Login = () => {
     </div>
   );
 };
-
-export default Login;
