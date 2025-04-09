@@ -1,5 +1,11 @@
 "use client";
-import React, { useState, useEffect, useMemo, useRef, ChangeEvent } from "react";
+import React, {
+  useState,
+  useEffect,
+  useMemo,
+  useRef,
+  ChangeEvent,
+} from "react";
 import { motion } from "framer-motion";
 import axios from "axios";
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
@@ -659,7 +665,9 @@ const CandidateList = () => {
             >
               <div className="flex flex-col items-center justify-center">
                 <span className="text-4xl mb-3">📁</span>
-                <p className="text-[var(--text-secondary)] mb-2">Drag & drop resumes here</p>
+                <p className="text-[var(--text-secondary)] mb-2">
+                  Drag & drop resumes here
+                </p>
                 <p className="text-[var(--text-muted)] mb-3">or</p>
                 <input
                   type="file"
@@ -720,7 +728,9 @@ const CandidateList = () => {
                           {getFileIcon(file.name)}
                         </span>
                         <div>
-                          <p className="text-[var(--text-primary)] font-medium">{file.name}</p>
+                          <p className="text-[var(--text-primary)] font-medium">
+                            {file.name}
+                          </p>
                           <p className="text-xs text-[var(--text-secondary)]">
                             {(file.size / 1024).toFixed(2)} KB
                           </p>
@@ -743,9 +753,25 @@ const CandidateList = () => {
                 >
                   {isLoading ? (
                     <>
-                      <svg className="animate-spin mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      <svg
+                        className="animate-spin mr-2 h-5 w-5"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
                       </svg>
                       Uploading... {uploadProgress}%
                     </>
@@ -1156,7 +1182,8 @@ const CandidateList = () => {
                         ></path>
                       </svg>
                       <div className="absolute z-10 left-6 top-0 hidden group-hover:block bg-[var(--surface)] text-[var(--text-secondary)] text-sm p-2 rounded shadow-lg border border-[var(--border)]">
-                        The match percentage based on the job description skills.
+                        The match percentage based on the job description
+                        skills.
                       </div>
                     </div>
                   </div>
@@ -1201,7 +1228,9 @@ const CandidateList = () => {
                           : "text-red-400"
                       }
                     >
-                      {selectedFeedback.feedback.experience_match ? "Yes" : "No"}
+                      {selectedFeedback.feedback.experience_match
+                        ? "Yes"
+                        : "No"}
                     </span>
                   </p>
                   <div className="relative group">
@@ -1220,8 +1249,8 @@ const CandidateList = () => {
                       ></path>
                     </svg>
                     <div className="absolute z-10 left-6 top-0 hidden group-hover:block bg-[var(--surface)] text-[var(--text-secondary)] text-sm p-2 rounded shadow-lg border border-[var(--border)]">
-                      Indicates whether the candidate's experience matches the job
-                      requirements.
+                      Indicates whether the candidate's experience matches the
+                      job requirements.
                     </div>
                   </div>
                 </div>
@@ -1230,7 +1259,7 @@ const CandidateList = () => {
               <div className="p-4 bg-[var(--dark-bg)] rounded-lg border border-[var(--border)] ">
                 <div className="text-[var(--text-secondary)] mb-1 flex items-center">
                   Recommendation
-                  <div className="relative group ml-2" >
+                  <div className="relative group ml-2">
                     <svg
                       className="h-5 w-5 text-[var(--text-secondary)] cursor-pointer"
                       fill="none"

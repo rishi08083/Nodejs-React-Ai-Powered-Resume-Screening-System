@@ -365,6 +365,9 @@ main {
 .logout-confirm-button:hover {
   background-color: var(--accent-hover);
 }
+button {
+  cursor: pointer;
+}
 
 /* Media queries for responsive design */
 @media (min-width: 768px) {
