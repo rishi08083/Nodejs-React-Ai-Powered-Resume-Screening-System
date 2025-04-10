@@ -157,10 +157,12 @@ export default function AdminDashboard() {
   const chartTitle = "text-[var(--text-primary)] font-medium text-lg mb-4";
 
   return (
-    <div className="bg-[var(--bg)] min-h-screen text-[var(--text-primary)]">
-      <main className="container mx-auto px-4 ">
-        <h1 className="text-3xl font-bold mb-6">Recruiter Dashboard (Coming Soon)</h1>
-
+    <div className="bg-[var(--bg)] min-h-screen text-[var(--text-primary)] ">
+      <main className="container mx-auto px-4">
+          <h1 className="text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-2">
+            Recruiter Dashboard (Coming Soon)
+          </h1>
+          <div className="h-1 w-24 bg-[var(--accent)] rounded-full mb-4 mt-2"></div>
         {/* KPI Stats Row */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <StatCard

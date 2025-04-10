@@ -39,9 +39,7 @@ module.exports.addCandidate = async (req, res) => {
       hiring_bull_status,
       status,
       is_deleted: false,
-    });
-    console.log("Received institution_name:", req.body.institution_name);
-  
+    });  
 
     return res.status(201).json({
       status: "success",
@@ -59,6 +57,7 @@ module.exports.addCandidate = async (req, res) => {
 module.exports.listCandidate = async (req, res) => {
   try {
     const { job_id } = req.params;
+    const user = req.user;
     if (!job_id) {
       return res.status(400).json({
         status: "error",
@@ -67,7 +66,7 @@ module.exports.listCandidate = async (req, res) => {
     }
 
     const candidates = await db.Candidates.findAll({
-      where: { job_id: parseInt(job_id), is_deleted: false },
+      where: { job_id: parseInt(job_id), is_deleted: false, user_id: user.id },
       order: [["createdAt", "DESC"]],
     });
     if (candidates.length === 0) {
@@ -131,6 +130,7 @@ module.exports.deleteCandidate = async (req, res) => {
 module.exports.getRecommendedCandidates = async (req, res) => {
   try {
     const { job_id } = req.params;
+    const user = req.user;
     if (!job_id) {
       return res.status(400).json({
         status: "error",
@@ -144,7 +144,8 @@ module.exports.getRecommendedCandidates = async (req, res) => {
         is_deleted: false,
         match_score: {
           [db.Sequelize.Op.gt]: 40 // Greater than 40
-        }
+        },
+        user_id: user.id
       },
       order: [['match_score', 'DESC']], // Order by match score in descending order
     });
