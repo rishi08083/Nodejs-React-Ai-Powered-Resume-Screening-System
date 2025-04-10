@@ -1,7 +1,20 @@
 "use client";
 
+import { Suspense } from "react";
+
+// Client component defined below
+const LoginWrapper = () => (
+  <Suspense fallback={<div>Loading login...</div>}>
+    <Login />
+  </Suspense>
+);
+
+export default function Page() {
+  return <LoginWrapper />;
+}
+
 import { useState, ChangeEvent, FormEvent } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "../../../lib/auth";
@@ -26,10 +39,11 @@ const Login = () => {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      let data = await login({ email, password });
-      router.push("/dashboard");
-    } catch (err) {
-      toast.error(err.message);
+      const redirectPath = searchParams.get("redirect") || "/dashboard";
+      await login({ email, password });
+      router.push(redirectPath);
+    } catch (err: any) {
+      toast.error(err.message || "Login failed");
       setIsOpen(true);
       setTimeout(() => {
         setIsOpen(false);
@@ -45,12 +59,10 @@ const Login = () => {
     <div className="flex min-h-screen bg-[var(--surface)] font-sans relative">
       <ToastContainer theme="dark" />
 
-      {/* Theme Toggle in top right corner */}
       <div className="absolute top-4 right-4 z-10">
         <ThemeToggle />
       </div>
 
-      {/* Left side decorative panel */}
       <div className="hidden lg:flex lg:w-1/2 bg-[var(--dark-surface)] items-center justify-center flex-col pt-4 pl-7">
         <Image src="/freelancer.svg" width={600} height={600} alt="Welcome" />
         <div className="max-w-md text-center">
@@ -61,13 +73,11 @@ const Login = () => {
         </div>
       </div>
 
-      {/* Right side login form */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
         <div className="w-full max-w-md">
           <div className="bg-[var(--surface)] p-8 rounded-xl shadow-lg border border-[var(--border)]">
             <div className="flex justify-center mb-6">
               <div className="w-32 h-12 relative">
-                {/* Logo placeholder */}
                 <div className="absolute inset-0 flex items-center justify-center">
                   <span className="text-2xl font-bold text-[var(--accent)]"></span>
                 </div>
@@ -190,5 +200,3 @@ const Login = () => {
     </div>
   );
 };
-
-export default Login;

@@ -17,6 +17,7 @@ const adminRegister = async (req, res) => {
         password_hash: hashedPassword,
         role: "admin",
         is_active: "accepted",
+        is_verified: true
       });
 
       res.status(201).json({
@@ -60,12 +61,39 @@ const recruiterRegister = async (req, res) => {
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: email,
-      subject: "Email Verification",
-      text: `Here is your OTP: ${token}`,
-      html: `<p>Enter this OTP ${token} to verify your email.</p>`,
+      subject: "Verify your email address",
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
+          <h2 style="text-align: center; color: #333;">Email Verification</h2>
+          <p>Hello <strong>${name}</strong>,</p>
+          <p>Thank you for registering. To complete your sign up, please verify your email address by entering the OTP below:</p>
+          <div style="text-align: center; margin: 30px 0;">
+            <span style="font-size: 32px; font-weight: bold; letter-spacing: 8px; color: #2c3e50;">${token}</span>
+          </div>
+          <p>This OTP is valid for <strong>10 minutes</strong>. Do not share this code with anyone.</p>
+          <p>If you didn't request this, you can safely ignore this email.</p>
+          <br />
+          <p>Best regards,</p>
+          <p><strong>ATS Team</strong></p>
+          <hr style="margin: 40px 0; border-top: 2px solid #d8a31a;" />
+          <div style="background-color: #fff; padding: 20px; color: #000; border-radius: 8px;">
+            <p style="font-size: 14px; margin: 0 0 10px;">
+              <strong>Website:</strong> 
+              <a href="https://rs-fe.rishi.publicvm.com" style="color: #d8a31a; text-decoration: none;">ats-recruitment.com</a>
+            </p>
+            <div style="margin-top: 15px; padding-top: 10px; border-radius: 4px;">
+              <img 
+                src="https://www.theatsteam.com/wp-content/uploads/2025/01/ATS_background.jpg" 
+                alt="ATS Logo" 
+                style="width: 300px; height: auto; display: block;" 
+              />
+            </div>
+          </div>
+          <p style="font-size: 11px; color: #aaa; text-align: center; margin-top: 20px;">This is an automated message. Please do not reply to this email.</p>
+        </div>
+      `
     };
-    await transporter.sendMail(mailOptions);
-
+    
     const user = await db.Users.create({
       name,
       email,
@@ -80,6 +108,8 @@ const recruiterRegister = async (req, res) => {
       message: "Recruiter registered successfully",
       data: { user },
     });
+
+    await transporter.sendMail(mailOptions);
   } catch (error) {
     res.status(500).json({
       status: "error",
@@ -94,7 +124,6 @@ const userLogin = async (req, res) => {
     const { email, password } = req.body;
     const user = await db.Users.findOne({ where: { 
       email,
-      is_verified: true
     }});
 
     if (!user) {
@@ -102,6 +131,14 @@ const userLogin = async (req, res) => {
         status: "error",
         message: "Invalid credentials",
         error: { details: "User not found or incorrect email" },
+      });
+    }
+
+    if(!user.is_verified){
+      return res.status(400).json({
+        status: "error",
+        message: "Email not verified. Register again!",
+        error: { details: "Email not verified" },
       });
     }
 

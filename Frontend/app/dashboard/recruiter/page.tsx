@@ -157,10 +157,12 @@ export default function AdminDashboard() {
   const chartTitle = "text-[var(--text-primary)] font-medium text-lg mb-4";
 
   return (
-    <div className="bg-[var(--bg)] min-h-screen text-[var(--text-primary)]">
-      <main className="container mx-auto px-4 ">
-        <h1 className="text-3xl font-bold mb-6">Recruiter Dashboard (Coming Soon)</h1>
-
+    <div className="bg-[var(--bg)] min-h-screen text-[var(--text-primary)] ">
+      <main className="container mx-auto px-4">
+          <h1 className="text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-2">
+            Recruiter Dashboard (Coming Soon)
+          </h1>
+          <div className="h-1 w-24 bg-[var(--accent)] rounded-full mb-4 mt-2"></div>
         {/* KPI Stats Row */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <StatCard
@@ -195,8 +197,6 @@ export default function AdminDashboard() {
 
         {/* Row 1: Main Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          {/* Candidate Screening Outcome */}
-
           {/* Resumes Parsed Over Time */}
           <div className="bg-[var(--surface)] p-6 rounded-lg shadow-lg border border-[var(--border)]">
             <div className="flex justify-between items-center mb-4">
@@ -317,11 +317,7 @@ export default function AdminDashboard() {
                     }}
                     labelStyle={{ color: "var(--text-primary)" }}
                   />
-                  <Legend
-                    layout="vertical"
-                    verticalAlign="middle"
-                    align="right"
-                  />
+               
                 </PieChart>
               </ResponsiveContainer>
             </div>
@@ -330,51 +326,6 @@ export default function AdminDashboard() {
 
         {/* Row 2: Bar Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          {/* Top Skills Across Candidates */}
-          <div className="bg-[var(--surface)] p-6 rounded-lg shadow-lg border border-[var(--border)]">
-            <h2 className={chartTitle}>Top Skills Across Candidates</h2>
-            <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={topSkillsData}
-                  layout="vertical"
-                  margin={{ left: 60 }}
-                >
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                    stroke="var(--border)"
-                    horizontal={false}
-                  />
-                  <XAxis
-                    type="number"
-                    stroke="var(--text-secondary)"
-                    tick={{ fontSize: 12 }}
-                  />
-                  <YAxis
-                    dataKey="name"
-                    type="category"
-                    stroke="var(--text-secondary)"
-                    tick={{ fontSize: 12 }}
-                    width={80}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "var(--surface)",
-                      borderColor: "var(--border)",
-                    }}
-                    labelStyle={{ color: "var(--text-primary)" }}
-                  />
-                  <Bar
-                    dataKey="count"
-                    fill="var(--accent)"
-                    barSize={20}
-                    radius={[0, 4, 4, 0]}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-
           {/* Screening Score Distribution */}
           <div className="bg-[var(--surface)] p-6 rounded-lg shadow-lg border border-[var(--border)]">
             <h2 className={chartTitle}>Screening Score Distribution</h2>
@@ -416,12 +367,8 @@ export default function AdminDashboard() {
               </ResponsiveContainer>
             </div>
           </div>
-        </div>
-
-        {/* Row 3: Pie Chart and Stats Table */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Job-wise Candidate Distribution */}
-          <div className="bg-[var(--surface)] p-6 rounded-lg shadow-lg border border-[var(--border)]">
+           {/* Job-wise Candidate Distribution */}
+           <div className="bg-[var(--surface)] p-6 rounded-lg shadow-lg border border-[var(--border)]">
             <h2 className={chartTitle}>Job-wise Candidate Distribution</h2>
             <div className="h-72">
               <ResponsiveContainer width="100%" height="100%">
@@ -433,7 +380,7 @@ export default function AdminDashboard() {
                     outerRadius={80}
                     dataKey="value"
                     label={({ name, percent }) =>
-                      `${(percent * 100).toFixed(0)}%`
+                      `${(percent * 100).toFixed(0)}% ${name}`
                     }
                   >
                     {jobDistributionData.map((entry, index) => (
@@ -451,16 +398,14 @@ export default function AdminDashboard() {
                       props.payload.name,
                     ]}
                   />
-                  <Legend
-                    layout="vertical"
-                    verticalAlign="bottom"
-                    align="center"
-                  />
+                 
                 </PieChart>
               </ResponsiveContainer>
             </div>
           </div>
         </div>
+
+        
       </main>
     </div>
   );

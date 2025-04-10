@@ -1,7 +1,15 @@
 "use client";
-import React, { useState, useEffect, useMemo, useRef, ChangeEvent } from "react";
+import React, {
+  useState,
+  useEffect,
+  useMemo,
+  useRef,
+  ChangeEvent,
+} from "react";
 import { motion } from "framer-motion";
 import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 type Job = {
@@ -105,12 +113,10 @@ const CandidateList = () => {
         );
         if (response.ok) {
           const data = await response.json();
-          console.log(data, "response");
           if (data.data) {
             setOriginalCandidates(data.data.candidates);
             setCandidates(() => {
               if (selectedRecommendation === "") return data.data.candidates;
-
               return data.data.candidates.filter(
                 (candidate) =>
                   candidate.is_recommended ===
@@ -129,8 +135,15 @@ const CandidateList = () => {
         console.log(error, "error");
       }
     };
+
     getCandidates();
-  }, [selectedJob]);
+
+    const intervalId = setInterval(() => {
+      getCandidates();
+    }, 6000);
+
+    return () => clearInterval(intervalId);
+  }, [selectedJob, selectedRecommendation]);
 
   const getFileExtension = (filename: string): string => {
     return filename.split(".").pop()?.toLowerCase() || "";
@@ -150,9 +163,19 @@ const CandidateList = () => {
     });
 
     if (invalidFiles.length > 0) {
-      setErrorMessage(
-        `Invalid file types: ${invalidFiles.join(", ")}. Please upload PDF, DOCX, or JPG files.`
-      );
+      const errorMsg = `Invalid file types: ${invalidFiles.join(
+        ", "
+      )}. Please upload PDF, DOCX, or JPG ,JPEG files.`;
+      setErrorMessage(errorMsg);
+      toast.error(errorMsg, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
     } else {
       setErrorMessage("");
     }
@@ -161,15 +184,30 @@ const CandidateList = () => {
   };
 
   const handleFileSelect = (event: ChangeEvent<HTMLInputElement>) => {
-    const selectedFiles = event.target.files;
-    if (selectedFiles) {
-      handleFile(selectedFiles);
-    }
-  };
+      event.preventDefault();
+      if (event.target.files === null) return;
+      const selectedFiles = event.target.files;
+      if (selectedFiles) {
+        handleFile(selectedFiles);
+      }
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ""; // Clear the input after selection
+      }
 
-  const handleRemoveFile = (index: number) => {
-    setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
-  };
+    };
+  
+    const handleRemoveFile = (index: number) => {
+      setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
+      toast.success("File removed successfully", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    };
 
   const handleDragEnter = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
@@ -241,7 +279,19 @@ const CandidateList = () => {
         setTimeout(() => {
           setFiles([]);
           setErrorMessage("");
-          setSuccessMessage("Resumes uploaded successfully.");
+          
+          toast.success("Resumes uploaded successfully", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
+
+          // close the modal after successful upload
+          setIsUploadModalOpen(false);
 
           const candidates = data?.data?.candidates;
           if (candidates && Array.isArray(candidates)) {
@@ -463,7 +513,7 @@ const CandidateList = () => {
         className="mb-8"
       >
         <h1 className="text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-2">
-          Screened Candidate List
+          Screened Candidates
         </h1>
         <div className="h-1 w-24 bg-[var(--accent)] rounded-full mb-4"></div>
         <p className="text-[var(--text-secondary)] mt-2">
@@ -478,16 +528,16 @@ const CandidateList = () => {
         transition={{ duration: 0.5, delay: 0.2 }}
         className="flex flex-col md:flex-row items-center justify-between mb-8 space-y-4 md:space-y-0 md:space-x-4"
       >
-        <div className="relative w-full md:w-1/3 group">
+        <div className="relative w-full md:w-1/3 group h-12">
           <input
             type="text"
             placeholder="Search by ID or Name"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full p-3 pl-10 border rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)] bg-[var(--surface)] border-[var(--border)] text-[var(--text-primary)] transition-all duration-300"
+            className="w-full h-full p-3 pl-10 border rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)] bg-[var(--surface)] border-[var(--border)] text-[var(--text-primary)] transition-all duration-300"
           />
           <svg
-            className="absolute left-3 top-3.5 h-5 w-5 text-[var(--text-secondary)] group-hover:text-[var(--accent)] transition-colors duration-300"
+            className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[var(--text-secondary)] group-hover:text-[var(--accent)] transition-colors duration-300"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -501,25 +551,29 @@ const CandidateList = () => {
             ></path>
           </svg>
         </div>
-        <div className="relative w-full md:w-1/3">
-          <select
-            className="w-full p-3 pl-4 border rounded-lg shadow-md appearance-none focus:outline-none focus:ring-2 focus:ring-[var(--accent)] bg-[var(--surface)] border-[var(--border)] text-[var(--text-primary)] transition-all duration-300"
+        <div className="relative w-full md:w-1/3 h-12">
+            <select
+            className="w-full h-full p-3 pl-4 border rounded-lg shadow-md appearance-none focus:outline-none focus:ring-2 focus:ring-[var(--accent)] bg-[var(--surface)] border-[var(--border)] text-[var(--text-primary)] transition-all duration-300"
             value={selectedJob}
             onChange={(e) => {
               setSelectedJob(e.target.value);
               setCandidates(originalCandidates); // Reset candidates when job changes
             }}
-          >
+            >
             <option value="" disabled>
               Select a Job
             </option>
-            {jobs.map((job) => (
+            {jobs.map((job, index) => (
               <option key={job.id} value={job.id}>
-                {job.title}
+              {job.title}
               </option>
             ))}
-          </select>
-          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[var(--text-secondary)] bg-[var(--accent)] rounded-r-lg ">
+            </select>
+            {jobs.length > 0 && selectedJob === "" && (() => {
+              setSelectedJob(jobs[0].id); 
+              return null; 
+            })()}
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[var(--text-secondary)] bg-[var(--accent)] rounded-r-lg">
             <svg
               className="h-5 w-5"
               fill="none"
@@ -536,9 +590,9 @@ const CandidateList = () => {
             </svg>
           </div>
         </div>
-        <div className="relative w-full md:w-1/6">
+        <div className="relative w-full md:w-1/6 h-12">
           <select
-            className={`w-full p-2 pl-4 border rounded-lg shadow-md appearance-none focus:outline-none focus:ring-2 ${
+            className={`w-full h-full p-2 pl-4 border rounded-lg shadow-md appearance-none focus:outline-none focus:ring-2 ${
               selectedJob
                 ? "focus:ring-[var(--accent)] bg-[var(--surface)] border-[var(--border)] text-[var(--text-primary)]"
                 : "bg-gray-200 border-gray-300 text-gray-400 cursor-not-allowed"
@@ -584,7 +638,7 @@ const CandidateList = () => {
         </div>
         <button
           type="button"
-          className="px-4 py-2 bg-[var(--accent)] text-[var(--dark-bg)] rounded-lg flex items-center hover:bg-[var(--accent-hover)] transition-all duration-300 disabled:bg-[var(--border)] disabled:cursor-not-allowed disabled:text-[var(--text-secondary)]"
+          className="h-12 px-4 py-2 bg-[var(--accent)] text-[var(--dark-bg)] rounded-lg flex items-center hover:bg-[var(--accent-hover)] transition-all duration-300 disabled:bg-[var(--border)] disabled:cursor-not-allowed disabled:text-[var(--text-secondary)]"
           onClick={() => setIsUploadModalOpen(true)}
           disabled={!selectedJob}
         >
@@ -659,7 +713,9 @@ const CandidateList = () => {
             >
               <div className="flex flex-col items-center justify-center">
                 <span className="text-4xl mb-3">📁</span>
-                <p className="text-[var(--text-secondary)] mb-2">Drag & drop resumes here</p>
+                <p className="text-[var(--text-secondary)] mb-2">
+                  Drag & drop resumes here
+                </p>
                 <p className="text-[var(--text-muted)] mb-3">or</p>
                 <input
                   type="file"
@@ -673,7 +729,7 @@ const CandidateList = () => {
                 <label htmlFor="file-input" className="cursor-pointer">
                   <button
                     type="button"
-                    className="px-6 py-2 bg-[var(--accent)] text-[var(--dark-bg)] rounded-lg hover:bg-[var(--accent-hover)] transform hover:-translate-y-1 transition-all duration-300 flex items-center"
+                    className="px-6 py-2 bg-[var(--accent)] text-[var(--dark-bg)] rounded-lg hover:bg-[var(--accent-hover)] transform  transition-all duration-300 flex items-center"
                     onClick={() => fileInputRef.current?.click()}
                   >
                     <span className="mr-2">📂</span>
@@ -682,7 +738,7 @@ const CandidateList = () => {
                 </label>
               </div>
               <p className="mt-4 text-xs text-[var(--text-muted)]">
-                Supported formats: PDF, DOCX, JPG
+                Supported formats: PDF, DOCX, Images
               </p>
             </div>
 
@@ -720,7 +776,9 @@ const CandidateList = () => {
                           {getFileIcon(file.name)}
                         </span>
                         <div>
-                          <p className="text-[var(--text-primary)] font-medium">{file.name}</p>
+                          <p className="text-[var(--text-primary)] font-medium">
+                            {file.name}
+                          </p>
                           <p className="text-xs text-[var(--text-secondary)]">
                             {(file.size / 1024).toFixed(2)} KB
                           </p>
@@ -743,9 +801,25 @@ const CandidateList = () => {
                 >
                   {isLoading ? (
                     <>
-                      <svg className="animate-spin mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      <svg
+                        className="animate-spin mr-2 h-5 w-5"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
                       </svg>
                       Uploading... {uploadProgress}%
                     </>
@@ -783,17 +857,19 @@ const CandidateList = () => {
                   <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
                     Contact
                   </th>
+
                   <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
-                    Resume
+                    Compatibility(%)
                   </th>
+
                   <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
-                    Compatibility (%)
+                    Recommended
                   </th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
                     Feedback
                   </th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
-                    Recommended
+                    Resume
                   </th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
                     Actions
@@ -818,44 +894,20 @@ const CandidateList = () => {
                     <td className="px-6 py-4 text-sm text-[var(--text-secondary)]">
                       {candidate.phone_number}
                     </td>
-                    <td className="px-6 py-4 text-sm">
-                      <button
-                        onClick={(e) => {
-                          get_resume(candidate.id, e);
-                        }}
-                        className="px-3 py-2 bg-[var(--border)] text-[var(--text-primary)] font-medium rounded-lg hover:bg-[var(--blue-highlight)] transition-colors duration-200 shadow-md hover:shadow-lg flex items-center space-x-1"
-                        tabIndex={0}
-                        style={{ transform: "none" }}
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="lucide lucide-eye h-4 w-4"
-                        >
-                          <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"></path>
-                          <circle cx="12" cy="12" r="3"></circle>
-                        </svg>
-                        <span>View</span>
-                      </button>
-                    </td>
+
                     {/* Compatibility Score */}
                     <td className="px-6 py-4 text-sm">
                       {candidate.match_score !== null &&
                       candidate.match_score !== undefined ? (
-                        <motion.button
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          className="px-4 py-2 bg-[var(--accent)] text-[var(--dark-bg)] font-medium rounded-lg shadow hover:bg-[var(--accent-hover)] transition-colors duration-300"
+                        <span
+                          className={`inline-block px-3 py-1 text-sm font-semibold rounded ${
+                            candidate.is_recommended === "YES"
+                              ? "bg-green-100 text-green-800"
+                              : "bg-red-100 text-red-800"
+                          }`}
                         >
                           {candidate.match_score} %
-                        </motion.button>
+                        </span>
                       ) : (
                         <motion.div
                           className="px-4 py-2 bg-[var(--surface)] text-[var(--text-secondary)] font-medium rounded-lg shadow flex items-center justify-center"
@@ -886,28 +938,6 @@ const CandidateList = () => {
                         </motion.div>
                       )}
                     </td>
-                    {/* Feedback Button */}
-                    <td className="px-6 py-4 text-sm">
-                      {candidate.match_score !== null &&
-                      candidate.match_score !== undefined &&
-                      candidate.is_screened ? (
-                        <motion.button
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          onClick={() => handleShowFeedback(candidate)}
-                          className="px-4 py-2 border border-[var(--accent)] text-[var(--accent)] font-medium rounded-lg shadow hover:bg-[var(--accent)] hover:text-[var(--dark-bg)] transition-all duration-300"
-                        >
-                          Show Feedback
-                        </motion.button>
-                      ) : (
-                        <span className="text-[var(--text-secondary)]">
-                          {candidate.status === "parsed"
-                            ? "Pending Feedback"
-                            : "Not Available"}
-                        </span>
-                      )}
-                    </td>
-
                     {/* Recommended */}
                     <td className="px-6 py-4 text-sm">
                       {candidate.is_recommended === "YES" ? (
@@ -921,6 +951,63 @@ const CandidateList = () => {
                       )}
                     </td>
 
+                    {/* Feedback Button */}
+                    <td className="px-6 py-4 text-sm">
+                      {candidate.match_score !== null &&
+                      candidate.match_score !== undefined &&
+                      candidate.is_screened ? (
+                        <div className="relative group">
+                          <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => handleShowFeedback(candidate)}
+                            className="px-4 py-2 border border-[var(--accent)] text-[var(--accent)] font-medium rounded-lg shadow hover:bg-[var(--accent)] hover:text-[var(--dark-bg)] transition-all duration-300"
+                          >
+                            Feedback
+                          </motion.button>
+                          <div className="absolute z-10 hidden group-hover:block bg-[var(--surface)] text-[var(--text-secondary)] text-sm p-2 rounded shadow-lg border border-[var(--border)] top-full mt-1">
+                            View Feedback
+                          </div>
+                        </div>
+                      ) : (
+                        <span className="text-[var(--text-secondary)]">
+                          {candidate.status === "parsed"
+                            ? "Pending Feedback"
+                            : "Not Available"}
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 text-sm">
+                      <div className="relative group">
+                        <button
+                          onClick={(e) => {
+                            get_resume(candidate.id, e);
+                          }}
+                          className="px-3 py-2 bg-[var(--border)] text-[var(--text-primary)] font-medium rounded-lg hover:bg-[var(--blue-highlight)] transition-colors duration-200 shadow-md hover:shadow-lg flex items-center space-x-1"
+                          tabIndex={0}
+                          style={{ transform: "none" }}
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="lucide lucide-eye h-4 w-4"
+                          >
+                            <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                          </svg>
+                        </button>
+                        <div className="absolute z-10 hidden group-hover:block bg-[var(--surface)] text-[var(--text-secondary)] text-sm p-2 rounded shadow-lg border border-[var(--border)] top-full mt-1">
+                          View Resume
+                        </div>
+                      </div>
+                    </td>
                     {/* Actions Dropdown */}
                     <td className="px-6 py-4 text-sm relative">
                       <div
@@ -1156,7 +1243,8 @@ const CandidateList = () => {
                         ></path>
                       </svg>
                       <div className="absolute z-10 left-6 top-0 hidden group-hover:block bg-[var(--surface)] text-[var(--text-secondary)] text-sm p-2 rounded shadow-lg border border-[var(--border)]">
-                        The match percentage based on the job description skills.
+                        The match percentage based on the job description
+                        skills.
                       </div>
                     </div>
                   </div>
@@ -1201,7 +1289,9 @@ const CandidateList = () => {
                           : "text-red-400"
                       }
                     >
-                      {selectedFeedback.feedback.experience_match ? "Yes" : "No"}
+                      {selectedFeedback.feedback.experience_match
+                        ? "Yes"
+                        : "No"}
                     </span>
                   </p>
                   <div className="relative group">
@@ -1220,8 +1310,8 @@ const CandidateList = () => {
                       ></path>
                     </svg>
                     <div className="absolute z-10 left-6 top-0 hidden group-hover:block bg-[var(--surface)] text-[var(--text-secondary)] text-sm p-2 rounded shadow-lg border border-[var(--border)]">
-                      Indicates whether the candidate's experience matches the job
-                      requirements.
+                      Indicates whether the candidate's experience matches the
+                      job requirements.
                     </div>
                   </div>
                 </div>
@@ -1230,7 +1320,7 @@ const CandidateList = () => {
               <div className="p-4 bg-[var(--dark-bg)] rounded-lg border border-[var(--border)] ">
                 <div className="text-[var(--text-secondary)] mb-1 flex items-center">
                   Recommendation
-                  <div className="relative group ml-2" >
+                  <div className="relative group ml-2">
                     <svg
                       className="h-5 w-5 text-[var(--text-secondary)] cursor-pointer"
                       fill="none"
@@ -1275,4 +1365,13 @@ const CandidateList = () => {
   );
 };
 
-export default React.memo(CandidateList);
+const MemoizedCandidateList = React.memo(() => (
+  <>
+    <ToastContainer />
+    <CandidateList />
+  </>
+));
+
+MemoizedCandidateList.displayName = "MemoizedCandidateList";
+
+export default MemoizedCandidateList;
