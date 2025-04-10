@@ -2,7 +2,10 @@ const cron = require("node-cron");
 const db = require("../models");
 const axios = require("axios");
 const { generateToken } = require("../utils/tokenGeneration");
-const { getCandidateDetails, saveScreeningResult } = require("../utils/screenUtils");
+const {
+  getCandidateDetails,
+  saveScreeningResult,
+} = require("../utils/screenUtils");
 
 // Helper: Sleep
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -15,7 +18,6 @@ async function screenCandidate(candidate) {
   try {
     const candidate_id = candidate.id;
     // console.log(`📝 Starting screening for candidate ${candidate_id}`);
-    
     const candidateDetails = await getCandidateDetails(candidate_id);
     const token = generateToken();
 
@@ -33,7 +35,7 @@ async function screenCandidate(candidate) {
         },
       }
     );
-
+    
     const payload = {
       candidate_id,
       job_id: candidateDetails.jd.job_id,
@@ -45,17 +47,16 @@ async function screenCandidate(candidate) {
         rcd_mismatch: aiResponse.data.feedback.rcd_mismatch || [],
       },
       is_deleted: false,
-      is_recommended: aiResponse.data.feedback.recommendation.toUpperCase() === "YES" ? "YES" : "NO",
-      feedback_json: {
-        experience_match: aiResponse.data.feedback.experience_match,
-        feedback: aiResponse.data.feedback.feedback,
-        jd_match: aiResponse.data.feedback.jd_match,
-        rcd_match: aiResponse.data.feedback.rcd_match,
-        experience_info: aiResponse.data.feedback.experience_info,
-      },
+      is_recommended:
+        aiResponse.data.feedback.recommendation.toUpperCase() === "YES"
+          ? "YES"
+          : "NO",
+      feedback_json: aiResponse.data.feedback
     };
 
-    const existing = await db.ScreeningResults.findOne({ where: { candidate_id } });
+    const existing = await db.ScreeningResults.findOne({
+      where: { candidate_id },
+    });
 
     if (existing) {
       await existing.update(payload);
@@ -63,7 +64,10 @@ async function screenCandidate(candidate) {
       await saveScreeningResult(payload);
     }
 
-    await db.Candidates.update({ is_screened: true ,is_recommended: payload.is_recommended }, { where: { id: candidate_id } });
+    await db.Candidates.update(
+      { is_screened: true, is_recommended: payload.is_recommended },
+      { where: { id: candidate_id } }
+    );
 
     // console.log(`✅ Candidate ${candidate_id} screened successfully`);
     return true;
@@ -81,21 +85,21 @@ async function processQueue() {
 
   try {
     isScreeningInProgress = true;
-    
+
     // Get the next unscreened candidate with a lock to prevent duplications
     const candidate = await db.sequelize.transaction(async (t) => {
       const candidate = await db.Candidates.findOne({
         where: { is_screened: false, is_deleted: false },
-        order: [['createdAt', 'ASC']], // Process oldest first
+        order: [["createdAt", "ASC"]], // Process oldest first
         lock: true,
-        transaction: t
+        transaction: t,
       });
-      
+
       if (candidate) {
         // Mark as processing to prevent duplication
-        await candidate.update({ status: 'processing' }, { transaction: t });
+        await candidate.update({ status: "processing" }, { transaction: t });
       }
-      
+
       return candidate;
     });
 
@@ -107,10 +111,9 @@ async function processQueue() {
 
     // Process the candidate
     await screenCandidate(candidate);
-    
+
     // Wait 6 seconds before processing the next candidate
     await sleep(6000);
-    
   } catch (error) {
     console.error("❌ Error in processing queue:", error);
   } finally {
@@ -129,5 +132,5 @@ cron.schedule("*/6 * * * * *", async () => {
 // Export for testing or manual triggering
 module.exports = {
   processQueue,
-  screenCandidate
+  screenCandidate,
 };

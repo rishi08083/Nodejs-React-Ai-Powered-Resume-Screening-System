@@ -91,27 +91,6 @@ const UploadForm = () => {
     };
   }, []);
 
-  const handleDragEnter = (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    setIsDragging(false);
-  };
-
-  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    setIsDragging(false);
-    const droppedFiles = event.dataTransfer.files;
-    handleFile(droppedFiles);
-  };
-
-  const getFileExtension = (filename: string): string => {
-    return filename.split(".").pop()?.toLowerCase() || "";
-  };
-
   const handleFile = (selectedFiles: FileList) => {
     const validFiles: File[] = [];
     const invalidFiles: string[] = [];
@@ -138,6 +117,29 @@ const UploadForm = () => {
 
     setFiles((prevFiles) => [...prevFiles, ...validFiles]); // Append new files to the existing list
   };
+
+  const handleDragEnter = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    setIsDragging(false);
+    const droppedFiles = event.dataTransfer.files;
+    handleFile(droppedFiles);
+  };
+
+  const getFileExtension = (filename: string): string => {
+    return filename.split(".").pop()?.toLowerCase() || "";
+  };
+
+ 
 
   const handleFileSelect = (event: ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = event.target.files;
