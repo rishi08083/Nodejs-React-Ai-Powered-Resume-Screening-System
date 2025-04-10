@@ -10,6 +10,7 @@ exports.adminAnalytics = async (req, res) => {
       candidateStatusCounts,
       dayWiseParseCount,
       candidateCountByJob,
+      candidateCountBySkill,
     ] = await Promise.all([
       db.UnparsedResume.count({
         where: {
@@ -81,6 +82,22 @@ exports.adminAnalytics = async (req, res) => {
         group: ["Candidates.job_id", "jobs.title"],
         raw: true,
       }),
+      db.Skills.findAll({
+        attributes: [
+          [db.sequelize.literal('unnest("skill_names")'), "skill_name"],
+          [
+            db.sequelize.fn(
+              "COUNT",
+              db.sequelize.fn("DISTINCT", db.sequelize.col("candidate_id"))
+            ),
+            "candidate_count",
+          ],
+        ],
+
+        raw: true,
+        group: ["skill_name"],
+        order: [[db.sequelize.literal("candidate_count"), "DESC"]],
+      }),
     ]);
 
     const statusCounts = candidateStatusCounts.reduce(
@@ -90,7 +107,6 @@ exports.adminAnalytics = async (req, res) => {
       },
       { NO: 0, YES: 0, NOT_SET: 0 }
     );
-
     res.status(200).json({
       status: "success",
       data: {
@@ -109,6 +125,9 @@ exports.adminAnalytics = async (req, res) => {
           job_title: job.job_title,
           candidate_count: job.candidate_count,
         })),
+        candidate_count_by_skill: candidateCountBySkill.filter((skillMap) => {
+          return skillMap.skill_name.length < 10;
+        }),
       },
     });
   } catch (error) {
