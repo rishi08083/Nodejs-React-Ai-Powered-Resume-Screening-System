@@ -27,6 +27,9 @@ const {
   validateLogin,
 } = require("../middlewares/validateMiddleware");
 
+const { googleOAuthRegister } = require("../controllers/authControllers/googleAuthController");
+const { googleOAuthLogin } = require("../controllers/authControllers/googleOAuthLogin");
+
 router.post("/register", validateRegister, recruiterRegister);
 router.post("/login", validateLogin, userLogin);
 router.post("/adminregister", adminRegister);
@@ -39,5 +42,8 @@ router.post("/forget-password", forgetPassword);
 router.post("/reset-password", resetPassword);
 
 router.post("/verify-token", verifyToken);
+
+router.post("/google-oauth-register", googleOAuthRegister);
+router.post("/google-oauth-login",  googleOAuthLogin);
 
 module.exports = router;
