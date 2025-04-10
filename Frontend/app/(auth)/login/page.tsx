@@ -9,7 +9,7 @@ import { toast } from "react-toastify";
 import GoogleSignIn from "../../../components/auth/GoogleAuth";
 import ThemeToggle from "../../../components/theme/ThemeToggle";
 
-const Login = () => {
+export default function LoginClient() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isFocused, setIsFocused] = useState({
@@ -34,7 +34,6 @@ const Login = () => {
 
   return (
     <div className="flex min-h-screen bg-[var(--surface)] font-sans relative">
-      {/* Place ToastContainer in root layout for global usage */}
       <div className="absolute top-4 right-4 z-10">
         <ThemeToggle />
       </div>
@@ -56,7 +55,7 @@ const Login = () => {
             </h1>
 
             <form onSubmit={handleSubmit}>
-              {/* Email Field */}
+              {/* Email */}
               <div className="mb-6 relative">
                 <label
                   htmlFor="email"
@@ -91,7 +90,7 @@ const Login = () => {
                 />
               </div>
 
-              {/* Password Field */}
+              {/* Password */}
               <div className="mb-6 relative">
                 <label
                   htmlFor="password"
@@ -133,7 +132,6 @@ const Login = () => {
                 Sign In
               </button>
 
-              {/* Google Sign-In */}
               <div className="mb-6">
                 <GoogleSignIn
                   mode="login"
@@ -141,7 +139,9 @@ const Login = () => {
                     await checkAuth();
                     router.push("/dashboard");
                   }}
-                  onError={(err) => toast.error(err || "Google login failed")}
+                  onError={(err) =>
+                    toast.error(err || "Google login failed")
+                  }
                 />
               </div>
             </form>
@@ -172,6 +172,4 @@ const Login = () => {
       </div>
     </div>
   );
-};
-
-export default Login;
+}
