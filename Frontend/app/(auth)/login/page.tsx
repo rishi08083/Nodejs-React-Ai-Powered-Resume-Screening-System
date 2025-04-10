@@ -1,39 +1,24 @@
 "use client";
 
-import { Suspense } from "react";
-
-// Client component defined below
-const LoginWrapper = () => (
-  <Suspense fallback={<div>Loading login...</div>}>
-    <Login />
-  </Suspense>
-);
-
-export default function Page() {
-  return <LoginWrapper />;
-}
-
 import { useState, ChangeEvent, FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "../../../lib/auth";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import GoogleSignIn from "../../../components/auth/GoogleAuth";
 import ThemeToggle from "../../../components/theme/ThemeToggle";
 
 const Login = () => {
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [error, setError] = useState<string>("");
-  const [isOpen, setIsOpen] = useState(false);
-
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isFocused, setIsFocused] = useState({
     email: false,
     password: false,
   });
 
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { login, checkAuth } = useAuth();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -44,21 +29,12 @@ const Login = () => {
       router.push(redirectPath);
     } catch (err: any) {
       toast.error(err.message || "Login failed");
-      setIsOpen(true);
-      setTimeout(() => {
-        setIsOpen(false);
-      }, 5000);
     }
-  };
-
-  const onClose = () => {
-    setIsOpen(false);
   };
 
   return (
     <div className="flex min-h-screen bg-[var(--surface)] font-sans relative">
-      <ToastContainer theme="dark" />
-
+      {/* Place ToastContainer in root layout for global usage */}
       <div className="absolute top-4 right-4 z-10">
         <ThemeToggle />
       </div>
@@ -69,26 +45,18 @@ const Login = () => {
           <p className="text-[var(--dark-text-secondary)] text-lg font-bold font-stretch-ultra-expanded">
             Sign in to access your dashboard and manage your recruitment tasks.
           </p>
-          <div className="mt-12"></div>
         </div>
       </div>
 
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
         <div className="w-full max-w-md">
           <div className="bg-[var(--surface)] p-8 rounded-xl shadow-lg border border-[var(--border)]">
-            <div className="flex justify-center mb-6">
-              <div className="w-32 h-12 relative">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-2xl font-bold text-[var(--accent)]"></span>
-                </div>
-              </div>
-            </div>
-
             <h1 className="text-3xl font-bold text-center text-[var(--text-primary)] mb-8">
               Sign In
             </h1>
 
             <form onSubmit={handleSubmit}>
+              {/* Email Field */}
               <div className="mb-6 relative">
                 <label
                   htmlFor="email"
@@ -123,6 +91,7 @@ const Login = () => {
                 />
               </div>
 
+              {/* Password Field */}
               <div className="mb-6 relative">
                 <label
                   htmlFor="password"
@@ -159,18 +128,22 @@ const Login = () => {
 
               <button
                 type="submit"
-                className="w-full bg-[var(--accent)] text-[var(--dark-bg)] font-medium py-3 rounded-lg hover:bg-[var(--accent-hover)] transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-lg mb-6 cursor-pointer"
+                className="w-full bg-[var(--accent)] text-[var(--dark-bg)] font-medium py-3 rounded-lg hover:bg-[var(--accent-hover)] transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-lg mb-6"
               >
                 Sign In
               </button>
 
-              <GoogleSignIn
-                mode="login"
-                onSuccess={async (data) => {
-                  await checkAuth();
-                  router.push("/dashboard");
-                }}
-              />
+              {/* Google Sign-In */}
+              <div className="mb-6">
+                <GoogleSignIn
+                  mode="login"
+                  onSuccess={async () => {
+                    await checkAuth();
+                    router.push("/dashboard");
+                  }}
+                  onError={(err) => toast.error(err || "Google login failed")}
+                />
+              </div>
             </form>
 
             <div className="mt-6 flex flex-col items-center space-y-4">
@@ -184,7 +157,7 @@ const Login = () => {
               <div className="w-full border-t border-[var(--border)] my-2"></div>
 
               <p className="text-[var(--text-secondary)]">
-                Don't have an account?
+                Don&apos;t have an account?
               </p>
 
               <Link
@@ -200,3 +173,5 @@ const Login = () => {
     </div>
   );
 };
+
+export default Login;
