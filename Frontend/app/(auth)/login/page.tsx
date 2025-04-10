@@ -155,6 +155,7 @@ const Login = () => {
               </button>
 
               <GoogleSignIn
+                mode="login"
                 onSuccess={async (data) => {
                   await checkAuth();
                   router.push("/dashboard");

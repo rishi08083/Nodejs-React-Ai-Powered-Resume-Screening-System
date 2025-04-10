@@ -14,19 +14,18 @@ interface GoogleDecodedToken {
 interface Props {
   onSuccess?: (data: any) => void;
   onError?: (error: string) => void;
+  mode: "login" | "register"; // distinguish between login and register use
 }
 
-export default function GoogleSignIn({ onSuccess, onError }: Props) {
+export default function GoogleSignIn({ onSuccess, onError, mode }: Props) {
   const router = useRouter();
 
   const handleGoogleSuccess = async (credentialResponse: any) => {
     try {
-      const decoded = jwtDecode<GoogleDecodedToken>(
-        credentialResponse.credential
-      );
+      const decoded = jwtDecode<GoogleDecodedToken>(credentialResponse.credential);
       console.log("✅ Decoded Google User:", decoded);
 
-      // Step 1: Try registering the user
+      // Try registration first
       const registerResponse = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/auth/google-oauth-register`,
         {
@@ -43,11 +42,14 @@ export default function GoogleSignIn({ onSuccess, onError }: Props) {
 
       const registerData = await registerResponse.json();
 
-      // Step 2: If already registered, try login
-      if (
-        registerResponse.ok &&
-        registerData.message === "User already registered"
-      ) {
+      if (registerResponse.ok && registerData.message === "User already registered") {
+        if (mode === "register") {
+          toast.error("Email already exists. Please log in.");
+          setTimeout(() => router.push("/login"), 2000);
+          return;
+        }
+
+        // Login attempt
         const loginResponse = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/api/auth/google-oauth-login`,
           {
@@ -60,17 +62,10 @@ export default function GoogleSignIn({ onSuccess, onError }: Props) {
         );
 
         const loginData = await loginResponse.json();
-        console.log(loginData);
         if (loginResponse.ok) {
           toast.success("Logged in successfully.");
           localStorage.setItem("token", loginData.data.token);
-
-          // Redirect based on role
-          const tokenPayload = jwtDecode<{ role: string }>(
-            loginData.data.token
-          );
-          console.log(loginData.data.token);
-
+          router.push("/dashboard");
           onSuccess?.(loginData);
         } else {
           toast.error(loginData.message || "Login failed.");
@@ -80,9 +75,7 @@ export default function GoogleSignIn({ onSuccess, onError }: Props) {
         toast.success("Registered successfully. Awaiting admin approval.");
         onSuccess?.(registerData);
       } else {
-        toast.error(
-          registerData.message || "Google OAuth registration failed."
-        );
+        toast.error(registerData.message || "Google OAuth registration failed.");
         onError?.(registerData.message);
       }
     } catch (error: any) {
