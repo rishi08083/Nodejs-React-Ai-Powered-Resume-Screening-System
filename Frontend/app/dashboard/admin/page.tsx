@@ -29,9 +29,9 @@ import {
 
 const colorPalette = {
   primary: ["#ffb300", "#ffc233", "#ffd166", "#ffdf99", "#ffedcc"],
-  success: "#4ade80",
-  warning: "#ffb300",
-  danger: "#f87171",
+  success: "#ffb300",
+  warning: "#ffd166",
+  danger: "#ffc233",
   info: "#60a5fa",
   neutral: "#8b949e",
   accent1: "#0ea5e9",
@@ -428,7 +428,7 @@ export default function AdminDashboard() {
                       borderRadius: "0.5rem",
                       boxShadow: "0 4px 6px var(--shadow)",
                     }}
-                    labelStyle={{ color: "var(--text-primary)" }}
+                    labelStyle={{ color: "white" }}
                     formatter={(value, name, props) => [
                       `${value} candidates`,
                       props.payload.name,
