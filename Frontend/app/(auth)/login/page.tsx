@@ -160,7 +160,6 @@ const Login = () => {
                   await checkAuth();
                   router.push("/dashboard");
                 }}
-                onError={(err) => toast.error(err || "Google login failed")}
               />
             </form>
 

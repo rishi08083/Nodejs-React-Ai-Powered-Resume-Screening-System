@@ -306,8 +306,12 @@ export default function RecruiterRegister() {
                 mode="register"
                 onSuccess={() => {
                   toast.success(
-                    "Registered successfully. Awaiting admin approval."
+                    "Recruiter request sent successfully. Awaiting admin approval."
                   );
+                  localStorage.setItem("recruiterEmail", formData.email);
+                  setTimeout(() => {
+                    router.push("/dashboard");
+                  }, 1000);
                 }}
                 onError={(err) => toast.error(err || "Google OAuth failed")}
               />
