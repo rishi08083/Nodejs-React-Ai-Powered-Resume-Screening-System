@@ -43,12 +43,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           Authorization: "Bearer " + localStorage.getItem("token"),
         },
       });
-    
+
       if (response.ok) {
         const data = await response.json();
         // console.log(data.user);
         // console.log(data.data.user);
-        console.log(data.data.user);
         setUser(data.data.user);
         setLoading(false);
       } else {
