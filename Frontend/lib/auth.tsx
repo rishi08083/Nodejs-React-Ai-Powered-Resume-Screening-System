@@ -7,99 +7,88 @@ import {
   useContext,
 } from "react";
 
-// // api response user: {
-//         id: user.id,
-//         name: user.name,
-//         email: user.email,
-//         role: user.role,
-//       }
 interface User {
   id: number;
   name: string;
   email: string;
   role: string;
+  createdAt?: string;
 }
+
 interface AuthContextType {
   user: User | null;
   login: (credentials: { email: string; password: string }) => Promise<void>;
   logout: () => Promise<void>;
   loading: boolean;
-
   checkAuth: () => Promise<void>;
+  setUser: (user: User) => void;
 }
+
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
-  // console.log("da", BASE_URL);
-  async function checkAuth() {
+
+  const checkAuth = async () => {
     try {
-      const response = await fetch(BASE_URL + "/api/user/getuserdetails", {
-        method: "POST",
-        credentials: "include",
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setUser(null);
+        setLoading(false);
+        return;
+      }
+
+      const res = await fetch(`${BASE_URL}/api/user/profile`, {
         headers: {
-          Authorization: "Bearer " + localStorage.getItem("token"),
+          Authorization: `Bearer ${token}`,
         },
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        // console.log(data.user);
-        // console.log(data.data.user);
+      const data = await res.json();
+      if (res.ok) {
         setUser(data.data.user);
-        setLoading(false);
       } else {
         setUser(null);
-        setLoading(false);
       }
     } catch (error) {
-      console.log(error);
+      console.error("Auth error:", error);
+      setUser(null);
+    } finally {
+      setLoading(false);
     }
-  }
+  };
+
   useEffect(() => {
     checkAuth();
   }, []);
-  const login = async (credentials: { email: string; password: string }) => {
+
+  const login = async ({ email, password }: { email: string; password: string }) => {
     const res = await fetch(`${BASE_URL}/api/auth/login`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(credentials),
-      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password }),
     });
-    //
-    //{"error":true,"message":"Too many requests, please try again later"}
-
-    if (!res.ok) {
-      const errorData = await res.json();
-      if (errorData.status === "error") {
-        if (errorData.message === "Invalid credentials") {
-          throw new Error(errorData.error.details);
-        }
-        if (errorData.message === "Validation failed") {
-          throw new Error(errorData.error.details[0].msg);
-        }
-        if (errorData.message === "Internal Server Error") {
-          throw new Error("Internal Server Error");
-        }
-        throw new Error(errorData.error.details || "Some error occurred");
-      } else {
-        throw new Error(errorData.message || "Some error occurred");
-      }
-    }
 
     const data = await res.json();
-    localStorage.setItem("token", data.data.token);
-    await checkAuth();
-    return data;
+    if (res.ok) {
+      localStorage.setItem("token", data.token);
+      await checkAuth();
+    } else {
+      throw new Error(data.error || "Login failed");
+    }
   };
+
   const logout = async () => {
     localStorage.removeItem("token");
-    await checkAuth();
+    setUser(null);
   };
+
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading, checkAuth }}>
+    <AuthContext.Provider value={{ user, login, logout, loading, checkAuth, setUser }}>
       {children}
     </AuthContext.Provider>
   );
@@ -108,8 +97,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
+    throw new Error("useAuth must be used within AuthProvider");
   }
-
   return context;
 };
