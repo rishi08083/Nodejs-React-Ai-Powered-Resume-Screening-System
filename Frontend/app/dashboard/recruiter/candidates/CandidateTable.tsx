@@ -170,14 +170,13 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
 
                   {/* Compatibility Score */}
                   <td className="px-6 py-4 text-sm">
-                    {candidate?.match_score != null  ? (
+                    {candidate?.match_score != null ? (
                       <span
-                        className={`inline-block px-3 py-1 text-sm font-semibold rounded ${
-                          candidate.feedback.feedback_text.recommendation ===
-                          "YES"
+                        className={`inline-block px-3 py-1 text-sm font-semibold rounded ${candidate.is_recommended ===
+                            "YES"
                             ? "bg-green-100 text-green-800"
                             : "bg-red-100 text-red-800"
-                        }`}
+                          }`}
                       >
                         {candidate.match_score} %
                       </span>
@@ -213,8 +212,8 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
                   </td>
                   {/* Recommended */}
                   <td className="px-6 py-4 text-sm">
-                    {candidate?.feedback?.feedback_text.recommendation ===
-                    "YES" ? (
+                    {candidate?.is_recommended ===
+                      "YES" ? (
                       <span className="text-green-400 font-medium">Yes</span>
                     ) : candidate?.feedback?.feedback_text.recommendation ===
                       "NO" ? (
@@ -228,9 +227,9 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
 
                   {/* Feedback Button */}
                   <td className="px-6 py-4 text-sm">
-                    {candidate?.feedback?.rating !== null &&
-                    candidate?.feedback?.rating !== undefined &&
-                    candidate.is_screened ? (
+                    {candidate?.is_recommended !== null &&
+                      candidate?.match_score !== undefined &&
+                      candidate.is_screened ? (
                       <div className="relative group">
                         <motion.button
                           whileHover={{ scale: 1.05 }}

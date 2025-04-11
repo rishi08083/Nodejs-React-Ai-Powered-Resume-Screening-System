@@ -3,11 +3,13 @@ import { motion } from "framer-motion";
 import { Candidate, Feedback } from "./page";
 
 type FeedbackModalProps = {
-  selectedFeedback:Feedback| null;
+  selectedFeedback: Feedback | null;
   closeModal: () => void;
 };
 
 const FeedbackModal: React.FC<FeedbackModalProps> = ({ selectedFeedback, closeModal }) => {
+
+  console.log("Selected Feedback:", selectedFeedback);
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -159,12 +161,12 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ selectedFeedback, closeMo
                 </span>{" "}
                 <span
                   className={
-                    selectedFeedback.feedback_text.experience_match
+                    selectedFeedback.feedback_text?.experience_match
                       ? "text-green-400"
                       : "text-red-400"
                   }
                 >
-                  {selectedFeedback.feedback_text.experience_match
+                  {selectedFeedback.feedback_text?.experience_match
                     ? "Yes"
                     : "No"}
                 </span>
@@ -217,7 +219,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ selectedFeedback, closeMo
               </div>
             </div>
             <p className="relative z-0 max-h-40 overflow-y-scroll text-[var(--text-primary)] scrollbar-thin scrollbar-thumb-[var(--border)] scrollbar-track-[var(--dark-bg)] shadow-inner rounded-lg p-4 bg-[var(--surface)] border border-[var(--border)]">
-              {/* {selectedFeedback.feedback.feedback} */}
+              {selectedFeedback?.feedback_text?.feedback}
             </p>
           </div>
         </div>

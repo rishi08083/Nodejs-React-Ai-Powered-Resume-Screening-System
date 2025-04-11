@@ -44,7 +44,7 @@ export type Candidate = {
   status: string;
   match_score: number | null;
   feedback?: Feedback
-  
+  is_recommended: string;
 };
 
 const CandidateList = () => {
@@ -96,7 +96,7 @@ const CandidateList = () => {
     };
     getJobDetails();
   }, []);
-// TODO: change time
+  // TODO: change time
   useEffect(() => {
     const getCandidates = async () => {
       try {
@@ -143,7 +143,7 @@ const CandidateList = () => {
 
     const intervalId = setInterval(() => {
       getCandidates();
-    }, 600000);
+    }, 6000);
 
     return () => clearInterval(intervalId);
   }, [selectedJob, selectedRecommendation]);
@@ -173,9 +173,9 @@ const CandidateList = () => {
         }));
         setSelectedFeedback({
           ...feedbackItem,
-          is_recommended: feedbackItem.rating,
+          id: candidateId,
         });
-
+        console.log("Feedback data:", selectedFeedback); // Debug log  
         setIsFeedbackModalOpen(true);
       }
     } catch (error: any) {
@@ -206,22 +206,21 @@ const CandidateList = () => {
 
   const handleShowFeedback = (candidate: Candidate) => {
     console.log("Candidate ID:", candidate.id);
-    console.log("Feedback Data:", feedbackData[candidate.id]);
     if (feedbackData[candidate.id]) {
-      setSelectedFeedback({
-        ...feedbackData[candidate.id],
-        rating: feedbackData[candidate.id].rating,
-      });
+      setSelectedFeedback(
+        (prev) => feedbackData[candidate.id] || null
+      );
       setIsFeedbackModalOpen(true);
     } else {
       fetchCandidateFeedback(candidate.id).then(() => {
-        setSelectedFeedback((prev) => ({
-          ...prev,
-          rating: feedbackData[candidate.id]?.rating,
-        }));
+        setSelectedFeedback((prev) => (
+          feedbackData[candidate.id] || null
+        ));
       });
     }
+    console.log("Feedback Data:", feedbackData[candidate.id]);
   };
+  
 
   const closeModal = () => {
     setIsFeedbackModalOpen(false);
@@ -322,11 +321,10 @@ const CandidateList = () => {
               onClick={() => paginate(number + 1)}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
-              className={`px-4 py-2 rounded-lg shadow-md transition-all duration-300 ${
-                currentPage === number + 1
-                  ? "bg-[var(--accent)] text-[var(--dark-bg)] font-medium"
-                  : "bg-[var(--surface)] text-[var(--text-secondary)] border border-[var(--border)] hover:border-[var(--accent)] hover:text-[var(--accent)]"
-              }`}
+              className={`px-4 py-2 rounded-lg shadow-md transition-all duration-300 ${currentPage === number + 1
+                ? "bg-[var(--accent)] text-[var(--dark-bg)] font-medium"
+                : "bg-[var(--surface)] text-[var(--text-secondary)] border border-[var(--border)] hover:border-[var(--accent)] hover:text-[var(--accent)]"
+                }`}
             >
               {number + 1}
             </motion.button>

@@ -78,7 +78,7 @@ const SearchFilter = ({
         {jobs.length > 0 &&
           selectedJob === "" &&
           (() => {
-            setSelectedJob(jobs[0].id);
+            // setSelectedJob(jobs[0].id);
             return null;
           })()}
         <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[var(--text-secondary)] bg-[var(--accent)] rounded-r-lg">
@@ -117,7 +117,7 @@ const SearchFilter = ({
             } else {
               const filtered = originalCandidates.filter(
                 (candidate) =>
-                  candidate.feedback.feedback_text.recommendation ===
+                  candidate.feedback?.feedback_text?.recommendation ===
                   value.toUpperCase()
               );
               setCandidates(filtered);
