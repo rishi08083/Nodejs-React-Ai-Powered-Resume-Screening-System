@@ -1,21 +1,29 @@
 "use client";
 
-import { Menu, UserRound, LogOut, Key } from "lucide-react";
+import { Menu, UserRound, LogOut, Settings } from "lucide-react";
 import ThemeToggle from "../theme/ThemeToggle";
 import { useState } from "react";
 import { useAuth } from "../../lib/auth";
 import LogOutModal from "./LogOut";
 import { useRouter } from "next/navigation";
+
 export default function Navbar({
   user,
   setIsSidebarOpen,
   isSidebarOpen,
   setIsLogoutModalOpen,
   isLogOutModal,
+}: {
+  user: any;
+  setIsSidebarOpen: (value: boolean) => void;
+  isSidebarOpen: boolean;
+  setIsLogoutModalOpen: (value: boolean) => void;
+  isLogOutModal: boolean;
 }) {
   const [modalVisible, setModalVisible] = useState(false);
   const { logout } = useAuth();
   const navigate = useRouter();
+
   return (
     <header className="navbar">
       <div className="navbar-content">
@@ -37,12 +45,12 @@ export default function Navbar({
 
       <div className="user-actions">
         <UserRound
-          className="user-icon  cursor-pointer"
-          onClick={() => setModalVisible((modalVisible) => !modalVisible)}
+          className="user-icon cursor-pointer"
+          onClick={() => setModalVisible((prev) => !prev)}
         />
-
         <ThemeToggle />
       </div>
+
       {modalVisible && (
         <div className="absolute z-50 top-14 right-4 w-56 bg-[var(--surface)] border border-[var(--border)] rounded-md shadow-lg overflow-hidden transition-all duration-200 ease-out">
           <div className="p-4 border-b border-[var(--border)]">
@@ -53,19 +61,21 @@ export default function Navbar({
           </div>
 
           <div className="p-1 space-y-1">
-            {/* Change Password Option */}
             <div
               className="flex items-center gap-2 px-3 py-2 text-sm text-[var(--text-primary)] rounded hover:bg-[var(--accent-hover)] transition-colors duration-150 cursor-pointer"
               onClick={() => {
-                // Add your change password handler here
+                const route =
+                  user?.role === "admin"
+                    ? "/dashboard/admin/profile"
+                    : "/dashboard/recruiter/profile";
+                navigate.push(route);
                 setModalVisible(false);
               }}
             >
-              <Key className="w-4 h-4 text-[var(--text-secondary)]" />
-              <span>Change Password</span>
+              <Settings className="w-4 h-4 text-[var(--text-secondary)]" />
+              <span>Profile Settings</span>
             </div>
 
-            {/* Log Out Option */}
             <div
               className="flex items-center gap-2 px-3 py-2 text-sm text-[var(--text-primary)] rounded hover:bg-[var(--accent-hover)] transition-colors duration-150 cursor-pointer"
               onClick={() => {

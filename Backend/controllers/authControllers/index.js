@@ -161,8 +161,9 @@ const userLogin = async (req, res) => {
       res.status(200).json({
         status: "success",
         message: "Logged in successfully",
-        data: { token },
-      });
+        token,
+        data: { user }
+      });      
     } else {
       res.status(401).json({
         status: "error",
