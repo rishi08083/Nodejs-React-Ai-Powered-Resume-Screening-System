@@ -17,7 +17,6 @@ exports.authMiddleware = (req, res, next) => {
       token.replace("Bearer ", ""),
       process.env.JWT_SECRET
     );
-    console.log(verified);
     req.user = verified; // Attach user data to request
     next();
   } catch (err) {

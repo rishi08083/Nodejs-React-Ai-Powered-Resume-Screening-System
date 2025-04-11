@@ -27,13 +27,15 @@ export default function GoogleSignIn({
 
   const handleGoogleSuccess = async (credentialResponse: any) => {
     try {
-      const decoded = jwtDecode<GoogleDecodedToken>(
-        credentialResponse.credential
-      );
+      if (!credentialResponse?.credential) {
+        toast.error("Google login failed: No credentials returned.");
+        return;
+      }
+
+      const decoded = jwtDecode<GoogleDecodedToken>(credentialResponse.credential);
       const { name, email } = decoded;
 
       if (mode === "register") {
-        // REGISTER MODE
         const registerRes = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/api/auth/google-oauth-register`,
           {
@@ -47,24 +49,18 @@ export default function GoogleSignIn({
 
         if (!registerRes.ok) {
           const message = registerData.message?.toLowerCase();
-        
           if (message?.includes("already registered")) {
-            toast.error("Email already registered. Try log in."); // 👈 UPDATE THIS LINE
-            setTimeout(() => {
-              router.push("/login");
-            }, 2000);
+            toast.error("Email already registered. Try logging in.");
+            setTimeout(() => router.push("/login"), 2000);
           } else {
             toast.error(registerData.message || "Registration failed.");
           }
-        
           onError?.(registerData.message);
           return;
         }
 
-        // Success - recruiter registered
         onSuccess?.(registerData);
       } else {
-        // LOGIN MODE
         const loginRes = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/api/auth/google-oauth-login`,
           {
@@ -76,13 +72,13 @@ export default function GoogleSignIn({
 
         const loginData = await loginRes.json();
 
-        if (loginRes.ok) {
+        if (loginRes.ok && loginData?.data?.token) {
           localStorage.setItem("token", loginData.data.token);
           toast.success("Logged in successfully.");
           onSuccess?.(loginData);
           router.push("/dashboard");
         } else {
-          onError?.(loginData.message);
+          onError?.(loginData.message || "Google login failed.");
         }
       }
     } catch (error: any) {

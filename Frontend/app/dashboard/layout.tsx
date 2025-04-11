@@ -18,7 +18,6 @@ export default function DashboardLayout({
 
   // Close sidebar when clicking outside on mobile
   useEffect(() => {
-    console.log(user)
     if (user === null) {
       if (loading === false) {
         navigate.push("/login");

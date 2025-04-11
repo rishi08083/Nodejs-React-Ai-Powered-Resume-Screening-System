@@ -9,7 +9,8 @@ const rcdRoutes = require("./rcdRoutes.js");
 const jobRoutes = require("./jobRoutes.js");
 const candidateRoutes = require("./candidateRoutes");
 const screeningRoutes = require("./screenRoutes");
-const mailRecruiter = require('./mailRecruiter.js')
+const mailRecruiter = require("./mailRecruiter.js");
+const analyticsRoutes = require("./analyticsRoutes.js");
 
 router.get("/", homeRoutes);
 router.use("/auth", authRoutes);
@@ -20,5 +21,6 @@ router.use("/rcd", rcdRoutes);
 router.use("/candidates", candidateRoutes);
 router.use("/screening", screeningRoutes);
 router.use("/mail", mailRecruiter);
+router.use("/analytics", analyticsRoutes);
 
 module.exports = router;
