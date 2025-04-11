@@ -302,7 +302,19 @@ export default function RecruiterRegister() {
               >
                 Register
               </button>
-              <GoogleSignIn onSuccess={() => {}} onError={() => {}} />
+              <GoogleSignIn
+                mode="register"
+                onSuccess={() => {
+                  toast.success(
+                    "Recruiter request sent successfully. Awaiting admin approval."
+                  );
+                  localStorage.setItem("recruiterEmail", formData.email);
+                  setTimeout(() => {
+                    router.push("/dashboard");
+                  }, 2000);
+                }}
+                onError={() => {}} 
+              />
             </form>
 
             <div className="mt-6 flex flex-col items-center space-y-4">
