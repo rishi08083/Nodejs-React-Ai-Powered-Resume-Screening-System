@@ -234,31 +234,31 @@ export default function AdminDashboard() {
         {/* KPI Stats Row */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <StatCard
-            title="Total Resumes Uploaded"
+            title="Total Resumes"
             value={analyticsData.num_of_resumes}
             icon={<FileText size={24} className="text-[var(--accent)]" />}
-            change={12.5}
+            //change={12.5}
             changeDirection="up"
           />
           <StatCard
             title="Total Candidates"
             value={analyticsData.num_of_candidates}
             icon={<Users size={24} className="text-[var(--accent)]" />}
-            change={8.3}
+            // change={8.3}
             changeDirection="up"
           />
           <StatCard
             title="Candidates Rejected"
             value={analyticsData.outcome.num_of_candidates_rejected}
             icon={<X size={24} className="text-red-400" />}
-            change={3.1}
+            // change={3.1}
             changeDirection="down"
           />
           <StatCard
             title="Avg. Screening Score"
             value={`${parseFloat(analyticsData.average_screening_score).toFixed(1)}%`}
             icon={<UserCheck size={24} className="text-[var(--accent)]" />}
-            change={2.4}
+            // change={2.4}
             changeDirection="up"
           />
         </div>
@@ -266,7 +266,7 @@ export default function AdminDashboard() {
         {/* Row 1: Main Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* Resumes Parsed Over Time */}
-          <div className="bg-[var(--surface)] p-6 rounded-xl shadow-md border border-[var(--border)] transition-all hover:shadow-lg">
+          <div className="bg-[var(--surface)] p-8 rounded-xl shadow-md border border-[var(--border)] transition-all hover:shadow-lg">
             <h2 className={chartTitle}>Resumes Parsed Over Time</h2>
             <div className="h-72">
               <ResponsiveContainer width="100%" height="100%">
@@ -285,7 +285,7 @@ export default function AdminDashboard() {
                         stopOpacity={0.8}
                       />
                       <stop
-                        offset="95%"
+                        offset="100%"
                         stopColor="var(--accent)"
                         stopOpacity={0}
                       />
@@ -350,7 +350,7 @@ export default function AdminDashboard() {
                   </Pie>
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "var(--surface)",
+                      backgroundColor: "var(--accent)",
                       borderColor: "var(--border)",
                       borderRadius: "0.5rem",
                       boxShadow: "0 4px 6px var(--shadow)",
@@ -417,10 +417,10 @@ export default function AdminDashboard() {
                     data={jobDistributionData}
                     cx="50%"
                     cy="50%"
-                    outerRadius={80}
+                    outerRadius={90}
                     dataKey="value"
                     label={({ name, percent }) =>
-                      `${(percent * 100).toFixed(0)}% ${name}`
+                      `${(percent * 100).toFixed(0)}%`
                     }
                   >
                     {jobDistributionData.map((entry, index) => (
@@ -429,7 +429,7 @@ export default function AdminDashboard() {
                   </Pie>
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "var(--surface)",
+                      backgroundColor: "var(--accent)",
                       borderColor: "var(--border)",
                       borderRadius: "0.5rem",
                       boxShadow: "0 4px 6px var(--shadow)",
