@@ -2,26 +2,6 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Candidate } from "./page";
 
-// type Candidate = {
-//   is_screened: boolean;
-//   id: string;
-//   match_score: number | null;
-//   name: string;
-//   email: string;
-//   phone_number: string;
-//   hiring_bull_status: string;
-//   is_recommended: boolean;
-//   is_screen_call_done: boolean;
-//   job_id: string;
-//   user_id: string;
-//   feedback?: {
-//     rating: number;
-//     feedback_text: {
-//       recommendation: string;
-//     };
-//   };
-// };
-
 type CandidateTableProps = {
   currentCandidates: Candidate[];
   selectedJob: string;
@@ -133,7 +113,7 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
                   Compatibility(%)
                 </th>
 
-                <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
+                <th className="px-4 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
                   Recommended
                 </th>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
@@ -142,7 +122,7 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
                 <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
                   Resume
                 </th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
+                <th className="px-4 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
                   Actions
                 </th>
               </tr>
@@ -212,10 +192,10 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
                   </td>
                   {/* Recommended */}
                   <td className="px-6 py-4 text-sm">
-                    {candidate?.is_recommended ===
+                    {candidate?.is_recommended.toUpperCase() ===
                       "YES" ? (
                       <span className="text-green-400 font-medium">Yes</span>
-                    ) : candidate?.feedback?.feedback_text.recommendation ===
+                    ) : candidate?.is_recommended.toUpperCase() ===
                       "NO" ? (
                       <span className="text-red-400 font-medium">No</span>
                     ) : (
@@ -225,32 +205,31 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
                     )}
                   </td>
 
+
                   {/* Feedback Button */}
-                  <td className="px-6 py-4 text-sm">
-                    {candidate?.is_recommended !== null &&
-                      candidate?.match_score !== undefined &&
-                      candidate.is_screened ? (
+                    <td className="px-6 py-4 text-sm">
+                    {candidate?.is_screened ? (
                       <div className="relative group">
-                        <motion.button
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          onClick={() => handleShowFeedback(candidate)}
-                          className="px-4 py-2 border border-[var(--accent)] text-[var(--accent)] font-medium rounded-lg shadow hover:bg-[var(--accent)] hover:text-[var(--dark-bg)] transition-all duration-300"
-                        >
-                          Feedback
-                        </motion.button>
-                        <div className="absolute z-10 hidden group-hover:block bg-[var(--surface)] text-[var(--text-secondary)] text-sm p-2 rounded shadow-lg border border-[var(--border)] top-full mt-1">
-                          View Feedback
-                        </div>
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => handleShowFeedback(candidate)}
+                        className="px-4 py-2 border border-[var(--accent)] text-[var(--accent)] font-medium rounded-lg shadow hover:bg-[var(--accent)] hover:text-[var(--dark-bg)] transition-all duration-300"
+                      >
+                        Feedback
+                      </motion.button>
+                      <div className="absolute z-10 hidden group-hover:block bg-[var(--surface)] text-[var(--text-secondary)] text-sm p-2 rounded shadow-lg border border-[var(--border)] top-full mt-1">
+                        View Feedback
+                      </div>
                       </div>
                     ) : (
                       <span className="text-[var(--text-secondary)]">
-                        {candidate.is_screened && candidate.feedback
-                          ? "Pending Feedback"
-                          : "Not Available"}
+                      {candidate.is_screened === false
+                        ? "Pending Screening"
+                        : "Not Available"}
                       </span>
                     )}
-                  </td>
+                    </td>
 
                   {/* Resume Button */}
                   <td className="px-6 py-4 text-sm">

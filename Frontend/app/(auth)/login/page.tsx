@@ -25,7 +25,6 @@ import ThemeToggle from "../../../components/theme/ThemeToggle";
 const Login = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [error, setError] = useState<string>("");
   const [isOpen, setIsOpen] = useState(false);
   const [isFocused, setIsFocused] = useState({
     email: false,

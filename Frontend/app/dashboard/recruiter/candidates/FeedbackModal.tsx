@@ -7,8 +7,10 @@ type FeedbackModalProps = {
   closeModal: () => void;
 };
 
-const FeedbackModal: React.FC<FeedbackModalProps> = ({ selectedFeedback, closeModal }) => {
-
+const FeedbackModal: React.FC<FeedbackModalProps> = ({
+  selectedFeedback,
+  closeModal,
+}) => {
   console.log("Selected Feedback:", selectedFeedback);
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -25,8 +27,11 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ selectedFeedback, closeMo
   }, [closeModal]);
 
   if (!selectedFeedback) return null;
-
+   console.log("Selected Feedback:", selectedFeedback);
   return (
+    if (!selectedFeedback) return null;
+
+    
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -70,7 +75,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ selectedFeedback, closeMo
           <div className="p-3 bg-[var(--blue-highlight)] rounded-lg flex items-center justify-between">
             <p className="text-[var(--text-primary)] font-medium">
               <span className="text-[var(--accent)]">Compatibility Score:</span>{" "}
-              {`${selectedFeedback.rating} %`}
+              {`${selectedFeedback.feedback_text} %`}
             </p>
             <div className="relative group">
               <svg
@@ -103,7 +108,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ selectedFeedback, closeMo
                   <span className="text-[var(--text-secondary)]">
                     Job Description Match:
                   </span>{" "}
-                  {/* {`${selectedFeedback.jd_skill_match.toFixed(2)}%`} */}
+                  {`${selectedFeedback.feedback_text.jd_match}%`}
                 </p>
                 <div className="relative group">
                   <svg
@@ -130,7 +135,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ selectedFeedback, closeMo
                   <span className="text-[var(--text-secondary)]">
                     Role Clarity Document:
                   </span>{" "}
-                  {/* {`${selectedFeedback.rcd_skill_match.toFixed(2)}%`} */}
+                  {`${selectedFeedback?.feedback_text.rcd_match}%`}
                 </p>
                 <div className="relative group">
                   <svg
@@ -161,12 +166,12 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ selectedFeedback, closeMo
                 </span>{" "}
                 <span
                   className={
-                    selectedFeedback.feedback_text?.experience_match
+                    selectedFeedback?.feedback_text?.experience_match
                       ? "text-green-400"
                       : "text-red-400"
                   }
                 >
-                  {selectedFeedback.feedback_text?.experience_match
+                  {selectedFeedback?.feedback_text?.experience_match
                     ? "Yes"
                     : "No"}
                 </span>
@@ -221,6 +226,36 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ selectedFeedback, closeMo
             <p className="relative z-0 max-h-40 overflow-y-scroll text-[var(--text-primary)] scrollbar-thin scrollbar-thumb-[var(--border)] scrollbar-track-[var(--dark-bg)] shadow-inner rounded-lg p-4 bg-[var(--surface)] border border-[var(--border)]">
               {selectedFeedback?.feedback_text?.feedback}
             </p>
+          </div>
+        </div>
+
+        <div className="mt-6 flex justify-between items-center">
+          <div className="flex items-center space-x-2">
+            Job Description Match:
+            <div className="relative group">
+              <svg
+                className="h-5 w-5 text-[var(--text-secondary)] cursor-pointer"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"
+                ></path>
+              </svg>
+              <div className="absolute z-10 left-6 top-0 hidden group-hover:block bg-[var(--surface)] text-[var(--text-secondary)] text-sm p-2 rounded shadow-lg border border-[var(--border)]">
+                The match percentage based on the job description skills.
+              </div>
+            </div>
+            {selectedFeedback?.jd_match > 80 ? (
+              <span className="text-green-400 font-medium">{`asdas`}</span>
+            ) : (
+              <span className="text-red-400 font-medium">{`${selectedFeedback.feedback_text.jd_mismatch}%`}</span>
+            )}
           </div>
         </div>
 

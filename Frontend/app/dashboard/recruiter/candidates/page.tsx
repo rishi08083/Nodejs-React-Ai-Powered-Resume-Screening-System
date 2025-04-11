@@ -43,7 +43,7 @@ export type Candidate = {
   is_screened: boolean;
   status: string;
   match_score: number | null;
-  feedback?: Feedback
+  feedback?: Feedback;
   is_recommended: string;
 };
 
@@ -57,13 +57,10 @@ const CandidateList = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [selectedRecommendation, setSelectedRecommendation] = useState("");
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
-  const [feedbackData, setFeedbackData] = useState<{
-    [id: string]: Candidate["feedback"];
-  }>({});
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [selectedFeedback, setSelectedFeedback] = useState<
-    Feedback | null
-  >(null);
+  const [selectedFeedback, setSelectedFeedback] = useState<Feedback | null>(
+    null
+  );
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
   const candidatesPerPage = 10;
 
@@ -96,7 +93,7 @@ const CandidateList = () => {
     };
     getJobDetails();
   }, []);
-  // TODO: change time
+
   useEffect(() => {
     const getCandidates = async () => {
       try {
@@ -140,12 +137,12 @@ const CandidateList = () => {
     };
 
     getCandidates();
+    // TODO: Uncomment this to enable auto-refresh every 6 seconds
+    // const intervalId = setInterval(() => {
+    //   getCandidates();
+    // }, 6000);
 
-    const intervalId = setInterval(() => {
-      getCandidates();
-    }, 6000);
-
-    return () => clearInterval(intervalId);
+    // return () => clearInterval(intervalId);
   }, [selectedJob, selectedRecommendation]);
 
   const fetchCandidateFeedback = async (candidateId: string) => {
@@ -160,22 +157,15 @@ const CandidateList = () => {
         }
       );
 
-      console.log("Feedback fetched successfully", response.data.data);
       const data = response.data;
 
       // Check if data exists and is an object with feedback details
       if (data.data) {
-        const feedbackItem = data.data;
-        console.log("Feedback item:", feedbackItem); // Debug log
-        setFeedbackData((prev) => ({
-          ...prev,
-          [candidateId]: feedbackItem,
-        }));
-        setSelectedFeedback({
-          ...feedbackItem,
-          id: candidateId,
-        });
-        console.log("Feedback data:", selectedFeedback); // Debug log  
+        const payload = data.data;
+
+        console.log("Feedback data:", payload.feedback);
+
+        setSelectedFeedback(payload.feedback);
         setIsFeedbackModalOpen(true);
       }
     } catch (error: any) {
@@ -204,29 +194,6 @@ const CandidateList = () => {
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
-  const handleShowFeedback = (candidate: Candidate) => {
-    console.log("Candidate ID:", candidate.id);
-    if (feedbackData[candidate.id]) {
-      setSelectedFeedback(
-        (prev) => feedbackData[candidate.id] || null
-      );
-      setIsFeedbackModalOpen(true);
-    } else {
-      fetchCandidateFeedback(candidate.id).then(() => {
-        setSelectedFeedback((prev) => (
-          feedbackData[candidate.id] || null
-        ));
-      });
-    }
-    console.log("Feedback Data:", feedbackData[candidate.id]);
-  };
-  
-
-  const closeModal = () => {
-    setIsFeedbackModalOpen(false);
-    setSelectedFeedback(null);
-  };
-
   const [isOpen, setIsOpen] = useState<string | null>(null);
   const dropdownRef = useRef(null);
 
@@ -248,6 +215,14 @@ const CandidateList = () => {
     };
   }, [isOpen]);
 
+  const handleShowFeedback = (candidate: Candidate) => {
+      fetchCandidateFeedback(candidate.id);
+  };
+
+  const closeModal = () => {
+    setIsFeedbackModalOpen(false);
+    setSelectedFeedback(null);
+  };
   return (
     <div className="w-full p-6 bg-[var(--bg)] mt-14 min-h-screen text-[var(--text-primary)] transition-all duration-300">
       <motion.div
@@ -321,10 +296,11 @@ const CandidateList = () => {
               onClick={() => paginate(number + 1)}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
-              className={`px-4 py-2 rounded-lg shadow-md transition-all duration-300 ${currentPage === number + 1
-                ? "bg-[var(--accent)] text-[var(--dark-bg)] font-medium"
-                : "bg-[var(--surface)] text-[var(--text-secondary)] border border-[var(--border)] hover:border-[var(--accent)] hover:text-[var(--accent)]"
-                }`}
+              className={`px-4 py-2 rounded-lg shadow-md transition-all duration-300 ${
+                currentPage === number + 1
+                  ? "bg-[var(--accent)] text-[var(--dark-bg)] font-medium"
+                  : "bg-[var(--surface)] text-[var(--text-secondary)] border border-[var(--border)] hover:border-[var(--accent)] hover:text-[var(--accent)]"
+              }`}
             >
               {number + 1}
             </motion.button>
