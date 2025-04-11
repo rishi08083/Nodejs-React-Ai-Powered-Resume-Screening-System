@@ -9,11 +9,16 @@ import { useRouter } from "next/navigation";
 
 export default function Navbar({
   user,
-  setUser,
   setIsSidebarOpen,
   isSidebarOpen,
   setIsLogoutModalOpen,
   isLogOutModal,
+}: {
+  user: any;
+  setIsSidebarOpen: (value: boolean) => void;
+  isSidebarOpen: boolean;
+  setIsLogoutModalOpen: (value: boolean) => void;
+  isLogOutModal: boolean;
 }) {
   const [modalVisible, setModalVisible] = useState(false);
   const { logout } = useAuth();
@@ -59,9 +64,10 @@ export default function Navbar({
             <div
               className="flex items-center gap-2 px-3 py-2 text-sm text-[var(--text-primary)] rounded hover:bg-[var(--accent-hover)] transition-colors duration-150 cursor-pointer"
               onClick={() => {
-                const route = user?.role === "admin"
-                  ? "/dashboard/admin/profile"
-                  : "/dashboard/recruiter/profile";
+                const route =
+                  user?.role === "admin"
+                    ? "/dashboard/admin/profile"
+                    : "/dashboard/recruiter/profile";
                 navigate.push(route);
                 setModalVisible(false);
               }}
