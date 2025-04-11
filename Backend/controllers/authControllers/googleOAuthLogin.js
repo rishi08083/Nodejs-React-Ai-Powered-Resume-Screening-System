@@ -6,7 +6,6 @@ const googleOAuthLogin = async (req, res) => {
     const { email } = req.body;
 
     const user = await db.Users.findOne({ where: { email } });
-    console.log(user);
     if (!user) {
       return res.status(404).json({
         status: "error",
