@@ -311,7 +311,7 @@ export default function RecruiterRegister() {
                   localStorage.setItem("recruiterEmail", formData.email);
                   setTimeout(() => {
                     router.push("/dashboard");
-                  }, 1000);
+                  }, 2000);
                 }}
                 onError={() => {}} 
               />

@@ -52,7 +52,7 @@ export default function GoogleSignIn({
             toast.error("Email already registered. Try log in."); // 👈 UPDATE THIS LINE
             setTimeout(() => {
               router.push("/login");
-            }, 1000);
+            }, 2000);
           } else {
             toast.error(registerData.message || "Registration failed.");
           }
@@ -82,7 +82,6 @@ export default function GoogleSignIn({
           onSuccess?.(loginData);
           router.push("/dashboard");
         } else {
-          toast.error(loginData.message || "Google login failed.");
           onError?.(loginData.message);
         }
       }
