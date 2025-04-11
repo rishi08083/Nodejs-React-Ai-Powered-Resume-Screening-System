@@ -92,6 +92,7 @@ export default function GoogleSignIn({
     <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}>
       <GoogleLogin
         theme="filled_black"
+        size="large"
         onSuccess={handleGoogleSuccess}
         onError={() => {
           toast.error("Google login failed");
