@@ -4,16 +4,15 @@ const db = require("../../models");
 const googleOAuthRegister = async (req, res) => {
   try {
     const { name, email } = req.body;
-    console.log(req.body);
-
+    
     const existingUser = await db.Users.findOne({ where: { email } });
     if (existingUser) {
-      return res.status(200).json({
-        status: "success",
-        message: "User already registered",
-        data: { user: existingUser },
+      return res.status(409).json({
+        status: "error",
+        message: "Email already registered. Try logging in.",
       });
     }
+    console.log(`⚠️ Duplicate Google OAuth registration attempt for: ${email}`);
 
     // Generate password and hash it
     const generatedPassword = Math.random().toString(36).slice(-8);

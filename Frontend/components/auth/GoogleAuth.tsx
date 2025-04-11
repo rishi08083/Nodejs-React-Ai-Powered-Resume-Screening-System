@@ -1,4 +1,5 @@
 "use client";
+
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
 import { toast } from "react-toastify";
@@ -17,37 +18,61 @@ interface Props {
   onError?: (error: string) => void;
 }
 
-export default function GoogleSignIn({ mode = "login", onSuccess, onError }: Props) {
+export default function GoogleSignIn({
+  mode = "login",
+  onSuccess,
+  onError,
+}: Props) {
   const router = useRouter();
 
   const handleGoogleSuccess = async (credentialResponse: any) => {
     try {
-      const decoded = jwtDecode<GoogleDecodedToken>(credentialResponse.credential);
+      const decoded = jwtDecode<GoogleDecodedToken>(
+        credentialResponse.credential
+      );
       const { name, email } = decoded;
 
       if (mode === "register") {
         // REGISTER MODE
-        const registerRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/google-oauth-register`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, email }),
-        });
+        const registerRes = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/auth/google-oauth-register`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name, email }),
+          }
+        );
 
         const registerData = await registerRes.json();
 
-        if (registerRes.ok) {
-          onSuccess?.(registerData); // Parent shows success toast
-        } else {
-          toast.error(registerData.message || "Registration failed.");
+        if (!registerRes.ok) {
+          const message = registerData.message?.toLowerCase();
+        
+          if (message?.includes("already registered")) {
+            toast.error("Email already registered. Try log in."); // 👈 UPDATE THIS LINE
+            setTimeout(() => {
+              router.push("/login");
+            }, 1000);
+          } else {
+            toast.error(registerData.message || "Registration failed.");
+          }
+        
           onError?.(registerData.message);
+          return;
         }
+
+        // Success - recruiter registered
+        onSuccess?.(registerData);
       } else {
         // LOGIN MODE
-        const loginRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/google-oauth-login`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email }),
-        });
+        const loginRes = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/auth/google-oauth-login`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email }),
+          }
+        );
 
         const loginData = await loginRes.json();
 
@@ -57,11 +82,10 @@ export default function GoogleSignIn({ mode = "login", onSuccess, onError }: Pro
           onSuccess?.(loginData);
           router.push("/dashboard");
         } else {
-          toast.error(loginData.message || "Google Login failed.");
+          toast.error(loginData.message || "Google login failed.");
           onError?.(loginData.message);
         }
       }
-
     } catch (error: any) {
       console.error("⚠️ Google login error:", error);
       toast.error("Something went wrong during Google authentication.");

@@ -313,7 +313,7 @@ export default function RecruiterRegister() {
                     router.push("/dashboard");
                   }, 1000);
                 }}
-                onError={(err) => toast.error(err || "Google OAuth failed")}
+                onError={() => {}} 
               />
             </form>
 
