@@ -122,7 +122,13 @@ export default function AdminDashboard() {
     const fetchData = async () => {
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/analytics/admin-analytics`
+          `${process.env.NEXT_PUBLIC_API_URL}/api/analytics/admin-analytics`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
         );
         if (!res.ok) {
           throw new Error("Failed to fetch analytics data");
