@@ -51,7 +51,6 @@ export default function Profile() {
       let nameError = "";
       let emailError = "";
     
-      // --- Name Validation ---
       const trimmedName = name.trim().replace(/\s+/g, " ");
       const nameRegex = /^[A-Za-z]+( [A-Za-z]+)?$/;
     
@@ -65,7 +64,6 @@ export default function Profile() {
         nameError = "Name must be less than 50 characters long.";
       }
     
-      // --- Email Validation ---
       const trimmedEmail = email.trim().toLowerCase();
       const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(\.[a-zA-Z]{2,})?$/;
     
