@@ -1,40 +1,22 @@
 'use client';
 
-import { Suspense } from "react";
-
-// Client component defined below
-const LoginWrapper = () => (
-  <Suspense fallback={<div>Loading login...</div>}>
-    <Login />
-  </Suspense>
-);
-
-export default function Page() {
-  return <LoginWrapper />;
-}
-
-import { useState, ChangeEvent, FormEvent } from "react";
+import { useState, ChangeEvent, FormEvent, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "../../../lib/auth";
-import { ToastContainer, toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import GoogleSignIn from "../../../components/auth/GoogleAuth";
 import ThemeToggle from "../../../components/theme/ThemeToggle";
 
-const Login = () => {
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [error, setError] = useState<string>("");
+function LoginContent() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isFocused, setIsFocused] = useState({ email: false, password: false });
   const [isOpen, setIsOpen] = useState(false);
-  const [isFocused, setIsFocused] = useState({
-    email: false,
-    password: false,
-  });
-
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { login } = useAuth();
+  const { login, checkAuth } = useAuth();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -89,9 +71,9 @@ const Login = () => {
             </h1>
 
             <form onSubmit={handleSubmit}>
+              {/* Email */}
               <div className="mb-6 relative">
-                <label
-                  htmlFor="email"
+                <label htmlFor="email"
                   className={`absolute left-3 transition-all duration-300 pointer-events-none ${
                     isFocused.email || email
                       ? "-top-2.5 text-xs font-medium text-[var(--accent)] bg-[var(--surface)] px-1"
@@ -103,29 +85,21 @@ const Login = () => {
                 <input
                   type="email"
                   id="email"
-                  className="w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition-colors duration-300 ease-in-out bg-[var(--surface)] text-[var(--text-primary)]"
+                  className="w-full px-4 py-3 border-2 rounded-lg focus:outline-none bg-[var(--surface)] text-[var(--text-primary)] transition-colors"
                   style={{
-                    borderColor: isFocused.email
-                      ? "var(--accent)"
-                      : "var(--border)",
+                    borderColor: isFocused.email ? "var(--accent)" : "var(--border)",
                   }}
                   value={email}
-                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                    setEmail(e.target.value)
-                  }
-                  onFocus={() =>
-                    setIsFocused((prev) => ({ ...prev, email: true }))
-                  }
-                  onBlur={() =>
-                    setIsFocused((prev) => ({ ...prev, email: false }))
-                  }
+                  onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+                  onFocus={() => setIsFocused((prev) => ({ ...prev, email: true }))}
+                  onBlur={() => setIsFocused((prev) => ({ ...prev, email: false }))}
                   required
                 />
               </div>
 
+              {/* Password */}
               <div className="mb-6 relative">
-                <label
-                  htmlFor="password"
+                <label htmlFor="password"
                   className={`absolute left-3 transition-all duration-300 pointer-events-none ${
                     isFocused.password || password
                       ? "-top-2.5 text-xs font-medium text-[var(--accent)] bg-[var(--surface)] px-1"
@@ -137,48 +111,47 @@ const Login = () => {
                 <input
                   type="password"
                   id="password"
-                  className="w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition-colors duration-300 ease-in-out bg-[var(--surface)] text-[var(--text-primary)]"
+                  className="w-full px-4 py-3 border-2 rounded-lg focus:outline-none bg-[var(--surface)] text-[var(--text-primary)] transition-colors"
                   style={{
-                    borderColor: isFocused.password
-                      ? "var(--accent)"
-                      : "var(--border)",
+                    borderColor: isFocused.password ? "var(--accent)" : "var(--border)",
                   }}
                   value={password}
-                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                    setPassword(e.target.value)
-                  }
-                  onFocus={() =>
-                    setIsFocused((prev) => ({ ...prev, password: true }))
-                  }
-                  onBlur={() =>
-                    setIsFocused((prev) => ({ ...prev, password: false }))
-                  }
+                  onChange={(e: ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+                  onFocus={() => setIsFocused((prev) => ({ ...prev, password: true }))}
+                  onBlur={() => setIsFocused((prev) => ({ ...prev, password: false }))}
                   required
                 />
               </div>
 
               <button
                 type="submit"
-                className="w-full bg-[var(--accent)] text-[var(--dark-bg)] font-medium py-3 rounded-lg hover:bg-[var(--accent-hover)] transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-lg mb-6 cursor-pointer"
+                className="w-full bg-[var(--accent)] text-[var(--dark-bg)] font-medium py-3 rounded-lg hover:bg-[var(--accent-hover)] transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-lg mb-6"
               >
                 Sign In
               </button>
 
-              <GoogleSignIn onSuccess={() => {}} onError={() => {}} />
+              {/* Google Login */}
+              <div className="mb-6">
+                <GoogleSignIn
+                  mode="login"
+                  onSuccess={async () => {
+                    await checkAuth();
+                    router.push("/dashboard");
+                  }}
+                  onError={(err) => toast.error(err || "Google login failed")}
+                />
+              </div>
             </form>
 
             <div className="mt-6 flex flex-col items-center space-y-4">
-              <Link
-                href="/forgetpassword"
-                className="text-[var(--accent)] hover:text-[var(--accent-hover)] transition-colors duration-300"
-              >
+              <Link href="/forgetpassword" className="text-[var(--accent)] hover:text-[var(--accent-hover)] transition-colors duration-300">
                 Forgot your password?
               </Link>
 
               <div className="w-full border-t border-[var(--border)] my-2"></div>
 
               <p className="text-[var(--text-secondary)]">
-                Don't have an account?
+                Don’t have an account?
               </p>
 
               <Link
@@ -193,4 +166,13 @@ const Login = () => {
       </div>
     </div>
   );
-};
+}
+
+// ✅ Final export wrapped with Suspense
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <LoginContent />
+    </Suspense>
+  );
+}
