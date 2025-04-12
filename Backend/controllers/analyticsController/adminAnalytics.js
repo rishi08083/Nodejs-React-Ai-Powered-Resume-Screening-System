@@ -1,6 +1,5 @@
 const db = require("../../models");
-const { Op } = require("sequelize");
-
+const { cache } = require("../../middlewares/cacheMiddleWare");
 exports.adminAnalytics = async (req, res) => {
   try {
     const [
@@ -107,7 +106,7 @@ exports.adminAnalytics = async (req, res) => {
       },
       { NO: 0, YES: 0, NOT_SET: 0 }
     );
-    res.status(200).json({
+    let fullResponse = {
       status: "success",
       data: {
         num_of_resumes: numOfResumes,
@@ -129,7 +128,14 @@ exports.adminAnalytics = async (req, res) => {
           return skillMap.skill_name.length < 10;
         }),
       },
-    });
+    };
+    try {
+      cache.set("adminAnalytics", fullResponse);
+    } catch (error) {
+      console.log("Cache settings failed ");
+    }
+
+    res.status(200).json(fullResponse);
   } catch (error) {
     res.status(500).json({
       status: "error",
