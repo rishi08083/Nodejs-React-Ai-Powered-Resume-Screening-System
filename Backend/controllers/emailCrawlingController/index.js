@@ -110,8 +110,6 @@ const crawlEmails = () => {
   imap.connect();
 }
 
-crawlEmails();
-
 module.exports = {
   crawlEmails
 };
