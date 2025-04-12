@@ -586,6 +586,25 @@ form {
 .Toastify__toast--error {
   border-left: 4px solid #f44336;
 }
+.password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-input-wrapper input {
+  width: 100%;
+  padding-right: 1rem; 
+}
+
+.toggle-password-inside {
+  position: absolute;
+  right: 10px;
+  cursor: pointer;
+  font-size: 1rem;
+  color: var(--text-secondary);
+  z-index: 1;
+}
 
 
 /* Media queries for responsive design */
