@@ -19,36 +19,129 @@ export default function Profile() {
   const [originalData, setOriginalData] = useState({ name: "", email: "" });
   const [editMode, setEditMode] = useState(false);
   const [changePasswordMode, setChangePasswordMode] = useState(false);
-  const [joinedDate, setJoinedDate] = useState("");
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+  const [isPasswordChangeConfirmed, setIsPasswordChangeConfirmed] =
+    useState(false);
 
-  // Debugging logs
+  const [validationErrors, setValidationErrors] = useState({
+    name: "",
+    email: "",
+    newPassword: "",
+    confirmPassword: "",
+    isFormValid: false,
+  });
+
   useEffect(() => {
-    console.log("useEffect triggered. Current user:", user);
-
     if (user) {
-      console.log("User createdAt value:", user.createdAt);
-
       setFormData((prev) => ({
         ...prev,
         name: user.name,
         email: user.email,
       }));
-
       setOriginalData({ name: user.name, email: user.email });
-
-      if (user.createdAt) {
-        const formattedDate = new Date(user.createdAt).toLocaleDateString();
-        setJoinedDate(formattedDate);
-        console.log("Formatted joinedDate:", formattedDate);
-      } else {
-        console.warn("createdAt is missing from user object");
-      }
     }
   }, [user]);
 
   const hasChanges =
     formData.name !== originalData.name ||
     formData.email !== originalData.email;
+
+    const validateProfileForm = () => {
+      const { name, email } = formData;
+      let nameError = "";
+      let emailError = "";
+    
+      // --- Name Validation ---
+      const trimmedName = name.trim().replace(/\s+/g, " ");
+      const nameRegex = /^[A-Za-z]+( [A-Za-z]+)?$/;
+    
+      if (!trimmedName) {
+        nameError = "Name is required.";
+      } else if (!nameRegex.test(trimmedName)) {
+        nameError = "Name must contain only alphabets and a single space between first and last name.";
+      } else if (trimmedName.length < 2) {
+        nameError = "Name must be at least 2 characters long.";
+      } else if (trimmedName.length > 50) {
+        nameError = "Name must be less than 50 characters long.";
+      }
+    
+      // --- Email Validation ---
+      const trimmedEmail = email.trim().toLowerCase();
+      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(\.[a-zA-Z]{2,})?$/;
+    
+      if (!trimmedEmail) {
+        emailError = "Email is required.";
+      } else if (trimmedEmail.length < 8) {
+        emailError = "Email must be at least 8 characters long.";
+      } else if (trimmedEmail.length > 100) {
+        emailError = "Email must be less than 100 characters long.";
+      } else if (/\.{2,}/.test(trimmedEmail)) {
+        emailError = "Email cannot contain consecutive dots.";
+      } else if (!emailRegex.test(trimmedEmail)) {
+        emailError = "Please provide a valid email domain.";
+      }
+    
+      // Additional check for .com.com
+      if (trimmedEmail.includes(".com.com")) {
+        emailError = "Email cannot contain consecutive '.com' in domain.";
+      }
+    
+      setValidationErrors((prev) => ({
+        ...prev,
+        name: nameError,
+        email: emailError,
+      }));
+    };    
+
+  const validatePasswordForm = () => {
+    const { currentPassword, newPassword, confirmPassword } = formData;
+    let newPasswordError = "";
+    let confirmPasswordError = "";
+    let isValid = true;
+
+    if (newPassword.length < 8) {
+      newPasswordError = "Password must be at least 8 characters.";
+      isValid = false;
+    } else if (!/[A-Z]/.test(newPassword)) {
+      newPasswordError = "Password must include at least one uppercase letter.";
+      isValid = false;
+    } else if (!/[!@#$%^&*(),.?":{}|<>]/.test(newPassword)) {
+      newPasswordError =
+        "Password must include at least one special character.";
+      isValid = false;
+    } else if (newPassword === currentPassword) {
+      newPasswordError =
+        "New password must be different from current password.";
+      isValid = false;
+    }
+
+    if (confirmPassword !== newPassword) {
+      confirmPasswordError = "Passwords do not match.";
+      isValid = false;
+    }
+
+    setValidationErrors((prev) => ({
+      ...prev,
+      newPassword: newPasswordError,
+      confirmPassword: confirmPasswordError,
+      isFormValid: isValid,
+    }));
+  };
+
+  useEffect(() => {
+    if (changePasswordMode) {
+      validatePasswordForm();
+    }
+    if (editMode) {
+      validateProfileForm();
+    }
+  }, [
+    formData.newPassword,
+    formData.confirmPassword,
+    formData.currentPassword,
+    formData.name,
+    formData.email,
+  ]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -58,7 +151,6 @@ export default function Profile() {
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/user/update-profile`,
@@ -76,8 +168,6 @@ export default function Profile() {
       );
 
       const data = await response.json();
-      console.log("Update profile response:", data);
-
       if (response.ok) {
         toast.success("Profile updated successfully!");
         setUser(data.data.user);
@@ -96,22 +186,17 @@ export default function Profile() {
 
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLogoutModalOpen(true);
+  };
 
-    if (
-      !window.confirm(
-        "Are you sure you want to change your password? You will be logged out."
-      )
-    ) {
-      return;
-    }
-
+  const handleConfirmLogout = async () => {
     if (formData.newPassword !== formData.confirmPassword) {
       toast.error("Passwords do not match");
+      setIsLogoutModalOpen(false);
       return;
     }
 
     setLoading(true);
-
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/user/change-password`,
@@ -129,13 +214,10 @@ export default function Profile() {
       );
 
       const data = await response.json();
-      console.log("Change password response:", data);
-
       if (response.ok) {
         toast.success("Password changed successfully. Please log in again.");
         setUser(null);
         localStorage.removeItem("token");
-
         setTimeout(() => {
           router.push("/login");
         }, 1500);
@@ -147,6 +229,7 @@ export default function Profile() {
       toast.error("An error occurred. Please try again.");
     } finally {
       setLoading(false);
+      setIsLogoutModalOpen(false);
     }
   };
 
@@ -161,9 +244,7 @@ export default function Profile() {
       : "U";
   };
 
-  if (!user) {
-    return <div className="profile-loading">Loading...</div>;
-  }
+  if (!user) return <div className="profile-loading">Loading...</div>;
 
   return (
     <div className="profile-container">
@@ -175,7 +256,9 @@ export default function Profile() {
         </div>
         <div className="profile-header-info">
           <h1>{formData.name}</h1>
-          <p className="user-role">{user.role}</p>
+          <p className="user-role">
+            {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+          </p>
         </div>
       </div>
 
@@ -202,6 +285,9 @@ export default function Profile() {
                   onChange={handleInputChange}
                   required
                 />
+                {validationErrors.name && (
+                  <p className="error-text">{validationErrors.name}</p>
+                )}
               </div>
               <div className="form-group">
                 <label htmlFor="email">Email</label>
@@ -213,14 +299,13 @@ export default function Profile() {
                   onChange={handleInputChange}
                   required
                 />
+                {validationErrors.email && (
+                  <p className="error-text">{validationErrors.email}</p>
+                )}
               </div>
               <div className="form-group">
                 <label>Role</label>
                 <input type="text" value={user.role} disabled readOnly />
-              </div>
-              <div className="form-group">
-                <label>Joined Date</label>
-                <input type="text" value={joinedDate} disabled readOnly />
               </div>
               <div className="form-actions">
                 <button
@@ -258,17 +343,9 @@ export default function Profile() {
               </div>
               <div className="detail-item">
                 <span className="detail-label">Role:</span>
-                <span className="detail-value">{user.role}</span>
-              </div>
-              <div className="detail-item">
-                <strong>Joined Date:</strong>{" "}
-                {user.createdAt
-                  ? new Date(user.createdAt).toLocaleDateString("en-US", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })
-                  : "N/A"}
+                <span className="detail-value">
+                  {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                </span>
               </div>
             </div>
           )}
@@ -287,11 +364,34 @@ export default function Profile() {
             )}
           </div>
 
+          {isLogoutModalOpen && (
+            <div className="logout-modal-overlay">
+              <div className="logout-modal">
+                <h2>Confirm Password Change</h2>
+                <p>You will be logged out. Continue?</p>
+                <div className="logout-modal-buttons">
+                  <button
+                    onClick={() => setIsLogoutModalOpen(false)}
+                    className="cancel-button"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleConfirmLogout}
+                    className="logout-confirm-button"
+                  >
+                    Change Password
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
           {!changePasswordMode && (
             <div className="security-info">
-              <p className="text-sm text-gray-600">
-                You can change your account password here for security purposes.
-                Once updated, you’ll be logged out automatically.
+              <p className="text-sm text-gray-700 font-medium">
+                <strong>Note: </strong> Updating your account password will
+                enhance security, and you will be logged out automatically after
+                the update.
               </p>
             </div>
           )}
@@ -319,6 +419,9 @@ export default function Profile() {
                   onChange={handleInputChange}
                   required
                 />
+                {validationErrors.newPassword && (
+                  <p className="error-text">{validationErrors.newPassword}</p>
+                )}
               </div>
               <div className="form-group">
                 <label htmlFor="confirmPassword">Confirm New Password</label>
@@ -330,6 +433,11 @@ export default function Profile() {
                   onChange={handleInputChange}
                   required
                 />
+                {validationErrors.confirmPassword && (
+                  <p className="error-text">
+                    {validationErrors.confirmPassword}
+                  </p>
+                )}
               </div>
               <div className="form-actions">
                 <button
@@ -347,7 +455,11 @@ export default function Profile() {
                 >
                   Cancel
                 </button>
-                <button type="submit" className="btn-save" disabled={loading}>
+                <button
+                  type="submit"
+                  className="btn-save"
+                  disabled={loading || !validationErrors.isFormValid}
+                >
                   {loading ? "Updating..." : "Update Password"}
                 </button>
               </div>
