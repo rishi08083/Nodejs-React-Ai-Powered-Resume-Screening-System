@@ -92,9 +92,10 @@ export default function GoogleSignIn({
     <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}>
       <div className="flex items-center justify-center w-full">
       <GoogleLogin
+        type="standard"
         theme="filled_black"
         size="large"
-        width={200}
+        width="335"
         onSuccess={handleGoogleSuccess}
         onError={() => {
           toast.error("Google login failed");
