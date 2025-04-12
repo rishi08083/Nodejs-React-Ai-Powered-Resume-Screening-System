@@ -78,7 +78,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       localStorage.setItem("token", data.token);
       await checkAuth();
     } else {
-      throw new Error(data.error || "Login failed");
+      const errorMessage =
+        typeof data.error === "string"
+          ? data.error
+          : data.message || "Login failed";
+      throw new Error(errorMessage);
     }
   };
 

@@ -90,15 +90,18 @@ export default function GoogleSignIn({
 
   return (
     <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}>
+      <div className="flex items-center justify-center w-full">
       <GoogleLogin
         theme="filled_black"
         size="large"
+        width={200}
         onSuccess={handleGoogleSuccess}
         onError={() => {
           toast.error("Google login failed");
           onError?.("Google login failed");
         }}
-      />
+        />
+        </div>
     </GoogleOAuthProvider>
   );
 }
