@@ -18,14 +18,14 @@ exports.validateRegister = [
         throw new Error("Name must be less than 50 characters long");
       }
       return true;
-    }),
+        }),
 
-  body("email")
-    .trim()
-    .toLowerCase()
-    .isEmail()
-    .withMessage("Valid email is required")
-    .custom((value) => {
+      body("email")
+        .trim()
+        .toLowerCase()
+        .isEmail()
+        .withMessage("Valid email is required")
+        .custom((value) => {
       if (value.length < 8) {
         throw new Error("Email must be at least 8 characters long");
       }
@@ -35,12 +35,15 @@ exports.validateRegister = [
       if (/\.{2,}/.test(value)) {
         throw new Error("Email cannot contain consecutive dots");
       }
+      if (/\.com\.com/.test(value)) {
+        throw new Error("Email cannot contain consecutive '.com' in domain.");
+      }
       if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(?!com\.com)([a-zA-Z]{2,})(\.[a-zA-Z]{2,})?$/.test(value)) {
         throw new Error("Please provide a valid email domain");
       }
       return true;
-    })
-    .custom(async (email) => {
+        })
+        .custom(async (email) => {
       const domain = email.split("@")[1];
       const trustedDomains = [
         "gmail.com",
@@ -61,8 +64,8 @@ exports.validateRegister = [
         throw new Error("Email domain is not valid or cannot receive emails");
       }
       return true;
-    })
-    .custom(async (email) => {
+        })
+        .custom(async (email) => {
       const existingUser = await db.Users.findOne({ where: { email } });
       if (existingUser) {
 
@@ -71,20 +74,20 @@ exports.validateRegister = [
         else await existingUser.destroy();
       }
       return true;
-    }),
+        }),
 
-  body("password")
-    .isLength({ min: 8 })
-    .trim()
-    .withMessage("Password must be at least 8 characters long")
-    .matches(
+      body("password")
+        .isLength({ min: 8 })
+        .trim()
+        .withMessage("Password must be at least 8 characters long")
+        .matches(
       /^(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])(?=.*[0-9])/
-    )
-    .withMessage(
+        )
+        .withMessage(
       "Password must contain at least 1 uppercase letter, 1 special character, and 1 number"
-    ),
+        ),
 
-  (req, res, next) => {
+      (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({

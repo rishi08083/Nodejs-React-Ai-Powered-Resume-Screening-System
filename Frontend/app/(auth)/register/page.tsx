@@ -122,7 +122,7 @@ export default function RecruiterRegister() {
             height={600}
             alt="Welcome"
           />
-          <p className="text-[var(--dark-text-secondary)] text-lg">
+          <p className="text-[var(--dark-text-secondary)] text-lg font-bold">
             Register as a recruiter to access powerful hiring tools and find the
             best talent for your organization.
           </p>
@@ -302,7 +302,19 @@ export default function RecruiterRegister() {
               >
                 Register
               </button>
-              <GoogleSignIn onSuccess={() => {}} onError={() => {}} />
+              <GoogleSignIn
+                mode="register"
+                onSuccess={() => {
+                  toast.success(
+                    "Recruiter request sent successfully. Awaiting admin approval."
+                  );
+                  localStorage.setItem("recruiterEmail", formData.email);
+                  setTimeout(() => {
+                    router.push("/dashboard");
+                  }, 2000);
+                }}
+                onError={() => {}} 
+              />
             </form>
 
             <div className="mt-6 flex flex-col items-center space-y-4">
