@@ -9,7 +9,7 @@ const { authMiddleware } = require("../middlewares/authMiddleware");
 const { checkCache } = require("../middlewares/cacheMiddleWare");
 const router = express.Router();
 
-router.get("/recruiter-analytics", recruiterAnalytics);
+router.get("/recruiter-analytics",authMiddleware, recruiterAnalytics);
 router.get("/admin-analytics", authMiddleware, checkCache, adminAnalytics);
 
 module.exports = router;
