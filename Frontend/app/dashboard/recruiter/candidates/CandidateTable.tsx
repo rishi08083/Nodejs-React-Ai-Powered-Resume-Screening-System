@@ -23,7 +23,6 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
   const [originalCandidates, setOriginalCandidates] =
     useState(currentCandidates);
 
-  console.log("Original Candidates:", currentCandidates[0]); // Debug log
   // Function to fetch and open the resume
   const get_resume = async (candidateId: string, e: React.MouseEvent) => {
     try {
@@ -152,11 +151,11 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
                   <td className="px-6 py-4 text-sm">
                     {candidate?.match_score != null ? (
                       <span
-                        className={`inline-block px-3 py-1 text-sm font-semibold rounded ${candidate.is_recommended ===
-                            "YES"
+                        className={`inline-block px-3 py-1 text-sm font-semibold rounded ${
+                          candidate.is_recommended === "YES"
                             ? "bg-green-100 text-green-800"
                             : "bg-red-100 text-red-800"
-                          }`}
+                        }`}
                       >
                         {candidate.match_score} %
                       </span>
@@ -192,11 +191,9 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
                   </td>
                   {/* Recommended */}
                   <td className="px-6 py-4 text-sm">
-                    {candidate?.is_recommended.toUpperCase() ===
-                      "YES" ? (
+                    {candidate?.is_recommended.toUpperCase() === "YES" ? (
                       <span className="text-green-400 font-medium">Yes</span>
-                    ) : candidate?.is_recommended.toUpperCase() ===
-                      "NO" ? (
+                    ) : candidate?.is_recommended.toUpperCase() === "NO" ? (
                       <span className="text-red-400 font-medium">No</span>
                     ) : (
                       <span className="text-yellow-400 font-medium">
@@ -205,31 +202,52 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
                     )}
                   </td>
 
-
                   {/* Feedback Button */}
-                    <td className="px-6 py-4 text-sm">
+                  <td className="px-6 py-4 text-sm">
                     {candidate?.is_screened ? (
                       <div className="relative group">
-                      <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={() => handleShowFeedback(candidate)}
-                        className="px-4 py-2 border border-[var(--accent)] text-[var(--accent)] font-medium rounded-lg shadow hover:bg-[var(--accent)] hover:text-[var(--dark-bg)] transition-all duration-300"
-                      >
-                        Feedback
-                      </motion.button>
-                      <div className="absolute z-10 hidden group-hover:block bg-[var(--surface)] text-[var(--text-secondary)] text-sm p-2 rounded shadow-lg border border-[var(--border)] top-full mt-1">
-                        View Feedback
-                      </div>
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => handleShowFeedback(candidate)}
+                          className="px-4 py-2 border border-[var(--accent)] text-[var(--accent)] font-medium rounded-lg shadow hover:bg-[var(--accent)] hover:text-[var(--dark-bg)] transition-all duration-300"
+                        >
+                          Feedback
+                        </motion.button>
+                        <div
+                          className="absolute z-10 inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-xs opacity-0 tooltip dark:bg-gray-700 group-hover:opacity-100 group-hover:visible transition-opacity duration-300"
+                          style={{
+                            visibility: "hidden",
+                            top: "-40px",
+                            left: "50%",
+                            transform: "translateX(-50%)",
+                          }}
+                        >
+                          View Feedback
+                          <div
+                            className="tooltip-arrow"
+                            style={{
+                              position: "absolute",
+                              top: "100%",
+                              left: "50%",
+                              transform: "translateX(-50%)",
+                              width: "0",
+                              height: "0",
+                              borderLeft: "5px solid transparent",
+                              borderRight: "5px solid transparent",
+                              borderTop: "5px solid #1a202c",
+                            }}
+                          ></div>
+                        </div>
                       </div>
                     ) : (
                       <span className="text-[var(--text-secondary)]">
-                      {candidate.is_screened === false
-                        ? "Pending Screening"
-                        : "Not Available"}
+                        {candidate.is_screened === false
+                          ? "Pending Screening"
+                          : "Not Available"}
                       </span>
                     )}
-                    </td>
+                  </td>
 
                   {/* Resume Button */}
                   <td className="px-6 py-4 text-sm">
@@ -258,9 +276,23 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
                           <circle cx="12" cy="12" r="3"></circle>
                         </svg>
                       </button>
-                      <div className="absolute z-10 hidden group-hover:block bg-[var(--surface)] text-[var(--text-secondary)] text-sm p-2 rounded shadow-lg border border-[var(--border)] top-full mt-1">
+                      <div className="absolute z-50 bg-[var(--surface)] text-[var(--text-secondary)] text-sm p-2 rounded shadow-lg border border-[var(--border)] top-[-40px] left-1/2 transform -translate-x-1/2 whitespace-nowrap group-hover:block hidden">
                         View Resume
                       </div>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="absolute top-[-50px] left-1/2 transform -translate-x-1/2 h-4 w-4 text-[var(--text-secondary)] hidden group-hover:block"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M12 4v16m8-8H4"
+                        />
+                      </svg>
                     </div>
                   </td>
 
@@ -289,51 +321,51 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
                         <circle cx="12" cy="19" r="1"></circle>
                       </svg>
                     </button>
-                    {isOpen === candidate.id && (
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.2 }}
-                        className="absolute right-0 mt-2 w-36 rounded-md shadow-lg bg-[var(--surface)] ring-1 ring-[var(--border)] focus:outline-none z-50"
-                        tabIndex={-1}
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <div
-                          className="py-1"
-                          role="menu"
-                          aria-orientation="vertical"
-                          aria-labelledby="options-menu"
-                        >
-                          <button
-                            onClick={() => {
-                              handleDeleteCandidate(candidate.id); // Ensure this uses the correct candidate.id
-                              setIsOpen(null); // Close dropdown after action
-                            }}
-                            className="block w-full px-4 py-2 text-sm text-red-400 hover:bg-[var(--border)] hover:text-red-300 transition-colors duration-300 text-left"
-                            role="menuitem"
-                          >
-                            <div className="flex items-center">
-                              <svg
-                                className="mr-2 h-4 w-4"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth="2"
-                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                                ></path>
-                              </svg>
-                              Delete
-                            </div>
-                          </button>
-                        </div>
-                      </motion.div>
-                    )}
                   </td>
+                  {isOpen === candidate.id && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute right-0 mt-15 w-36 rounded-md shadow-lg bg-[var(--surface)] ring-1 ring-[var(--border)] focus:outline-none z-50"
+                      tabIndex={-1}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <div
+                        className="py-1"
+                        role="menu"
+                        aria-orientation="vertical"
+                        aria-labelledby="options-menu"
+                      >
+                        <button
+                          onClick={() => {
+                            handleDeleteCandidate(candidate.id); // Ensure this uses the correct candidate.id
+                            setIsOpen(null); // Close dropdown after action
+                          }}
+                          className="block w-full px-4 py-2 text-sm text-red-400 hover:bg-[var(--border)] hover:text-red-300 transition-colors duration-300 text-left"
+                          role="menuitem"
+                        >
+                          <div className="flex items-center">
+                            <svg
+                              className="mr-2 h-4 w-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                              ></path>
+                            </svg>
+                            Delete
+                          </div>
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
                 </motion.tr>
               ))}
             </tbody>
