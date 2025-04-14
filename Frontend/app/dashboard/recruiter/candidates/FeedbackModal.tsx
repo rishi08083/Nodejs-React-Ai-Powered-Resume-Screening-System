@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Candidate, Feedback } from "./page";
 
 type FeedbackModalProps = {
-  selectedFeedback: Feedback | null;
+  selectedFeedback: any;
   closeModal: () => void;
 };
 
