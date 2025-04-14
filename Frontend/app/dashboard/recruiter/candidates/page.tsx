@@ -136,10 +136,9 @@ const CandidateList = () => {
     };
 
     getCandidates();
-    // TODO: Uncomment this to enable auto-refresh every 6 seconds
-    // const intervalId = setInterval(() => {
-    //   getCandidates();
-    // }, 6000);
+    const intervalId = setInterval(() => {
+      getCandidates();
+    }, 6000);
 
     // return () => clearInterval(intervalId);
   }, [selectedJob, selectedRecommendation]);
