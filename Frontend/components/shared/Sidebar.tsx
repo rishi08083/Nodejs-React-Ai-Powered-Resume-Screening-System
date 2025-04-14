@@ -1,5 +1,4 @@
 "use client";
-
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -14,22 +13,23 @@ import {
   X,
 } from "lucide-react";
 import { useTheme } from "../../lib/themeContext";
+import styles from "../../styles/Sidebar.module.css";
 
 const recruiterLinks = [
   {
     href: "/dashboard/recruiter",
     label: "Dashboard",
-    icon: <LayoutDashboard className="sidebar-icon" />,
+    icon: <LayoutDashboard className={styles.icon} />,
   },
   {
     href: "/dashboard/recruiter/jobs",
     label: "Jobs",
-    icon: <Briefcase className="sidebar-icon" />,
+    icon: <Briefcase className={styles.icon} />,
   },
   {
     href: "/dashboard/recruiter/candidates",
     label: "Candidates",
-    icon: <Book className="sidebar-icon" />,
+    icon: <Book className={styles.icon} />,
   },
 ];
 
@@ -37,18 +37,13 @@ const adminLinks = [
   {
     href: "/dashboard/admin",
     label: "Dashboard",
-    icon: <LayoutDashboard className="sidebar-icon" />,
+    icon: <LayoutDashboard className={styles.icon} />,
   },
   {
     href: "/dashboard/admin/recruiter-requests",
     label: "Recruiter Requests",
-    icon: <Users className="sidebar-icon" />,
+    icon: <Users className={styles.icon} />,
   },
-  // {
-  //   href: "/dashboard/admin/settings",
-  //   label: "Settings",
-  //   icon: <Settings className="sidebar-icon" />,
-  // },
 ];
 
 export default function Sidebar({
@@ -56,19 +51,27 @@ export default function Sidebar({
   isOpen,
   setIsOpen,
   setIsLogoutModalOpen,
+}: {
+  role: string;
+  isOpen: boolean;
+  setIsOpen: (value: boolean) => void;
+  setIsLogoutModalOpen: (value: boolean) => void;
 }) {
   const links = role === "admin" ? adminLinks : recruiterLinks;
   const pathname = usePathname();
-  const { theme, toggleTheme } = useTheme();
+  const { theme } = useTheme();
 
   return (
     <>
       <div
-        className={`sidebar-overlay ${isOpen ? "active" : ""}`}
+        className={`${styles.overlay} ${isOpen ? styles.active : ""}`}
         onClick={() => setIsOpen(false)}
       />
-      <aside className={`sidebar ${isOpen ? "open" : ""}`}>
-        <div className="logo-container">
+      <aside
+        data-sidebar
+        className={`${styles.sidebar} ${isOpen ? styles.open : ""}`}
+      >
+        <div className={styles.logoContainer}>
           {theme === "dark" ? (
             <Image
               src="/promact.png"
@@ -87,17 +90,22 @@ export default function Sidebar({
             />
           )}
 
-          <button className="close-button" onClick={() => setIsOpen(false)}>
+          <button
+            className={styles.closeButton}
+            onClick={() => setIsOpen(false)}
+          >
             <X size={24} />
           </button>
         </div>
 
-        <nav className="sidebar-nav">
+        <nav className={styles.nav}>
           {links.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className={`sidebar-link ${pathname === link.href ? "active" : ""}`}
+              className={`${styles.link} ${
+                pathname === link.href ? styles.active : ""
+              }`}
               onClick={() => setIsOpen(false)}
             >
               {link.icon}
@@ -105,14 +113,6 @@ export default function Sidebar({
             </Link>
           ))}
         </nav>
-
-        {/* <button
-          className="sidebar-logout-btn"
-          onClick={() => setIsLogoutModalOpen(true)}
-        >
-          <LogOut className="sidebar-icon" />
-          <span>Logout</span>
-        </button> */}
       </aside>
     </>
   );

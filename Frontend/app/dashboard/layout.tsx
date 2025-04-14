@@ -1,11 +1,12 @@
 "use client";
-
 import { useEffect, useState } from "react";
 import { useAuth } from "../../lib/auth";
 import Sidebar from "../../components/shared/Sidebar";
 import Navbar from "../../components/shared/Navbar";
 import { useRouter } from "next/navigation";
 import LogOutModal from "../../components/shared/LogOut";
+import styles from "../../styles/Layout.module.css";
+
 export default function DashboardLayout({
   children,
 }: {
@@ -16,7 +17,6 @@ export default function DashboardLayout({
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const navigate = useRouter();
 
-  // Close sidebar when clicking outside on mobile
   useEffect(() => {
     if (user === null) {
       if (loading === false) {
@@ -30,8 +30,8 @@ export default function DashboardLayout({
       const target = e.target as HTMLElement;
       if (
         isSidebarOpen &&
-        !target.closest(".sidebar") &&
-        !target.closest(".menu-button")
+        !target.closest("[data-sidebar]") &&
+        !target.closest("[data-menu-button]")
       ) {
         setIsSidebarOpen(false);
       }
@@ -45,39 +45,15 @@ export default function DashboardLayout({
 
   if (loading) {
     return (
-      <div className="loading-container">
-        <div className="loader"></div>
+      <div className={styles.loadingContainer}>
+        <div className={styles.loader}></div>
       </div>
     );
   }
 
   return (
-    <div className="dashboard-container">
+    <div className={styles.container}>
       {isLogoutModalOpen && (
-        // <div className="logout-modal-overlay">
-        //   <div className="logout-modal">
-        //     <h2>Confirm Logout</h2>
-        //     <p>Are you sure you want to log out?</p>
-        //     <div className="logout-modal-buttons">
-        //       <button
-        //         onClick={() => setIsLogoutModalOpen(false)}
-        //         className="cancel-button"
-        //       >
-        //         Cancel
-        //       </button>
-        //       <button
-        //         onClick={async () => {
-        //           await logout();
-        //           navigate.push("/login");
-        //           setIsLogoutModalOpen(false);
-        //         }}
-        //         className="logout-confirm-button"
-        //       >
-        //         Logout
-        //       </button>
-        //     </div>
-        //   </div>
-        // </div>
         <LogOutModal
           setIsLogoutModalOpen={setIsLogoutModalOpen}
           logout={logout}
@@ -100,7 +76,7 @@ export default function DashboardLayout({
         setIsLogoutModalOpen={setIsLogoutModalOpen}
       />
 
-      <main className="dashboard-content">{children}</main>
+      <main className={styles.content}>{children}</main>
     </div>
   );
 }

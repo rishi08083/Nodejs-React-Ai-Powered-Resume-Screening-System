@@ -1,20 +1,26 @@
 "use client";
 import { LogOut } from "lucide-react";
 import React from "react";
+import styles from "../../styles/LogOut.module.css";
+
 export default function LogOutModal({
   setIsLogoutModalOpen,
   logout,
   navigate,
+}: {
+  setIsLogoutModalOpen: (value: boolean) => void;
+  logout: () => Promise<void>;
+  navigate: any;
 }) {
   return (
-    <div className="logout-modal-overlay">
-      <div className="logout-modal">
+    <div className={styles.overlay}>
+      <div className={styles.modal}>
         <h2>Confirm Logout</h2>
         <p>Are you sure you want to log out?</p>
-        <div className="logout-modal-buttons">
+        <div className={styles.buttons}>
           <button
             onClick={() => setIsLogoutModalOpen(false)}
-            className="cancel-button"
+            className={styles.cancelButton}
           >
             Cancel
           </button>
@@ -24,7 +30,7 @@ export default function LogOutModal({
               navigate.push("/login");
               setIsLogoutModalOpen(false);
             }}
-            className="logout-confirm-button"
+            className={styles.confirmButton}
           >
             Logout
           </button>

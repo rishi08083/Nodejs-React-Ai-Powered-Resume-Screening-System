@@ -1,0 +1,112 @@
+.sidebar {
+  background-color: var(--surface);
+  width: 250px;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: -280px;
+  transition: left 0.3s ease;
+  box-shadow: 2px 0 10px var(--shadow);
+  z-index: 20;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar.open {
+  left: 0;
+}
+
+.overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 15;
+}
+
+.overlay.active {
+  display: block;
+}
+
+.logoContainer {
+  padding: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1rem;
+}
+
+.closeButton {
+  position: absolute;
+  right: 1rem;
+  top: 1rem;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  padding: 0.25rem;
+  border-radius: 50%;
+  transition: background-color 0.3s;
+}
+
+.closeButton:hover {
+  background-color: var(--surface-lighter);
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  padding: 0 0.75rem;
+  flex-grow: 1;
+}
+
+.link {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  color: var(--text-primary);
+  text-decoration: none;
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+  transition: background-color 0.3s;
+  gap: 0.75rem;
+}
+
+.link:hover {
+  background-color: var(--surface-lighter);
+}
+
+.link.active {
+  background-color: rgba(255, 179, 0, 0.15);
+  color: var(--accent);
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+}
+
+@media (min-width: 768px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    box-shadow: none;
+    border-right: 1px solid var(--border);
+  }
+
+  .closeButton {
+    display: none;
+  }
+
+  .overlay {
+    display: none !important;
+  }
+}

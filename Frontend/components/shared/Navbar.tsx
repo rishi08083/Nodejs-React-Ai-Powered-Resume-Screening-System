@@ -1,11 +1,11 @@
 "use client";
-
 import { Menu, UserRound, LogOut, Settings } from "lucide-react";
 import ThemeToggle from "../theme/ThemeToggle";
 import { useState } from "react";
 import { useAuth } from "../../lib/auth";
 import LogOutModal from "./LogOut";
 import { useRouter } from "next/navigation";
+import styles from "../../styles/Navbar.module.css";
 
 export default function Navbar({
   user,
@@ -25,27 +25,28 @@ export default function Navbar({
   const navigate = useRouter();
 
   return (
-    <header className="navbar">
-      <div className="navbar-content">
+    <header className={styles.navbar}>
+      <div className={styles.navbarContent}>
         <button
-          className="menu-button"
+          data-menu-button
+          className={styles.menuButton}
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
           aria-label="Toggle menu"
         >
           <Menu size={24} />
         </button>
 
-        <div className="welcome-info">
-          <h1 className="user-name">Welcome, {user?.name || "User"}</h1>
-          <p className="user-role">
+        <div className={styles.welcomeInfo}>
+          <h1 className={styles.userName}>Welcome, {user?.name || "User"}</h1>
+          <p className={styles.userRole}>
             {user?.role === "admin" ? "Admin" : "Recruiter"}
           </p>
         </div>
       </div>
 
-      <div className="user-actions">
+      <div className={styles.userActions}>
         <UserRound
-          className="user-icon cursor-pointer"
+          className={`${styles.userIcon} cursor-pointer`}
           onClick={() => setModalVisible((prev) => !prev)}
         />
         <ThemeToggle />

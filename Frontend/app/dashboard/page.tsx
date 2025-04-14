@@ -2,6 +2,7 @@
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../lib/auth";
 import { useState, useEffect } from "react";
+import styles from "../../styles/Layout.module.css";
 
 export default function Dashboard() {
   const navigate = useRouter();
@@ -24,8 +25,8 @@ export default function Dashboard() {
 
   return (
     <div>
-      <div className="loading-container">
-        <div className="loader"></div>
+      <div className={styles.loadingContainer}>
+        <div className={styles.loader}></div>
       </div>
     </div>
   );
