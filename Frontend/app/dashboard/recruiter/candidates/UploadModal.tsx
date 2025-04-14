@@ -226,8 +226,9 @@ const UploadModal: React.FC<UploadModalProps> = ({
           setIsLoading(false);
         }, 500);
       } else {
+        console.log(data);
         setTimeout(() => {
-          setErrorMessage(data.message || "Failed to upload the resumes.");
+          setErrorMessage(data.message  || "Failed to upload the resumes.");
           setIsLoading(false);
         }, 500);
       }

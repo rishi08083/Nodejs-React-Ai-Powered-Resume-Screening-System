@@ -20,6 +20,11 @@ async function screenCandidate(candidate) {
     // console.log(`📝 Starting screening for candidate ${candidate_id}`);
     const candidateDetails = await getCandidateDetails(candidate_id);
     const token = generateToken();
+    // console.log(candidateDetails)
+    if (candidateDetails.rcd_file_key === null || candidateDetails.rcd_file_key === undefined || candidateDetails.rcd_file_key === "") {
+      console.log(`❌ RCD file key is null for candidate ${candidate_id}`);
+      return false;
+    }
 
     const aiResponse = await axios.post(
       `${process.env.AI_BACKEND_URL}/screen_candidates_2`,
@@ -35,7 +40,8 @@ async function screenCandidate(candidate) {
         },
       }
     );
-    
+    console.log(aiResponse.data);
+
     const payload = {
       candidate_id,
       job_id: candidateDetails.jd.job_id,
@@ -45,6 +51,10 @@ async function screenCandidate(candidate) {
       missing_skills: {
         jd_mismatch: aiResponse.data.feedback.jd_mismatch || [],
         rcd_mismatch: aiResponse.data.feedback.rcd_mismatch || [],
+        jd_skill_match_score:
+          aiResponse.data.jd_skill_match || 0,
+        rcd_mismatch_score:
+          aiResponse.data.rcd_skill_match || 0,
       },
       is_deleted: false,
       is_recommended:

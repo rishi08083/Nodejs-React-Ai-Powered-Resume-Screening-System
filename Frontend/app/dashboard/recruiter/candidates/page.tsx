@@ -23,15 +23,14 @@ type Job = {
 
 export type Feedback = {
   rating: number;
-  feedback_text: {
-    experience_match?: boolean;
-    recommendation?: string;
-    feedback?: string;
-    jd_mismatch?: string[];
-    rcd_mismatch?: string[];
-    jd_match?: string[];
-    rcd_match?: string[];
-  };
+  experience_match?: boolean;
+  recommendation?: string;
+  feedback?: string;
+  jd_mismatch?: string[];
+  rcd_mismatch?: string[];
+  jd_match?: string[];
+  rcd_match?: string[];
+  experience_info: string
 };
 
 export type Candidate = {
@@ -163,9 +162,8 @@ const CandidateList = () => {
       if (data.data) {
         const payload = data.data;
 
-        console.log("Feedback data:", payload.feedback);
-
-        setSelectedFeedback(payload.feedback);
+        console.log("Feedback data:", payload[0]);
+        setSelectedFeedback(payload[0] || {});
         setIsFeedbackModalOpen(true);
       }
     } catch (error: any) {
@@ -216,7 +214,8 @@ const CandidateList = () => {
   }, [isOpen]);
 
   const handleShowFeedback = (candidate: Candidate) => {
-      fetchCandidateFeedback(candidate.id);
+    fetchCandidateFeedback(candidate.id);
+    setIsOpen(null);
   };
 
   const closeModal = () => {
@@ -296,11 +295,10 @@ const CandidateList = () => {
               onClick={() => paginate(number + 1)}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
-              className={`px-4 py-2 rounded-lg shadow-md transition-all duration-300 ${
-                currentPage === number + 1
-                  ? "bg-[var(--accent)] text-[var(--dark-bg)] font-medium"
-                  : "bg-[var(--surface)] text-[var(--text-secondary)] border border-[var(--border)] hover:border-[var(--accent)] hover:text-[var(--accent)]"
-              }`}
+              className={`px-4 py-2 rounded-lg shadow-md transition-all duration-300 ${currentPage === number + 1
+                ? "bg-[var(--accent)] text-[var(--dark-bg)] font-medium"
+                : "bg-[var(--surface)] text-[var(--text-secondary)] border border-[var(--border)] hover:border-[var(--accent)] hover:text-[var(--accent)]"
+                }`}
             >
               {number + 1}
             </motion.button>
