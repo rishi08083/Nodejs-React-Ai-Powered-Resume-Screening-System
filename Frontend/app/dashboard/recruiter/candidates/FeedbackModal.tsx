@@ -205,7 +205,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
           {/* JD Skills Match */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-lg font-semibold text-[var(--text-primary)]">JD Skills Match</h3>
+              <h3 className="text-lg font-semibold text-[var(--text-primary)]">Job Description Skills Match</h3>
               <div className="text-sm font-medium text-[var(--text-primary)]">{jdMatchPercent}%</div>
             </div>
             <div className="h-2 bg-[var(--border)] rounded-full mb-4">

@@ -1,7 +1,9 @@
 const db = require("../../models");
 const { cache } = require("../../middlewares/cacheMiddleWare");
-exports.adminAnalytics = async (req, res) => {
+const { use } = require("../../routes/analyticsRoutes");
+exports.recruiterAnalytics = async (req, res) => {
   try {
+    console.log("Fetching admin analytics data...",req.user);
     const [
       numOfResumes,
       numOfCandidates,
@@ -14,11 +16,13 @@ exports.adminAnalytics = async (req, res) => {
       db.UnparsedResume.count({
         where: {
           is_deleted: false,
+          user_id: req.user.id,
         },
       }),
       db.Candidates.count({
         where: {
           is_deleted: false,
+          user_id: req.user.id,
         },
       }),
       db.Candidates.findOne({
@@ -30,6 +34,7 @@ exports.adminAnalytics = async (req, res) => {
         ],
         where: {
           is_deleted: false,
+          user_id: req.user.id
         },
         raw: true,
       }),
@@ -40,6 +45,7 @@ exports.adminAnalytics = async (req, res) => {
         ],
         where: {
           is_deleted: false,
+          user_id: req.user.id
         },
         group: "is_recommended",
         raw: true,
@@ -51,6 +57,7 @@ exports.adminAnalytics = async (req, res) => {
         ],
         where: {
           is_deleted: false,
+          user_id: req.user.id
         },
         group: [db.sequelize.fn("DATE", db.sequelize.col("created_at"))],
         order: [
@@ -77,6 +84,7 @@ exports.adminAnalytics = async (req, res) => {
         ],
         where: {
           is_deleted: false,
+          user_id: req.user.id
         },
         group: ["Candidates.job_id", "jobs.title"],
         raw: true,
@@ -130,7 +138,7 @@ exports.adminAnalytics = async (req, res) => {
       },
     };
     try {
-      cache.set("adminAnalytics", fullResponse);
+      cache.set("recruiterAnalytics", fullResponse);
     } catch (error) {
       console.log("Cache settings failed ");
     }
