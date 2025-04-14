@@ -82,6 +82,16 @@ const CandidateList = () => {
         if (response.ok) {
           const data = await response.json();
           setJobs(data.data);
+
+          {
+            data.data.length > 0 &&
+              selectedJob === "" &&
+              (() => {
+                setSelectedJob(data.data[0].id);
+                return null;
+              })();
+          }
+
         } else {
           const errorData = await response.json();
           throw new Error(errorData.message);
@@ -91,6 +101,7 @@ const CandidateList = () => {
       }
     };
     getJobDetails();
+
   }, []);
 
   useEffect(() => {
@@ -134,8 +145,10 @@ const CandidateList = () => {
         console.log(error, "error");
       }
     };
+  
 
     getCandidates();
+    
     const intervalId = setInterval(() => {
       getCandidates();
     }, 6000);

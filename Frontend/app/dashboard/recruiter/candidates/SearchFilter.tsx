@@ -75,12 +75,7 @@ const SearchFilter = ({
             </option>
           ))}
         </select>
-        {jobs.length > 0 &&
-          selectedJob === "" &&
-          (() => {
-            // setSelectedJob(jobs[0].id);
-            return null;
-          })()}
+       
         <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[var(--text-secondary)] bg-[var(--accent)] rounded-r-lg">
           <svg
             className="h-5 w-5"
