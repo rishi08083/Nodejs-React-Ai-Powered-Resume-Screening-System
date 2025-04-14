@@ -144,4 +144,34 @@ const processAndUploadResume = async (file, job_id, user_id) => {
   await parseResumes({ fileName, fileUrl }, job_id, user_id);
 };
 
-module.exports = { processAndUploadResume };
+const extractJobTitle = async (parsed) => {
+  const subject = parsed.subject || '';
+  const body = (parsed.text || '').trim();
+
+  // Extract job title
+  let jobTitle = null;
+
+  // Try extracting from subject
+  const subjectMatch = subject.match(/Job Application:\s*(.+)/i);
+  if (subjectMatch) {
+    jobTitle = subjectMatch[1].trim();
+  } 
+  // else if (body.length > 0 && body.length <= 150) {
+  //   // Fallback: if body is short, assume it's the job title
+  //   jobTitle = body;
+  // }
+
+  const job = await db.Jobs.findOne({
+    where: {title: jobTitle},
+    raw: true
+  });
+
+  return job.id;
+
+}
+
+
+module.exports = { 
+  processAndUploadResume,
+  extractJobTitle
+};

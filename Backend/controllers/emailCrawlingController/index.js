@@ -2,7 +2,10 @@ const Imap = require("node-imap");
 const { simpleParser } = require("mailparser");
 const mime = require('mime-types');
 require("dotenv").config();
-const { processAndUploadResume } = require("../emailCrawlingController/processEmailResumes");
+const { 
+  processAndUploadResume,
+  extractJobTitle
+} = require("../emailCrawlingController/processEmailResumes");
 
 const crawlEmails = () => {
     // IST offset (UTC+5:30)
@@ -31,7 +34,8 @@ const crawlEmails = () => {
   // Search criteria: 'SINCE' and 'BEFORE'
   const searchCriteria = [
     ['SINCE', utcSince], 
-    ['BEFORE', utcBefore], 
+    ['BEFORE', utcBefore],
+    // ['FROM', 'vidjanainesh@gmail.com']
     // ['X-GM-LABELS', 'PRIMARY']
   ];
 
@@ -81,13 +85,16 @@ const crawlEmails = () => {
                 return;
               }
 
+              const jobId = await extractJobTitle(parsed);
+              console.log("Job: ",jobId);
+
               const attachments = parsed.attachments || [];
               for (let file of attachments) {
                 const ext = file.filename?.split('.').pop()?.toLowerCase();
                 if (["pdf", "docx", "jpg", "jpeg", "png"].includes(ext)) {
                   try {
                     // console.log("Inside Controller: ",file);
-                    await processAndUploadResume(file, 3, 23); 
+                    await processAndUploadResume(file, jobId, 23); 
                     
                     console.log(`Processed and uploaded: ${file.filename}`);
                   } catch (uploadErr) {
