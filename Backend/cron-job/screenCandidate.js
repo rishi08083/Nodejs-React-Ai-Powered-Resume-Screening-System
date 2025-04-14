@@ -21,7 +21,11 @@ async function screenCandidate(candidate) {
     const candidateDetails = await getCandidateDetails(candidate_id);
     const token = generateToken();
     // console.log(candidateDetails)
-    if (candidateDetails.rcd_file_key === null || candidateDetails.rcd_file_key === undefined || candidateDetails.rcd_file_key === "") {
+    if (
+      candidateDetails.rcd_file_key === null ||
+      candidateDetails.rcd_file_key === undefined ||
+      candidateDetails.rcd_file_key === ""
+    ) {
       console.log(`❌ RCD file key is null for candidate ${candidate_id}`);
       return false;
     }
@@ -40,7 +44,7 @@ async function screenCandidate(candidate) {
         },
       }
     );
-    console.log(aiResponse.data);
+    console.log(aiResponse.data.feedback);
 
     const payload = {
       candidate_id,
@@ -49,19 +53,28 @@ async function screenCandidate(candidate) {
       match_score: aiResponse.data.combined_score, // Updated to match response
       status_of: aiResponse.data.status === "success",
       missing_skills: {
+        jd_match: aiResponse.data.feedback.jd_match || [],
+        rcd_match: aiResponse.data.feedback.rcd_match || [],
         jd_mismatch: aiResponse.data.feedback.jd_mismatch || [],
         rcd_mismatch: aiResponse.data.feedback.rcd_mismatch || [],
-        jd_skill_match_score:
-          aiResponse.data.jd_skill_match || 0,
-        rcd_mismatch_score:
-          aiResponse.data.rcd_skill_match || 0,
+        jd_skill_match: aiResponse.data.jd_skill_match || 0,
+        rcd_skill_match: aiResponse.data.rcd_skill_match || 0,
+        feedback : aiResponse.data.feedback.feedback || [],
+        experience_match : aiResponse.data.feedback.experience_match || [],
+        experience_info: aiResponse.data.feedback.experience_info || [],
+        match_score: aiResponse.data.combined_score || 0,
+        is_recommended :
+          aiResponse.data.feedback.recommendation.toUpperCase() === "YES"
+            ? "YES"
+            : "NO",
       },
       is_deleted: false,
       is_recommended:
         aiResponse.data.feedback.recommendation.toUpperCase() === "YES"
           ? "YES"
           : "NO",
-      feedback_json: aiResponse.data.feedback
+      feedback_json: aiResponse.data.feedback,
+
     };
 
     const existing = await db.ScreeningResults.findOne({

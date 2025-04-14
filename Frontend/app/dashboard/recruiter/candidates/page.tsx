@@ -30,7 +30,7 @@ export type Feedback = {
   rcd_mismatch?: string[];
   jd_match?: string[];
   rcd_match?: string[];
-  experience_info: string
+  experience_info: string;
 };
 
 export type Candidate = {
@@ -162,8 +162,8 @@ const CandidateList = () => {
       if (data.data) {
         const payload = data.data;
 
-        console.log("Feedback data:", payload[0]);
-        setSelectedFeedback(payload[0] || {});
+        console.log("Feedback data:", payload);
+        setSelectedFeedback(payload || {});
         setIsFeedbackModalOpen(true);
       }
     } catch (error: any) {
@@ -295,10 +295,11 @@ const CandidateList = () => {
               onClick={() => paginate(number + 1)}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
-              className={`px-4 py-2 rounded-lg shadow-md transition-all duration-300 ${currentPage === number + 1
-                ? "bg-[var(--accent)] text-[var(--dark-bg)] font-medium"
-                : "bg-[var(--surface)] text-[var(--text-secondary)] border border-[var(--border)] hover:border-[var(--accent)] hover:text-[var(--accent)]"
-                }`}
+              className={`px-4 py-2 rounded-lg shadow-md transition-all duration-300 ${
+                currentPage === number + 1
+                  ? "bg-[var(--accent)] text-[var(--dark-bg)] font-medium"
+                  : "bg-[var(--surface)] text-[var(--text-secondary)] border border-[var(--border)] hover:border-[var(--accent)] hover:text-[var(--accent)]"
+              }`}
             >
               {number + 1}
             </motion.button>

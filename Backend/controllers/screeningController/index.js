@@ -99,19 +99,16 @@ const getFeedback = async (req, res) => {
     const feedback = await getFeedbackByCandidateId(candidate_id);
 
     if (!feedback) {
-      return res
-        .status(404)
-        .json({
-          status: "error",
-          message: "No feedback found for this candidate.",
-        });
+      return res.status(404).json({
+        status: "error",
+        message: "No feedback found for this candidate.",
+      });
     }
     res.json({
       status: "success",
       message: "Feedback retrieved successfully.",
       data: feedback,
     });
-
   } catch (error) {
     // console.error("Error fetching feedback:", error);
     res.status(500).json({ status: "error", message: "Internal Server Error" });
@@ -166,9 +163,9 @@ async function getCandidateDetails(candidate_id) {
     // Format required skills
     const req_skills = job_detail_candidate.skills_required
       ? job_detail_candidate.skills_required
-        .split(",")
-        .map((skill) => skill.trim())
-        .join(", ")
+          .split(",")
+          .map((skill) => skill.trim())
+          .join(", ")
       : "";
 
     // Prepare final response
@@ -261,40 +258,41 @@ async function getFeedbackByCandidateId(candidate_id) {
     }
 
     // list assotiaction method
-    
-    // Fetch feedback from Feedback table
-    const feedback = await db.ScreeningResults.findOne({
-      where :{
-        candidate_id:candidate_id
-      }
-    });
-    console.log(feedback)
 
-    if (!feedback) {
+    // Fetch feedback from Feedback table
+    const ScreeningResults = await db.ScreeningResults.findOne({
+      where: {
+        candidate_id: candidate_id,
+      },
+    });
+    console.log(ScreeningResults, "ScreeningResults------------------");
+
+    if (!ScreeningResults) {
       return null;
     }
     console.log(candidate);
-    const formattedFeedback = JSON.parse(feedback);
+    const formattedFeedback = ScreeningResults; // Assuming feedback_json contains the required data
     const res = {
+      feedback: formattedFeedback.missing_skills.feedback,
       candidate_id: candidate.id,
-      rating: feedback.rating,
-      experience_match: formattedFeedback.experience_match,
+      rating: formattedFeedback.match_score,
+      experience_match: formattedFeedback.missing_skills.experience_match,
       recommendation: formattedFeedback.recommendation,
       feedback_summery: formattedFeedback.feedback,
-      jd_mismatch: formattedFeedback.jd_mismatch,
-      rcd_mismatch: formattedFeedback.rcd_mismatch,
-      jd_match: formattedFeedback.jd_match,
-      rcd_match: formattedFeedback.rcd_match,
-      jd_match_score: formattedFeedback.jd_skill_match_score,
-      rcd_match_score: formattedFeedback.rcd_mismatch_score,
-      experience_info: formattedFeedback.experience_info
-    }
-    console.log(res,"111111111111")
-
+      jd_mismatch: formattedFeedback.missing_skills.jd_mismatch,
+      rcd_mismatch: formattedFeedback.missing_skills.rcd_mismatch,
+      jd_match: formattedFeedback.missing_skills.jd_match,
+      rcd_match: formattedFeedback.missing_skills.rcd_match,
+      jd_match_score: formattedFeedback.missing_skills.jd_skill_match,
+      rcd_match_score: formattedFeedback.missing_skills.rcd_skill_match,
+      experience_info: formattedFeedback.missing_skills.experience_info,
+      is_recommended: formattedFeedback.missing_skills.is_recommended,
+    };
+    console.log(res, "111111111111");
     // Format feedback for response
     return res;
   } catch (error) {
-    console.error("Error fetching feedback:", error.message || error);
+    console.error("Error fetching feedback:", error.message + error);
     throw new Error("Failed to fetch feedback.");
   }
 }

@@ -51,9 +51,10 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
   const rcdMismatchSkills = selectedFeedback.rcd_mismatch ? parseSkills(selectedFeedback.rcd_mismatch) : [];
 
   // Calculate match percentages
-  const jdMatchPercent =Math.round(1)  || 0;
-  const rcdMatchPercent = Math.round(1) || 0;
-  const overallMatchPercent = Math.round(1) || 0;
+  console.log("selected feedback", selectedFeedback);
+  const jdMatchPercent =Math.round(selectedFeedback.jd_match_score)  || 0;
+  const rcdMatchPercent = Math.round(selectedFeedback.rcd_match_score) || 0;
+  const overallMatchPercent = Math.round(selectedFeedback.rating) || 0;
 
   return (
     <motion.div
@@ -113,11 +114,11 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
               Overall Assessment
             </h3>
             <div className={`px-3 py-1 rounded-full text-sm font-medium ${
-              selectedFeedback.recommendation === "Yes" 
+              selectedFeedback.is_recommended === "YES" 
                 ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
                 : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
             }`}>
-              {selectedFeedback.recommendation === "Yes" ? "Recommended" : "Not Recommended"}
+              {selectedFeedback.is_recommended === "YES" ? "Recommended" : "Not Recommended"}
             </div>
           </div>
 
@@ -311,14 +312,14 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
           >
             Close
           </motion.button>
-          <motion.button
+          {/* <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             className="px-4 py-2 bg-[var(--accent)] text-[var(--dark-bg)] rounded-lg"
             onClick={() => window.print()}
           >
             Export Report
-          </motion.button>
+          </motion.button> */}
         </div>
       </motion.div>
     </motion.div>
