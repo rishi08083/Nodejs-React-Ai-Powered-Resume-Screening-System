@@ -10,7 +10,17 @@ const adminRegister = async (req, res) => {
     const { name, email, password, apikey } = req.body;
     if (apikey === "Niket") {
       const hashedPassword = await bcrypt.hash(password, 10);
-
+      const is_exist = await db.Users.findOne({
+        where: {
+          email
+        }
+      })
+      if (is_exist) {
+        return res.status(400).json({
+          status: "error",
+          message: "email already exists",
+        });
+      }
       const user = await db.Users.create({
         name,
         email,
@@ -33,6 +43,7 @@ const adminRegister = async (req, res) => {
       });
     }
   } catch (error) {
+    console.log(error)
     res.status(500).json({
       status: "error",
       message: "Internal Server Error",
@@ -93,7 +104,7 @@ const recruiterRegister = async (req, res) => {
         </div>
       `
     };
-    
+
     const user = await db.Users.create({
       name,
       email,
@@ -122,9 +133,11 @@ const recruiterRegister = async (req, res) => {
 const userLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await db.Users.findOne({ where: { 
-      email,
-    }});
+    const user = await db.Users.findOne({
+      where: {
+        email,
+      }
+    });
 
     if (!user) {
       return res.status(400).json({
@@ -134,7 +147,7 @@ const userLogin = async (req, res) => {
       });
     }
 
-    if(!user.is_verified){
+    if (!user.is_verified) {
       return res.status(400).json({
         status: "error",
         message: "Email not verified. Register again!",
@@ -161,7 +174,8 @@ const userLogin = async (req, res) => {
       res.status(200).json({
         status: "success",
         message: "Logged in successfully",
-        data: { token },
+        token,
+        data: { user }
       });
     } else {
       res.status(401).json({

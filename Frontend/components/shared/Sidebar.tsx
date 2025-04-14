@@ -10,7 +10,6 @@ import {
   Users,
   LogOut,
   Book,
-  Settings,
   UserRound,
   X,
 } from "lucide-react";
@@ -45,11 +44,11 @@ const adminLinks = [
     label: "Recruiter Requests",
     icon: <Users className="sidebar-icon" />,
   },
-  {
-    href: "/dashboard/admin/settings",
-    label: "Settings",
-    icon: <Settings className="sidebar-icon" />,
-  },
+  // {
+  //   href: "/dashboard/admin/settings",
+  //   label: "Settings",
+  //   icon: <Settings className="sidebar-icon" />,
+  // },
 ];
 
 export default function Sidebar({

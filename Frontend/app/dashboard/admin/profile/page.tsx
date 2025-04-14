@@ -15,9 +15,6 @@ export default function Profile() {
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
-    showCurrentPassword: false,
-    showNewPassword: false,
-    showConfirmPassword: false,
   });
   const [originalData, setOriginalData] = useState({ name: "", email: "" });
   const [editMode, setEditMode] = useState(false);
@@ -49,52 +46,50 @@ export default function Profile() {
     formData.name !== originalData.name ||
     formData.email !== originalData.email;
 
-  const validateProfileForm = () => {
-    const { name, email } = formData;
-    let nameError = "";
-    let emailError = "";
-
-    const trimmedName = name.trim().replace(/\s+/g, " ");
-    const nameRegex = /^[A-Za-z]+( [A-Za-z]+)?$/;
-
-    if (!trimmedName) {
-      nameError = "Name is required.";
-    } else if (!nameRegex.test(trimmedName)) {
-      nameError =
-        "Name must contain only alphabets and a single space between first and last name.";
-    } else if (trimmedName.length < 2) {
-      nameError = "Name must be at least 2 characters long.";
-    } else if (trimmedName.length > 50) {
-      nameError = "Name must be less than 50 characters long.";
-    }
-
-    const trimmedEmail = email.trim().toLowerCase();
-    const emailRegex =
-      /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(\.[a-zA-Z]{2,})?$/;
-
-    if (!trimmedEmail) {
-      emailError = "Email is required.";
-    } else if (trimmedEmail.length < 8) {
-      emailError = "Email must be at least 8 characters long.";
-    } else if (trimmedEmail.length > 100) {
-      emailError = "Email must be less than 100 characters long.";
-    } else if (/\.{2,}/.test(trimmedEmail)) {
-      emailError = "Email cannot contain consecutive dots.";
-    } else if (!emailRegex.test(trimmedEmail)) {
-      emailError = "Please provide a valid email domain.";
-    }
-
-    // Additional check for .com.com
-    if (trimmedEmail.includes(".com.com")) {
-      emailError = "Email cannot contain consecutive '.com' in domain.";
-    }
-
-    setValidationErrors((prev) => ({
-      ...prev,
-      name: nameError,
-      email: emailError,
-    }));
-  };
+    const validateProfileForm = () => {
+      const { name, email } = formData;
+      let nameError = "";
+      let emailError = "";
+    
+      const trimmedName = name.trim().replace(/\s+/g, " ");
+      const nameRegex = /^[A-Za-z]+( [A-Za-z]+)?$/;
+    
+      if (!trimmedName) {
+        nameError = "Name is required.";
+      } else if (!nameRegex.test(trimmedName)) {
+        nameError = "Name must contain only alphabets and a single space between first and last name.";
+      } else if (trimmedName.length < 2) {
+        nameError = "Name must be at least 2 characters long.";
+      } else if (trimmedName.length > 50) {
+        nameError = "Name must be less than 50 characters long.";
+      }
+    
+      const trimmedEmail = email.trim().toLowerCase();
+      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(\.[a-zA-Z]{2,})?$/;
+    
+      if (!trimmedEmail) {
+        emailError = "Email is required.";
+      } else if (trimmedEmail.length < 8) {
+        emailError = "Email must be at least 8 characters long.";
+      } else if (trimmedEmail.length > 100) {
+        emailError = "Email must be less than 100 characters long.";
+      } else if (/\.{2,}/.test(trimmedEmail)) {
+        emailError = "Email cannot contain consecutive dots.";
+      } else if (!emailRegex.test(trimmedEmail)) {
+        emailError = "Please provide a valid email domain.";
+      }
+    
+      // Additional check for .com.com
+      if (trimmedEmail.includes(".com.com")) {
+        emailError = "Email cannot contain consecutive '.com' in domain.";
+      }
+    
+      setValidationErrors((prev) => ({
+        ...prev,
+        name: nameError,
+        email: emailError,
+      }));
+    };    
 
   const validatePasswordForm = () => {
     const { currentPassword, newPassword, confirmPassword } = formData;
@@ -403,78 +398,39 @@ export default function Profile() {
             <form onSubmit={handleChangePassword}>
               <div className="form-group">
                 <label htmlFor="currentPassword">Current Password</label>
-                <div className="password-input-wrapper">
-                  <input
-                    type={formData.showCurrentPassword ? "text" : "password"}
-                    id="currentPassword"
-                    name="currentPassword"
-                    value={formData.currentPassword}
-                    onChange={handleInputChange}
-                    required
-                  />
-                  <span
-                    className="toggle-password-inside"
-                    onClick={() =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        showCurrentPassword: !prev.showCurrentPassword,
-                      }))
-                    }
-                  >
-                    {formData.showCurrentPassword ? "Hide" : "Show"}
-                  </span>
-                </div>
+                <input
+                  type="password"
+                  id="currentPassword"
+                  name="currentPassword"
+                  value={formData.currentPassword}
+                  onChange={handleInputChange}
+                  required
+                />
               </div>
               <div className="form-group">
                 <label htmlFor="newPassword">New Password</label>
-                <div className="password-input-wrapper">
-                  <input
-                    type={formData.showNewPassword ? "text" : "password"}
-                    id="newPassword"
-                    name="newPassword"
-                    value={formData.newPassword}
-                    onChange={handleInputChange}
-                    required
-                  />
-                  <span
-                    className="toggle-password-inside"
-                    onClick={() =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        showNewPassword: !prev.showNewPassword,
-                      }))
-                    }
-                  >
-                    {formData.showNewPassword ? "Hide" : "Show"}
-                  </span>
-                </div>
+                <input
+                  type="password"
+                  id="newPassword"
+                  name="newPassword"
+                  value={formData.newPassword}
+                  onChange={handleInputChange}
+                  required
+                />
                 {validationErrors.newPassword && (
                   <p className="error-text">{validationErrors.newPassword}</p>
                 )}
               </div>
               <div className="form-group">
                 <label htmlFor="confirmPassword">Confirm New Password</label>
-                <div className="password-input-wrapper">
-                  <input
-                    type={formData.showConfirmPassword ? "text" : "password"}
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    value={formData.confirmPassword}
-                    onChange={handleInputChange}
-                    required
-                  />
-                  <span
-                    className="toggle-password-inside"
-                    onClick={() =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        showConfirmPassword: !prev.showConfirmPassword,
-                      }))
-                    }
-                  >
-                    {formData.showConfirmPassword ? "Hide" : "Show"}
-                  </span>
-                </div>
+                <input
+                  type="password"
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleInputChange}
+                  required
+                />
                 {validationErrors.confirmPassword && (
                   <p className="error-text">
                     {validationErrors.confirmPassword}
@@ -492,9 +448,6 @@ export default function Profile() {
                       currentPassword: "",
                       newPassword: "",
                       confirmPassword: "",
-                      showCurrentPassword: false,
-                      showNewPassword: false,
-                      showConfirmPassword: false,
                     }));
                   }}
                 >
