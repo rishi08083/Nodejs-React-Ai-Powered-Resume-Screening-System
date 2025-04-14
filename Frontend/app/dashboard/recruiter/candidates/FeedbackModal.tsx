@@ -51,7 +51,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
   const rcdMismatchSkills = selectedFeedback.rcd_mismatch ? parseSkills(selectedFeedback.rcd_mismatch) : [];
 
   // Calculate match percentages
-  console.log("selected feedback", selectedFeedback);
+  // console.log("selected feedback", selectedFeedback);
   const jdMatchPercent =Math.round(selectedFeedback.jd_match_score)  || 0;
   const rcdMatchPercent = Math.round(selectedFeedback.rcd_match_score) || 0;
   const overallMatchPercent = Math.round(selectedFeedback.rating) || 0;
