@@ -51,6 +51,7 @@ type StatCardProps = {
 
 type AnalyticsData = {
   num_of_resumes: number;
+  num_recommended_candidates : number;
   num_of_candidates: number;
   average_screening_score: string;
   day_wise_parse_count: {
@@ -234,15 +235,15 @@ export default function AdminDashboard() {
         {/* KPI Stats Row */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <StatCard
-            title="Total Resumes"
-            value={analyticsData.num_of_resumes}
+            title="Total Candidates"
+            value={analyticsData.num_of_candidates}
             icon={<FileText size={24} className="text-[var(--accent)]" />}
             //change={12.5}
             changeDirection="up"
           />
           <StatCard
-            title="Total Candidates"
-            value={analyticsData.num_of_candidates}
+            title="Recommended Candidates"
+            value={analyticsData.num_recommended_candidates}
             icon={<Users size={24} className="text-[var(--accent)]" />}
             // change={8.3}
             changeDirection="up"
