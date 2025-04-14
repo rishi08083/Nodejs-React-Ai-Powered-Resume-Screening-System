@@ -66,16 +66,14 @@ const SearchFilter = ({
             setCandidates(originalCandidates); // Reset candidates when job changes
           }}
         >
-          <option value="" disabled>
-            Select a Job
-          </option>
+
           {jobs.map((job, index) => (
             <option key={job.id} value={job.id}>
               {job.title}
             </option>
           ))}
         </select>
-       
+
         <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[var(--text-secondary)] bg-[var(--accent)] rounded-r-lg">
           <svg
             className="h-5 w-5"
@@ -97,11 +95,10 @@ const SearchFilter = ({
       {/* Recommendation Filter */}
       <div className="relative w-full md:w-1/6 h-12">
         <select
-          className={`w-full h-full p-2 pl-4 border rounded-lg shadow-md appearance-none focus:outline-none focus:ring-2 ${
-            selectedJob
-              ? "focus:ring-[var(--accent)] bg-[var(--surface)] border-[var(--border)] text-[var(--text-primary)]"
-              : "bg-gray-200 border-gray-300 text-gray-400 cursor-not-allowed"
-          } transition-all duration-300`}
+          className={`w-full h-full p-2 pl-4 border rounded-lg shadow-md appearance-none focus:outline-none focus:ring-2 ${selectedJob
+            ? "focus:ring-[var(--accent)] bg-[var(--surface)] border-[var(--border)] text-[var(--text-primary)]"
+            : "bg-gray-200 border-gray-300 text-gray-400 cursor-not-allowed"
+            } transition-all duration-300`}
           value={selectedRecommendation}
           onChange={(e) => {
             const value = e.target.value;
