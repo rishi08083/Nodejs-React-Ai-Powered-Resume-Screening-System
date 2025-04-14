@@ -3,7 +3,6 @@ const { cache } = require("../../middlewares/cacheMiddleWare");
 const { use } = require("../../routes/analyticsRoutes");
 exports.recruiterAnalytics = async (req, res) => {
   try {
-    console.log("Fetching admin analytics data...",req.user);
     const [
       numOfResumes,
       numOfCandidates,
@@ -13,7 +12,7 @@ exports.recruiterAnalytics = async (req, res) => {
       candidateCountByJob,
       candidateCountBySkill,
     ] = await Promise.all([
-      db.UnparsedResume.count({
+      db.Candidates.count({
         where: {
           is_deleted: false,
           user_id: req.user.id,
@@ -34,7 +33,7 @@ exports.recruiterAnalytics = async (req, res) => {
         ],
         where: {
           is_deleted: false,
-          user_id: req.user.id
+          user_id: req.user.id,
         },
         raw: true,
       }),
@@ -45,7 +44,7 @@ exports.recruiterAnalytics = async (req, res) => {
         ],
         where: {
           is_deleted: false,
-          user_id: req.user.id
+          user_id: req.user.id,
         },
         group: "is_recommended",
         raw: true,
@@ -57,7 +56,7 @@ exports.recruiterAnalytics = async (req, res) => {
         ],
         where: {
           is_deleted: false,
-          user_id: req.user.id
+          user_id: req.user.id,
         },
         group: [db.sequelize.fn("DATE", db.sequelize.col("created_at"))],
         order: [
@@ -84,7 +83,7 @@ exports.recruiterAnalytics = async (req, res) => {
         ],
         where: {
           is_deleted: false,
-          user_id: req.user.id
+          user_id: req.user.id,
         },
         group: ["Candidates.job_id", "jobs.title"],
         raw: true,
@@ -100,7 +99,6 @@ exports.recruiterAnalytics = async (req, res) => {
             "candidate_count",
           ],
         ],
-
         raw: true,
         group: ["skill_name"],
         order: [[db.sequelize.literal("candidate_count"), "DESC"]],
@@ -117,8 +115,8 @@ exports.recruiterAnalytics = async (req, res) => {
     let fullResponse = {
       status: "success",
       data: {
-        num_of_resumes: numOfResumes,
         num_of_candidates: numOfCandidates,
+        num_recommended_candidates: statusCounts.YES,
         average_screening_score:
           averageScreeningScore?.average_screening_score || 0,
         day_wise_parse_count: dayWiseParseCount,
@@ -133,18 +131,21 @@ exports.recruiterAnalytics = async (req, res) => {
           candidate_count: job.candidate_count,
         })),
         candidate_count_by_skill: candidateCountBySkill.filter((skillMap) => {
+          console.log(skillMap.skill_name);
           return skillMap.skill_name.length < 10;
         }),
       },
     };
-    try {
-      cache.set("recruiterAnalytics", fullResponse);
-    } catch (error) {
-      console.log("Cache settings failed ");
-    }
+    // try {
+    //   // cache.set("recruiterAnalytics", fullResponse);
+    // } catch (error) {
+    //   console.log("Cache settings failed ");
+    // }
+    console.log(fullResponse)
 
     res.status(200).json(fullResponse);
   } catch (error) {
+    console.error("Error fetching recruiter analytics:", error);
     res.status(500).json({
       status: "error",
       message: "Internal Server Error",

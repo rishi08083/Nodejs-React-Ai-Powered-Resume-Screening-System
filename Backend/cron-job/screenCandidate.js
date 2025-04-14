@@ -60,7 +60,7 @@ async function screenCandidate(candidate) {
         jd_skill_match: aiResponse.data.jd_skill_match || 0,
         rcd_skill_match: aiResponse.data.rcd_skill_match || 0,
         feedback : aiResponse.data.feedback.feedback || [],
-        experience_match : aiResponse.data.feedback.experience_match || [],
+        experience_match : aiResponse.data.feedback.experience_match || false,
         experience_info: aiResponse.data.feedback.experience_info || [],
         match_score: aiResponse.data.combined_score || 0,
         is_recommended :

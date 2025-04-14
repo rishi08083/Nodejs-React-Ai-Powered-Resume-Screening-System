@@ -276,7 +276,7 @@ async function getFeedbackByCandidateId(candidate_id) {
       feedback: formattedFeedback.missing_skills.feedback,
       candidate_id: candidate.id,
       rating: formattedFeedback.match_score,
-      experience_match: formattedFeedback.missing_skills.experience_match,
+      experience_match: formattedFeedback.missing_skills.experience_match ? true : false || formattedFeedback.missing_skills.experience_match == [] ? false : true,
       recommendation: formattedFeedback.recommendation,
       feedback_summery: formattedFeedback.feedback,
       jd_mismatch: formattedFeedback.missing_skills.jd_mismatch,
@@ -288,7 +288,6 @@ async function getFeedbackByCandidateId(candidate_id) {
       experience_info: formattedFeedback.missing_skills.experience_info,
       is_recommended: formattedFeedback.missing_skills.is_recommended,
     };
-    console.log(res, "111111111111");
     // Format feedback for response
     return res;
   } catch (error) {
