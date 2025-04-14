@@ -1,6 +1,7 @@
 const db = require("../../models"); // Load models
 const axios = require("axios");
 const { generateToken } = require("../../utils/tokenGeneration"); // Token generator utility
+const { where } = require("sequelize");
 
 const screenCandidate = async (req, res) => {
   try {
@@ -98,19 +99,16 @@ const getFeedback = async (req, res) => {
     const feedback = await getFeedbackByCandidateId(candidate_id);
 
     if (!feedback) {
-      return res
-        .status(404)
-        .json({
-          status: "error",
-          message: "No feedback found for this candidate.",
-        });
+      return res.status(404).json({
+        status: "error",
+        message: "No feedback found for this candidate.",
+      });
     }
     res.json({
       status: "success",
       message: "Feedback retrieved successfully.",
       data: feedback,
     });
-    
   } catch (error) {
     // console.error("Error fetching feedback:", error);
     res.status(500).json({ status: "error", message: "Internal Server Error" });
@@ -253,38 +251,48 @@ async function saveScreeningResult(resultData) {
 // Fetch feedback by candidate_id
 async function getFeedbackByCandidateId(candidate_id) {
   try {
-    // Get feedback from Feedback table
-    const feedback = await db.Feedback.findAll({
-      where: { candidate_id, is_deleted: false },
-      attributes: [
-        "id",
-        "candidate_id",
-        "feedback_text",
-        "rating",
-        "given_by",
-        "created_at",
-      ],
-      order: [["created_at", "DESC"]], // Show latest feedback first
-    });
-
-    if (feedback.length === 0) {
-      return null;
+    // Get candidate details
+    const candidate = await db.Candidates.findByPk(candidate_id);
+    if (!candidate) {
+      throw new Error(`Candidate not found with id: ${candidate_id}`);
     }
 
-    // Format feedback_text as parsed JSON
-    const formattedFeedback = feedback.map((entry) => ({
-      id: entry.id,
-      candidate_id: entry.candidate_id,
-      feedback_text: JSON.parse(entry.feedback_text),
-      rating: entry.rating,
-      
-      given_by: entry.given_by,
-      created_at: entry.created_at,
-    }));
+    // list assotiaction method
 
-    return formattedFeedback;
+    // Fetch feedback from Feedback table
+    const ScreeningResults = await db.ScreeningResults.findOne({
+      where: {
+        candidate_id: candidate_id,
+      },
+    });
+    console.log(ScreeningResults, "ScreeningResults------------------");
+
+    if (!ScreeningResults) {
+      return null;
+    }
+    console.log(candidate);
+    const formattedFeedback = ScreeningResults; // Assuming feedback_json contains the required data
+    const res = {
+      feedback: formattedFeedback.missing_skills.feedback,
+      candidate_id: candidate.id,
+      rating: formattedFeedback.match_score,
+      experience_match: formattedFeedback.missing_skills.experience_match,
+      recommendation: formattedFeedback.recommendation,
+      feedback_summery: formattedFeedback.feedback,
+      jd_mismatch: formattedFeedback.missing_skills.jd_mismatch,
+      rcd_mismatch: formattedFeedback.missing_skills.rcd_mismatch,
+      jd_match: formattedFeedback.missing_skills.jd_match,
+      rcd_match: formattedFeedback.missing_skills.rcd_match,
+      jd_match_score: formattedFeedback.missing_skills.jd_skill_match,
+      rcd_match_score: formattedFeedback.missing_skills.rcd_skill_match,
+      experience_info: formattedFeedback.missing_skills.experience_info,
+      is_recommended: formattedFeedback.missing_skills.is_recommended,
+    };
+    console.log(res, "111111111111");
+    // Format feedback for response
+    return res;
   } catch (error) {
-    console.error("Error fetching feedback:", error.message || error);
+    console.error("Error fetching feedback:", error.message + error);
     throw new Error("Failed to fetch feedback.");
   }
 }

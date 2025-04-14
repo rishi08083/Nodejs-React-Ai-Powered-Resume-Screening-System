@@ -76,6 +76,8 @@ exports.uploadResumes = async (req, res) => {
     const parsingErrors = await parseResumes(uploadedFiles, job_id, user_id);
 
     if (parsingErrors.length > 0) {
+      // Handle errors during parsing
+      console.error("Parsing errors:", parsingErrors);
       return res.status(400).json({
         status: "partial_success",
         message: "errors occurred during parsing",
@@ -172,69 +174,90 @@ const parseResumes = async (uploadedFiles, job_id, user_id) => {
           }
         );
 
-        const candidate = await db.Candidates.create({
-          name: aiResponse.data.data.name,
-          email: aiResponse.data.data.email,
-          phone_number: aiResponse.data.data.phone,
-          resume_url: file.fileUrl,
+        // Error handling for AI response
+        if (aiResponse.status !== 200 || !aiResponse.data || !aiResponse.data.data) {
+          errors.push({
+            file: file.fileName,
+            error: "Failed to parse resume or invalid response from AI backend",
+          });
+          continue;
+        }
 
+        // Validate required fields in AI response
+        const parsedData = aiResponse.data.data;
+        if (!parsedData.name || !parsedData.email || !parsedData.phone) {
+          errors.push({
+            file: file.fileName,
+            error: "Incomplete parsed data from AI backend",
+          });
+          continue;
+        }
+
+        // Save the parsed data to the database
+        const candidate = await db.Candidates.create({
+          name: parsedData.name,
+          email: parsedData.email,
+          phone_number: parsedData.phone,
+          resume_url: file.fileUrl,
           status: "parsed",
           job_id: job_id,
           user_id: user_id,
         });
 
-        await candidate.createSkill({
-          skill_names: aiResponse.data.data.skills,
+        await candidate.createParsed_resume({
+          resume_obj: parsedData,
+          user_id: user_id,
+          is_deleted: false,
         });
 
-        for (let exp of aiResponse.data.data.experience) {
-          const startDate = exp.start_date ? new Date(exp.start_date) : null;
-          const endDate = exp.end_date ? new Date(exp.end_date) : null;
-          const isValidDate = (date) => date instanceof Date && !isNaN(date);
-
-          await candidate.createExperience({
-            company_names: exp.company,
-            job_titles: exp.job_title,
-            start_date: isValidDate(startDate) ? startDate : null,
-            end_date: isValidDate(endDate) ? endDate : null,
+        if (parsedData.skills && Array.isArray(parsedData.skills)) {
+          await candidate.createSkill({
+            skill_names: parsedData.skills,
           });
         }
 
-        for (let edu of aiResponse.data.data.education) {
-          await candidate.createEducation({
-            institution_name: edu?.College || "Unknown Institution",
-            degree: edu?.Degree || "Unknown Degree",
-            start_date: edu?.start_date || null,
-            end_date: edu?.end_date || null,
-          });
+        if (parsedData.experience && Array.isArray(parsedData.experience)) {
+          for (let exp of parsedData.experience) {
+            const startDate = exp.start_date ? new Date(exp.start_date) : null;
+            const endDate = exp.end_date ? new Date(exp.end_date) : null;
+            const isValidDate = (date) => date instanceof Date && !isNaN(date);
+
+            await candidate.createExperience({
+              company_names: exp.company || "Unknown Company",
+              job_titles: exp.job_title || "Unknown Job Title",
+              start_date: isValidDate(startDate) ? startDate : null,
+              end_date: isValidDate(endDate) ? endDate : null,
+            });
+          }
+        }
+
+        if (parsedData.education && Array.isArray(parsedData.education)) {
+          for (let edu of parsedData.education) {
+            await candidate.createEducation({
+              institution_name: edu?.College || "Unknown Institution",
+              degree: edu?.Degree || "Unknown Degree",
+              start_date: edu?.start_date || null,
+              end_date: edu?.end_date || null,
+            });
+          }
         }
       } catch (error) {
         if (error.response && error.response.data) {
           const errorData = error.response.data;
-          // console.error({
-          //   status: errorData.status || "error",
-          //   message: errorData.message || "API request failed",
-          //   error: {
-          //     details: errorData.error?.details || error.message,
-          //   },
-          //   code: errorData.code || error.response.status, // Include the code from response
-            
-          // });
-          // console.error(`Error parsing file ${file.fileName}:`, error.message);
-          errors.push({ file: file.fileName, error: errorData.message });
-        } else {
-          console.error({
-            status: "error",
-            message: "Network or unknown error",
-            error: {
-              details: error.message,
-            },
-            code: null,
+          errors.push({
+            file: file.fileName,
+            error: errorData.message || "API request failed",
+            code: errorData.code || error.response.status,
           });
-        };
+        } else {
+          errors.push({
+            file: file.fileName,
+            error: "Network or unknown error",
+            details: error.message,
+          });
+        }
       }
     }
-
     return errors;
   } catch (error) {
     console.log(`Error during parsing: ${error}`);
