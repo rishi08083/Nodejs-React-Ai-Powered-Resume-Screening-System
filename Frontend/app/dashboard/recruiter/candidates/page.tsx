@@ -140,7 +140,7 @@ const CandidateList = () => {
       getCandidates();
     }, 6000);
 
-    // return () => clearInterval(intervalId);
+    return () => clearInterval(intervalId);
   }, [selectedJob, selectedRecommendation]);
 
   const fetchCandidateFeedback = async (candidateId: string) => {
