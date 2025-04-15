@@ -140,10 +140,10 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
                   <td className="px-6 py-4 text-sm font-medium text-[var(--text-primary)]">
                     {candidate.name}
                   </td>
-                  <td className="px-6 py-4 text-sm text-[var(--text-secondary)]">
+                  <td className="px-6 py-4 text-sm font-medium text-[var(--text-primary)]">
                     {candidate.email}
                   </td>
-                  <td className="px-6 py-4 text-sm text-[var(--text-secondary)]">
+                  <td className="px-6 py-4 text-sm font-medium text-[var(--text-primary)]">
                     {candidate.phone_number}
                   </td>
 
