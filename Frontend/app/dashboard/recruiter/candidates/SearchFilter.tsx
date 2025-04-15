@@ -141,7 +141,7 @@ const SearchFilter = ({
       </div>
 
       {/* Upload Resume Button */}
-      <button
+    {/*  <button
         type="button"
         className="h-12 px-4 py-2 bg-[var(--accent)] text-[var(--dark-bg)] rounded-lg flex items-center hover:bg-[var(--accent-hover)] transition-all duration-300 disabled:bg-[var(--border)] disabled:cursor-not-allowed disabled:text-[var(--text-secondary)]"
         onClick={() => setIsUploadModalOpen(true)}
@@ -172,7 +172,7 @@ const SearchFilter = ({
           />
         </svg>
         Upload Resume
-      </button>
+      </button> */}
     </motion.div>
   );
 };

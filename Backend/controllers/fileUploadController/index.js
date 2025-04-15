@@ -80,7 +80,7 @@ exports.uploadResumes = async (req, res) => {
       console.error("Parsing errors:", parsingErrors);
       return res.status(400).json({
         status: "partial_success",
-        message: "errors occurred during parsing",
+        message: "Parsing Error",
         data: { files: uploadedFiles },
         errors: parsingErrors,
       });
@@ -175,7 +175,11 @@ const parseResumes = async (uploadedFiles, job_id, user_id) => {
         );
 
         // Error handling for AI response
-        if (aiResponse.status !== 200 || !aiResponse.data || !aiResponse.data.data) {
+        if (
+          aiResponse.status !== 200 ||
+          !aiResponse.data ||
+          !aiResponse.data.data
+        ) {
           errors.push({
             file: file.fileName,
             error: "Failed to parse resume or invalid response from AI backend",
