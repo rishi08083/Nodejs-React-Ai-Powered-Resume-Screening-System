@@ -5,7 +5,7 @@ const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 const { Op, where } = require("sequelize");
 
-const viewRecruiterReq = async (req, res) => {
+const viewPendingRecruiterReq = async (req, res) => {
   try {
     const users = await db.Users.findAll({
       where: { is_verified: true, is_active: "pending"},
@@ -20,6 +20,46 @@ const viewRecruiterReq = async (req, res) => {
     res.status(500).json({
       status: "error",
       message: "Failed to retrieve recruiter requests",
+      error: { details: error.message },
+    });
+  }
+};
+
+const viewAcceptedRecruiter = async (req, res) => {
+  try {
+    const users = await db.Users.findAll({
+      where: { is_verified: true, is_active: "accepted", role: "recruiter"},
+      attributes: ["id", "name", "email", "role", "is_active"],
+    });
+    res.status(200).json({
+      status: "success",
+      message: "Accepted Recruiters Displayed",
+      data: { users },
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "error",
+      message: "Failed to retrieve accepted recruiters",
+      error: { details: error.message },
+    });
+  }
+};
+
+const viewRejectedRecruiter = async (req, res) => {
+  try {
+    const users = await db.Users.findAll({
+      where: { is_verified: true, is_active: "rejected"},
+      attributes: ["id", "name", "email", "role", "is_active"],
+    });
+    res.status(200).json({
+      status: "success",
+      message: "Rejected Recruiters Displayed",
+      data: { users },
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "error",
+      message: "Failed to retrieve rejected recruiters",
       error: { details: error.message },
     });
   }
@@ -90,7 +130,9 @@ const rejectRecruiterReq = async (req, res) => {
 };
 
 module.exports = {
-  viewRecruiterReq,
+  viewPendingRecruiterReq,
+  viewAcceptedRecruiter,
+  viewRejectedRecruiter,
   approveRecruiterReq,
   rejectRecruiterReq,
 };

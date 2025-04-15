@@ -8,7 +8,9 @@ const {
 } = require("../controllers/authControllers");
 
 const {
-  viewRecruiterReq,
+  viewPendingRecruiterReq,
+  viewAcceptedRecruiter,
+  viewRejectedRecruiter,
   approveRecruiterReq,
   rejectRecruiterReq,
 } = require("../controllers/authControllers/recruiterReqController");
@@ -40,7 +42,9 @@ router.post("/register", validateRegister, recruiterRegister);
 router.post("/login", validateLogin, userLogin);
 router.post("/adminregister", adminRegister);
 
-router.get("/view-recruiter-req", viewRecruiterReq);
+router.get("/view-recruiter-req", viewPendingRecruiterReq);
+router.get("/view-accepted-recruiters", viewAcceptedRecruiter);
+router.get("/view-rejected-recruiters", viewRejectedRecruiter);
 router.post("/approve-recruiter-req", approveRecruiterReq);
 router.delete("/reject-recruiter-req", rejectRecruiterReq);
 
