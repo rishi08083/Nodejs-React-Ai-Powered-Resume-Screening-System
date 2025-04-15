@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import {
     fetchRecruiterRequests,
+    fetchAcceptedRecruiters,
+    fetchRejectedRecruiters,
     acceptRecruiterRequest,
     rejectRecruiterRequest,
   } from "../../../../api-services/recruiterService";
@@ -27,22 +29,34 @@ export default function RecruiterRequests() {
   const [message, setMessage] = useState(""); // Message to display in the UI
   const [searchTerm, setSearchTerm] = useState(""); // Search term for filtering
 
+  const getRequestsByFilter = async (): Promise<void> => {
+    setIsLoading(true);
+    try {
+      let data: ApiResponse;
+
+      if (filter === "pending") {
+        data = (await fetchRecruiterRequests()) as unknown as ApiResponse;
+      } else if (filter === "accepted") {
+        data = (await fetchAcceptedRecruiters()) as unknown as ApiResponse;
+      } else {
+        data = (await fetchRejectedRecruiters()) as unknown as ApiResponse;
+      }
+
+      setRequests(data.data.users);
+    } catch (error) {
+      console.error(`Error fetching ${filter} recruiter requests:`, error);
+      setMessage(`Failed to fetch ${filter} recruiter requests.`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
   useEffect(() => {
-        const getRequests = async (): Promise<void> => {
-          setIsLoading(true);
-          try {
-            const data = (await fetchRecruiterRequests()) as unknown as ApiResponse;
-            setRequests(data.data.users);
-          } catch (error) {
-            console.error("Error fetching recruiter requests:", error);
-            setMessage("Failed to fetch recruiter requests.");
-            // showAlert();
-          } finally {
-            setIsLoading(false);
-          }
-        };
-        getRequests();
-      }, []);
+    getRequestsByFilter();
+  }, [filter]); // re-run whenever the filter changes
+  
+
+      
 
   // useEffect(() => {
   //   // Fetch recruiter requests when the component loads
@@ -66,12 +80,8 @@ export default function RecruiterRequests() {
     try {
       const response = await acceptRecruiterRequest(email);
       if (response.ok) {
-        setRequests((prev) =>
-          prev.map((req) =>
-            req.email === email ? { ...req, is_active: "accepted" } : req
-          )
-        );
         setMessage("Recruiter request accepted successfully!");
+        getRequestsByFilter();
       } else {
         setMessage("Failed to accept the recruiter request.");
       }
@@ -89,12 +99,8 @@ export default function RecruiterRequests() {
     try {
       const response = await rejectRecruiterRequest(email);
       if (response.ok) {
-        setRequests((prev) =>
-          prev.map((req) =>
-            req.email === email ? { ...req, is_active: "rejected" } : req
-          )
-        );
         setMessage("Recruiter request rejected successfully!");
+        getRequestsByFilter();
       } else {
         setMessage("Failed to reject the recruiter request.");
       }
@@ -117,10 +123,9 @@ export default function RecruiterRequests() {
   // Filter requests based on the selected filter and search term
   const filteredRequests = requests.filter(
     (req) =>
-      req.is_active === filter &&
-      (req.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        req.email.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+      req.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      req.email.toLowerCase().includes(searchTerm.toLowerCase())
+  );  
 
   return (
     <div className="min-h-screen bg-[var(--bg)] py-8 px-0 sm:px-0 lg:px-0 text-[var(--text-primary)] mt-10">
