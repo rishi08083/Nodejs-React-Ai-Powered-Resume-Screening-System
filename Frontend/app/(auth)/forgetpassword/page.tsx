@@ -80,7 +80,7 @@ const ForgetPassword = () => {
 
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/verify-otp`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/verify-token`,
         {
           method: "POST",
           headers: {
