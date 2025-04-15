@@ -11,7 +11,6 @@ import axios from "axios";
 import "react-toastify/dist/ReactToastify.css";
 import FeedbackModal from "./FeedbackModal";
 import CandidateTable from "./CandidateTable";
-import UploadModal from "./UploadModal";
 import SearchFilter from "./SearchFilter";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
@@ -56,7 +55,6 @@ const CandidateList = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [selectedRecommendation, setSelectedRecommendation] = useState("");
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [selectedFeedback, setSelectedFeedback] = useState<Feedback | null>(
     null
   );
@@ -66,7 +64,6 @@ const CandidateList = () => {
   // File upload related states
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [successMessage, setSuccessMessage] = useState<string>("");
-  const [uploadProgress, setUploadProgress] = useState<number>(0);
 
   useEffect(() => {
     const getJobDetails = async () => {
@@ -91,7 +88,6 @@ const CandidateList = () => {
                 return null;
               })();
           }
-
         } else {
           const errorData = await response.json();
           throw new Error(errorData.message);
@@ -101,7 +97,6 @@ const CandidateList = () => {
       }
     };
     getJobDetails();
-
   }, []);
 
   useEffect(() => {
@@ -145,10 +140,9 @@ const CandidateList = () => {
         console.log(error, "error");
       }
     };
-  
 
     getCandidates();
-    
+
     const intervalId = setInterval(() => {
       getCandidates();
     }, 6000);
@@ -264,20 +258,6 @@ const CandidateList = () => {
         setSelectedJob={setSelectedJob}
         setSelectedRecommendation={setSelectedRecommendation}
       />
-
-      {/* Upload Modal */}
-      {isUploadModalOpen && (
-        <UploadModal
-          isLoading={isLoading}
-          selectedJob={selectedJob}
-          setCandidates={setCandidates}
-          closeModal={() => setIsUploadModalOpen(false)}
-          uploadProgress={uploadProgress}
-          setIsLoading={setIsLoading}
-          setUploadProgress={setUploadProgress}
-          setIsUploadModalOpen={setIsUploadModalOpen}
-        />
-      )}
 
       {/* Candidate Table */}
       <CandidateTable
