@@ -1,6 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 import {
     fetchRecruiterRequests,
     fetchAcceptedRecruiters,
@@ -26,7 +29,6 @@ export default function RecruiterRequests() {
   const [filter, setFilter] = useState("pending"); // Current filter: pending, accepted, rejected
   const [isLoading, setIsLoading] = useState(true);
   const [actionInProgress, setActionInProgress] = useState(null);
-  const [message, setMessage] = useState(""); // Message to display in the UI
   const [searchTerm, setSearchTerm] = useState(""); // Search term for filtering
 
   const getRequestsByFilter = async (): Promise<void> => {
@@ -44,8 +46,7 @@ export default function RecruiterRequests() {
 
       setRequests(data.data.users);
     } catch (error) {
-      console.error(`Error fetching ${filter} recruiter requests:`, error);
-      setMessage(`Failed to fetch ${filter} recruiter requests.`);
+      toast.error(`Failed to fetch ${filter} recruiter requests.`);
     } finally {
       setIsLoading(false);
     }
@@ -54,43 +55,21 @@ export default function RecruiterRequests() {
   useEffect(() => {
     getRequestsByFilter();
   }, [filter]); // re-run whenever the filter changes
-  
-
-      
-
-  // useEffect(() => {
-  //   // Fetch recruiter requests when the component loads
-  //   const getRequests = async () => {
-  //     setIsLoading(true);
-  //     try {
-  //       const data = await fetchRecruiterRequests();
-  //       console.log("Fetched recruiter requests:", data.data.users);
-  //       setRequests(data.data.users); // Assuming API returns all requests
-  //     } catch (error) {
-  //       console.error("Error fetching recruiter requests:", error);
-  //     } finally {
-  //       setIsLoading(false);
-  //     }
-  //   };
-  //   getRequests();
-  // }, []);
 
   const handleAccept = async (email) => {
     setActionInProgress(email);
     try {
       const response = await acceptRecruiterRequest(email);
       if (response.ok) {
-        setMessage("Recruiter request accepted successfully!");
+        toast.success("Recruiter request accepted successfully!");
         getRequestsByFilter();
       } else {
-        setMessage("Failed to accept the recruiter request.");
+        toast.error("Failed to accept the recruiter request.");
       }
     } catch (error) {
-      console.error("Error accepting recruiter request:", error);
-      setMessage("An error occurred while accepting the request.");
+      toast.error("An error occurred while accepting the request.");
     } finally {
       setActionInProgress(null);
-      clearMessageAfterDelay();
     }
   };
 
@@ -99,25 +78,16 @@ export default function RecruiterRequests() {
     try {
       const response = await rejectRecruiterRequest(email);
       if (response.ok) {
-        setMessage("Recruiter request rejected successfully!");
+        toast.success("Recruiter request rejected successfully!");
         getRequestsByFilter();
       } else {
-        setMessage("Failed to reject the recruiter request.");
+        toast.error("Failed to reject the recruiter request.");
       }
     } catch (error) {
-      console.error("Error rejecting recruiter request:", error);
-      setMessage("An error occurred while rejecting the request.");
+      toast.error("An error occurred while rejecting the request.");
     } finally {
       setActionInProgress(null);
-      clearMessageAfterDelay();
     }
-  };
-
-  // Clear the message after 3 seconds
-  const clearMessageAfterDelay = () => {
-    setTimeout(() => {
-      setMessage("");
-    }, 3000);
   };
 
   // Filter requests based on the selected filter and search term
@@ -132,11 +102,7 @@ export default function RecruiterRequests() {
       <div className="mx-auto">
         <div className="bg-[var(--surface)] rounded-xl shadow-lg overflow-hidden border border-[var(--border)]">
           {/* Display Message */}
-          {message && (
-            <div className="bg-[var(--accent)]/20 text-[var(--accent)] px-4 py-2 text-center border-l-4 border-[var(--accent)]">
-              {message}
-            </div>
-          )}
+          <ToastContainer theme="dark" autoClose={3000}/>
 
           {/* Filter Buttons and Search Bar */}
           <div className="flex justify-between items-center p-4 border-b border-[var(--border)]">
