@@ -37,7 +37,7 @@ const SearchFilter = ({
       <div className="relative w-full md:w-1/3 group h-12">
         <input
           type="text"
-          placeholder="Search by ID or Name"
+          placeholder="Search by Name or Email"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="w-full h-full p-3 pl-10 border rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)] bg-[var(--surface)] border-[var(--border)] text-[var(--text-primary)] transition-all duration-300"

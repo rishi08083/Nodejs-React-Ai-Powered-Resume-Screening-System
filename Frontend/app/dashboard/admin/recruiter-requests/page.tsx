@@ -61,13 +61,19 @@ export default function RecruiterRequests() {
     try {
       const response = await acceptRecruiterRequest(email);
       if (response.ok) {
-        toast.success("Recruiter request accepted successfully!");
+        toast.success("Recruiter request accepted successfully!", {
+          theme: "light",
+        });
         getRequestsByFilter();
       } else {
-        toast.error("Failed to accept the recruiter request.");
+        toast.error("Failed to accept the recruiter request.", {
+          theme: "light",
+        });
       }
     } catch (error) {
-      toast.error("An error occurred while accepting the request.");
+      toast.error("An error occurred while accepting the request.", {
+        theme: "light",
+      });
     } finally {
       setActionInProgress(null);
     }
@@ -78,13 +84,19 @@ export default function RecruiterRequests() {
     try {
       const response = await rejectRecruiterRequest(email);
       if (response.ok) {
-        toast.success("Recruiter request rejected successfully!");
+        toast.success("Recruiter request rejected successfully!", {
+          theme: "light",
+        });
         getRequestsByFilter();
       } else {
-        toast.error("Failed to reject the recruiter request.");
+        toast.error("Failed to reject the recruiter request.", {
+          theme: "light",
+        });
       }
     } catch (error) {
-      toast.error("An error occurred while rejecting the request.");
+      toast.error("An error occurred while rejecting the request.", {
+        theme: "light",
+      });
     } finally {
       setActionInProgress(null);
     }
