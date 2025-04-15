@@ -1,6 +1,7 @@
 import React, { ChangeEvent, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { toast } from "react-toastify";
+import ParseCandidate from "../../../../components/ParseCandidate";
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 type UploadModalProps = {
@@ -202,110 +203,191 @@ const UploadModal: React.FC<UploadModalProps> = ({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-opacity-70 flex items-center justify-center z-50 backdrop-blur-sm"
+      className="fixed inset-0 bg-opacity-70 flex items-center justify-center z-50 backdrop-blur-sm overflow-y-auto"
       onClick={closeModal}
+      style={{ maxHeight: "100vh" }}
     >
       <motion.div
-        initial={{ opacity: 0, scale: 0.9, y: 20 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ type: "spring", duration: 0.5 }}
-        className="bg-[var(--surface)] rounded-xl shadow-2xl p-6 w-full max-w-2xl border border-[var(--border)]"
-        onClick={(e) => e.stopPropagation()}
+      initial={{ opacity: 0, scale: 0.9, y: 20 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      transition={{ type: "spring", duration: 0.5 }}
+      className="bg-[var(--surface)] rounded-xl shadow-2xl p-6 w-full max-w-2xl border border-[var(--border)] max-h-[90vh] overflow-y-auto"
+      onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold text-[var(--text-primary)]">
-            Upload Resumes
-          </h2>
-          <button onClick={closeModal}>❌</button>
-        </div>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-2xl font-bold text-[var(--text-primary)]">
+        Upload Resumes
+        </h2>
+        <button onClick={closeModal}>❌</button>
+      </div>
 
-        {/* Job Dropdown */}
-        <div className="mb-4">
-          <label className="block mb-2 text-[var(--text-primary)] font-medium">
-            Select Job:
-          </label>
-          <select
-            className="w-full p-2 rounded border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)]"
-            value={selectedJob ?? ""}
-            onChange={(e) => setSelectedJob(e.target.value)}
-          >
-            <option value="" disabled>
-              -- Choose a job --
-            </option>
-            {jobs?.map((job) => (
-              <option key={job.id} value={job.id}>
-                {job.title}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Drop Zone */}
-        <div
-          className={`border-2 border-dashed rounded-lg p-8 text-center transition-all duration-300 ${
-            isDragging
-              ? "border-[var(--accent)] bg-[var(--blue-highlight)] scale-105"
-              : "border-[var(--border)] hover:border-[var(--accent)] hover:bg-[var(--blue-highlight)]"
-          }`}
-          onDrop={(e) => {
-            e.preventDefault();
-            setIsDragging(false);
-            handleFile(e.dataTransfer.files);
-          }}
-          onDragOver={(e) => e.preventDefault()}
-          onDragEnter={() => setIsDragging(true)}
-          onDragLeave={() => setIsDragging(false)}
+      {/* Job Dropdown */}
+      <div className="mb-4">
+        <label className="block mb-2 text-[var(--text-primary)] font-medium">
+        Select Job:
+        </label>
+        <select
+        className="w-full p-2 rounded border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)]"
+        value={selectedJob ?? ""}
+        onChange={(e) => setSelectedJob(e.target.value)}
         >
-          <p className="mb-2">Drag & drop resumes here</p>
-          <p className="mb-3 text-[var(--text-muted)]">or</p>
-          <input
-            type="file"
-            multiple
-            accept=".pdf,.docx,.jpg,.jpeg"
-            ref={fileInputRef}
-            onChange={handleFileSelect}
-            className="hidden"
-            id="file-input"
-          />
-          <button
-            className="px-6 py-2 bg-[var(--accent)] text-white rounded hover:bg-[var(--accent-hover)]"
-            onClick={() => fileInputRef.current?.click()}
-          >
-            Select Resumes
-          </button>
-          <p className="mt-4 text-sm text-[var(--text-muted)]">
-            Supported formats: PDF, DOCX, JPG
-          </p>
-        </div>
+        <option value="" disabled>
+          -- Choose a job --
+        </option>
+        {jobs?.map((job) => (
+          <option key={job.id} value={job.id}>
+          {job.title}
+          </option>
+        ))}
+        </select>
+      </div>
 
-        {files.length > 0 && (
-          <div className="mt-6">
-            <h3 className="text-lg font-semibold mb-3">Selected Files</h3>
-            <ul className="space-y-2">
-              {files.map((file, idx) => (
-                <li
-                  key={idx}
-                  className="flex justify-between items-center border p-2 rounded"
-                >
-                  <span>
-                    {getFileIcon(file.name)} {file.name}
-                  </span>
-                  <button onClick={() => handleRemoveFile(idx)}>❌</button>
-                </li>
-              ))}
-            </ul>
-            <button
-              onClick={handleUploadResume}
-              disabled={isLoading}
-              className="mt-5 w-full px-6 py-3 bg-[var(--accent)] text-white rounded hover:bg-[var(--accent-hover)]"
-            >
-              {isLoading
-                ? `Uploading... ${uploadProgress}%`
-                : "📤 Upload Resumes"}
-            </button>
-          </div>
-        )}
+      {/* Drop Zone */}
+      <div
+        className={`border-2 border-dashed rounded-lg p-8 text-center transition-all duration-300 ${
+        isDragging
+          ? "border-[var(--accent)] bg-[var(--blue-highlight)] scale-105"
+          : "border-[var(--border)] hover:border-[var(--accent)] hover:bg-[var(--blue-highlight)]"
+        }`}
+        onDrop={(e) => {
+        e.preventDefault();
+        setIsDragging(false);
+        handleFile(e.dataTransfer.files);
+        }}
+        onDragOver={(e) => e.preventDefault()}
+        onDragEnter={() => setIsDragging(true)}
+        onDragLeave={() => setIsDragging(false)}
+      >
+        <p className="mb-2">Drag & drop resumes here</p>
+        <p className="mb-3 text-[var(--text-muted)]">or</p>
+        <input
+        type="file"
+        multiple
+        accept=".pdf,.docx,.jpg,.jpeg"
+        ref={fileInputRef}
+        onChange={handleFileSelect}
+        className="hidden"
+        id="file-input"
+        />
+        <button
+        className="px-6 py-2 bg-[var(--accent)] text-white rounded hover:bg-[var(--accent-hover)]"
+        onClick={() => fileInputRef.current?.click()}
+        >
+        Select Resumes
+        </button>
+        <p className="mt-4 text-sm text-[var(--text-muted)]">
+        Supported formats: PDF, DOCX, JPG
+        </p>
+      </div>
+
+      {files.length > 0 && (
+        <div className="mt-6">
+        <h3 className="text-lg font-semibold mb-3">Selected Files</h3>
+        <ul className="space-y-2">
+          {files.map((file, idx) => (
+          <li
+            key={idx}
+            className="flex justify-between items-center border p-2 rounded"
+          >
+            <span>
+            {getFileIcon(file.name)} {file.name}
+            </span>
+            <button onClick={() => handleRemoveFile(idx)}>❌</button>
+          </li>
+          ))}
+        </ul>
+        <button
+          onClick={handleUploadResume}
+          disabled={isLoading}
+          className="mt-5 w-full px-6 py-3 bg-[var(--accent)] text-white rounded hover:bg-[var(--accent-hover)]"
+        >
+          {isLoading
+          ? `Uploading... ${uploadProgress}%`
+          : "📤 Upload Resumes"}
+        </button>
+        </div>
+      )}
+        
+      <ParseCandidate
+        candidate={{
+          name: "VINAY DANIDHARIYA",
+          email: "vinaydanidhariya@gmail.com",
+          phone: "+91-9265979359",
+          skills: [
+            "Web Development",
+            "AI",
+            "ML",
+            "Node.js",
+            "Express",
+            "RESTful API architecture",
+            "PostgreSQL",
+            "Meta WhatsApp API",
+            "Handlebar",
+            "AWS",
+            "Nginx",
+            "FastAPI",
+            "Twillo",
+            "Bootstrap",
+            "HTML",
+            "CSS",
+            "JavaScript",
+            "C/C++",
+            "TypeScript",
+            "Java",
+            "Python",
+            "SQL",
+            "ReactJS",
+            "MongoDB",
+            "EC2",
+            "S3",
+            "SQS",
+            "Lambda",
+            "Docker",
+            "Kafka",
+            "Full-Stack Development",
+            "VS Code",
+            "Linux",
+            "Git",
+            "Postman",
+            "Problem Solving",
+            "Analytical Thinking",
+            "Data Structures",
+            "Algorithms",
+            "Telemedicine Service: Developed an online appointment booking system for patients. Implemented Meta WhatsApp API for emergency consultations, achieving seamless communication. Created a dynamic user interface using Handlebar, ensuring an intuitive user experience. Applied PostgreSQL for robust database management.",
+            "AI-IVR-System: Developed an AI-driven interactive voice response system, achieving high customer satisfaction. Implemented FastAPI for efficient backend processing, handling large volumes of data. Created real-time voice interaction features using Twilio. Applied machine learning models to improve customer support automation.",
+            "QR-Code-Generator: Developed a QR code generator system for various data inputs. Implemented ExpressJS for backend development, ensuring fast processing. Created responsive front-end using Bootstrap and Handlebar. Achieved seamless integration with various data sources.",
+            "Personal Portfolio Website: Developed a personal portfolio website showcasing professional projects and skills. Implemented interactive features using JavaScript, enhancing user engagement. Created a visually appealing design with HTML and CSS. Ensured responsive design for compatibility across devices.",
+            "Developed backend technology components using Node.js and Express, performing deployments that ensured smooth and efficient software operations.",
+            "Implemented RESTful API architecture, enhancing system performance.",
+            "Presented findings and solutions at internal tech meetings, receiving recognition for contributions to project success and team efficiency."
+          ],
+          experience: [
+            {
+              company: "Shivay Infotech PVT LTD, Inc",
+              job_title: "Full-Stack Developer Intern",
+              start_date: "2022-10",
+              end_date: "2023-06"
+            }
+          ],
+          education: [
+            {
+              College: "Marwadi University (NAAC A+)",
+              Degree: "Master of Computer Application",
+              start_date: "2023-",
+              end_date: "2025"
+            },
+            {
+              College: "Saurashtra University",
+              Degree: "Bachelor of Computer Application",
+              start_date: "2020-",
+              end_date: "2023"
+            }
+          ],
+          locations: ["Rajkot", "Gujarat", "India"]
+        }}
+      />
       </motion.div>
+      
     </motion.div>
   );
 };
