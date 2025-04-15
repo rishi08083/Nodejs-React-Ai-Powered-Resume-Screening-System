@@ -11,6 +11,7 @@ const candidateRoutes = require("./candidateRoutes");
 const screeningRoutes = require("./screenRoutes");
 const mailRecruiter = require("./mailRecruiter.js");
 const analyticsRoutes = require("./analyticsRoutes.js");
+const parseResumeRoutes = require("./parsedResumeRoutes.js");
 
 router.get("/", homeRoutes);
 router.use("/auth", authRoutes);
@@ -22,5 +23,6 @@ router.use("/candidates", candidateRoutes);
 router.use("/screening", screeningRoutes);
 router.use("/mail", mailRecruiter);
 router.use("/analytics", analyticsRoutes);
+router.use("/parsed-resume", parseResumeRoutes);
 
 module.exports = router;
