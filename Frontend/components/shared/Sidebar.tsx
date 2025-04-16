@@ -44,11 +44,6 @@ const adminLinks = [
     label: "Recruiter Requests",
     icon: <Users className="sidebar-icon" />,
   },
-  // {
-  //   href: "/dashboard/admin/settings",
-  //   label: "Settings",
-  //   icon: <Settings className="sidebar-icon" />,
-  // },
 ];
 
 export default function Sidebar({
@@ -105,14 +100,6 @@ export default function Sidebar({
             </Link>
           ))}
         </nav>
-
-        {/* <button
-          className="sidebar-logout-btn"
-          onClick={() => setIsLogoutModalOpen(true)}
-        >
-          <LogOut className="sidebar-icon" />
-          <span>Logout</span>
-        </button> */}
       </aside>
     </>
   );

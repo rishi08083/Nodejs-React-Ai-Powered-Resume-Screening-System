@@ -2,7 +2,9 @@ import React, { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Candidate } from "./page";
 import ParseCandidate from "../../../../components/ParseCandidate";
-
+import DeleteModal, {
+  AnimationType,
+} from "../../../../components/recruiter/DeleteModal/DeleteModal";
 type CandidateTableProps = {
   currentCandidates: Candidate[];
   selectedJob: string;
@@ -23,6 +25,7 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
   const [isOpen, setIsOpen] = useState<string | null>(null);
   const [originalCandidates, setOriginalCandidates] =
     useState(currentCandidates);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [activeTooltip, setActiveTooltip] = useState<string | null>(null);
   const [viewParsedResume, setViewParsedResume] = useState<string | null>(null);
 
@@ -167,7 +170,8 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
                           className={`px-2 py-1 text-xs font-medium rounded border ${
                             candidate?.is_recommended?.toUpperCase() === "YES"
                               ? "bg-green-100 text-green-700 border-green-400"
-                              : candidate?.is_recommended?.toUpperCase() === "NO"
+                              : candidate?.is_recommended?.toUpperCase() ===
+                                  "NO"
                                 ? "bg-red-100 text-red-700 border-red-400"
                                 : "bg-yellow-100 text-yellow-700 border-yellow-400"
                           }`}
@@ -271,7 +275,9 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
                             onMouseLeave={() => setActiveTooltip(null)}
                           >
                             <button
-                              onClick={() => handleViewParsedResume(candidate.id)}
+                              onClick={() =>
+                                handleViewParsedResume(candidate.id)
+                              }
                               className={`p-1.5 bg-[var(--surface)] hover:bg-[var(--surface-lighter)] text-[var(--text-primary)] transition-colors duration-200 
                                 ${
                                   viewParsedResume === candidate.id
@@ -352,6 +358,19 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
                                 tabIndex={-1}
                                 onClick={(e) => e.stopPropagation()}
                               >
+                                <DeleteModal
+                                  isOpen={isDeleteModalOpen}
+                                  onClose={() => setIsDeleteModalOpen(false)}
+                                  onDelete={() =>
+                                    handleDeleteCandidate(candidate.id)
+                                  }
+                                  title={candidate.name}
+                                  hoverAnimation={true}
+                                  animationType={AnimationType.FadeIn}
+                                  deleteButtonAnimation={true}
+                                  animationDuration={300}
+                                  message="Are you sure you want to delete this candidate? This action cannot be undone."
+                                />
                                 <div
                                   className="py-1"
                                   role="menu"
@@ -360,8 +379,7 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
                                 >
                                   <button
                                     onClick={() => {
-                                      handleDeleteCandidate(candidate.id);
-                                      setIsOpen(null);
+                                      setIsDeleteModalOpen(true);
                                     }}
                                     className="block w-full px-4 py-2 text-sm text-red-400 hover:bg-[var(--border)] hover:text-red-300 transition-colors duration-300 text-left"
                                     role="menuitem"
@@ -392,17 +410,17 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
                       </div>
                     </td>
                   </motion.tr>
-                  
+
                   {/* Parsed Resume Modal View */}
                   <AnimatePresence>
                     {viewParsedResume === candidate.id && (
-                        <motion.div
+                      <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.3 }}
                         className="fixed inset-0 z-50 flex items-center justify-center  bg-opacity-50 backdrop-blur-sm overflow-y-auto"
-                        >
+                      >
                         <div className="bg-[var(--surface)] rounded-lg shadow-lg p-6 w-full max-w-3xl h-[90vh] relative my-4 mx-auto overflow-y-auto">
                           <button
                             onClick={() => setViewParsedResume(null)}

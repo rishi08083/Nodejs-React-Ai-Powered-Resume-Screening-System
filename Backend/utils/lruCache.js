@@ -1,5 +1,4 @@
 const { LRUCache } = require("lru-cache");
-
 class LRUCacheOptimized {
   constructor(options = {}) {
     this.maxSize = options.maxSize || 1000;
@@ -42,6 +41,9 @@ class LRUCacheOptimized {
       evictions: 0,
       sets: 0,
     };
+  }
+  getStats() {
+    return this.stats;
   }
 }
 module.exports = LRUCacheOptimized;
