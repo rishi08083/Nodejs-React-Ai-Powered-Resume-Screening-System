@@ -72,7 +72,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex justify-between items-center mb-6 sticky top-0 bg-[var(--surface)] z-10 pb-4 border-b border-[var(--border)]">
+        <div className="flex justify-between items-center mb-6 top-0 bg-[var(--surface)] z-10 pb-4 border-b border-[var(--border)]">
           <div>
             <h2 className="text-2xl font-bold text-[var(--text-primary)]">
               Candidate Assessment Report

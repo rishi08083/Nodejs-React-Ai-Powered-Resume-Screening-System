@@ -10,6 +10,7 @@ const crypto = require("crypto");
 const db = require("../../models");
 require("dotenv").config();
 const { generateToken } = require("../../utils/tokenGeneration");
+const { where } = require("sequelize");
 
 // AWS S3 Configuration
 const s3 = new S3Client({
@@ -73,7 +74,12 @@ exports.uploadResumes = async (req, res) => {
     const user_id = req.user.id;
 
     // Wait for AI parsing and get errors
-    const parsingErrors = await parseResumes(uploadedFiles, job_id, user_id);
+    const parsingErrors = await parseResumes(
+      uploadedFiles,
+      job_id,
+      user_id,
+      req.files
+    );
 
     if (parsingErrors.length > 0) {
       // Handle errors during parsing
@@ -140,11 +146,13 @@ exports.getResume = async (req, res) => {
   }
 };
 
-const parseResumes = async (uploadedFiles, job_id, user_id) => {
+const parseResumes = async (uploadedFiles, job_id, user_id, originalfiles) => {
   try {
     const errors = [];
     for (let i = 0; i < uploadedFiles.length; i++) {
       const file = uploadedFiles[i];
+      const fileName = originalfiles[i].originalname;
+      console.log(originalfiles[i].originalName)
       let aiEndpoint;
       const fileExtension = path.extname(file.fileName).toLowerCase();
 
@@ -156,13 +164,13 @@ const parseResumes = async (uploadedFiles, job_id, user_id) => {
       } else if ([".png", ".jpg", ".jpeg"].includes(fileExtension)) {
         aiEndpoint = "/parse_image_resume";
       } else {
-        errors.push({ file: file.fileName, error: "Unsupported file type" });
+        errors.push({ file: fileName, error: "Unsupported file type" });
         continue;
       }
 
       try {
         // Generate a token for authentication
-        const token = await generateToken();
+        const token = generateToken();
         const aiResponse = await axios.post(
           `${process.env.AI_BACKEND_URL}${aiEndpoint}?file_key=${file.fileName}`,
           {},
@@ -181,7 +189,7 @@ const parseResumes = async (uploadedFiles, job_id, user_id) => {
           !aiResponse.data.data
         ) {
           errors.push({
-            file: file.fileName,
+            file: fileName,
             error: "Failed to parse resume or invalid response from AI backend",
           });
           continue;
@@ -191,8 +199,22 @@ const parseResumes = async (uploadedFiles, job_id, user_id) => {
         const parsedData = aiResponse.data.data;
         if (!parsedData.name || !parsedData.email || !parsedData.phone) {
           errors.push({
-            file: file.fileName,
+            file: fileName,
             error: "Incomplete parsed data from AI backend",
+          });
+          continue;
+        }
+        const isEmailExist = await db.Candidates.findOne({
+          where: {
+            email: parsedData.email,
+            job_id
+          },
+        });
+
+        if (isEmailExist) {
+          errors.push({
+            file: fileName,
+            error: `Candidate with email ${parsedData.email} and phone number ${parsedData.phone} already exists for the job.`,
           });
           continue;
         }
@@ -249,13 +271,13 @@ const parseResumes = async (uploadedFiles, job_id, user_id) => {
         if (error.response && error.response.data) {
           const errorData = error.response.data;
           errors.push({
-            file: file.fileName,
+            file: fileName,
             error: errorData.message || "API request failed",
             code: errorData.code || error.response.status,
           });
         } else {
           errors.push({
-            file: file.fileName,
+            file: fileName,
             error: "Network or unknown error",
             details: error.message,
           });
