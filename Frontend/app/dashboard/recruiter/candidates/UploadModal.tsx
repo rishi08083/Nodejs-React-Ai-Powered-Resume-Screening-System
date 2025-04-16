@@ -308,84 +308,9 @@ const UploadModal: React.FC<UploadModalProps> = ({
         </div>
       )}
         
-      <ParseCandidate
-        candidate={{
-          name: "VINAY DANIDHARIYA",
-          email: "vinaydanidhariya@gmail.com",
-          phone: "+91-9265979359",
-          skills: [
-            "Web Development",
-            "AI",
-            "ML",
-            "Node.js",
-            "Express",
-            "RESTful API architecture",
-            "PostgreSQL",
-            "Meta WhatsApp API",
-            "Handlebar",
-            "AWS",
-            "Nginx",
-            "FastAPI",
-            "Twillo",
-            "Bootstrap",
-            "HTML",
-            "CSS",
-            "JavaScript",
-            "C/C++",
-            "TypeScript",
-            "Java",
-            "Python",
-            "SQL",
-            "ReactJS",
-            "MongoDB",
-            "EC2",
-            "S3",
-            "SQS",
-            "Lambda",
-            "Docker",
-            "Kafka",
-            "Full-Stack Development",
-            "VS Code",
-            "Linux",
-            "Git",
-            "Postman",
-            "Problem Solving",
-            "Analytical Thinking",
-            "Data Structures",
-            "Algorithms",
-            "Telemedicine Service: Developed an online appointment booking system for patients. Implemented Meta WhatsApp API for emergency consultations, achieving seamless communication. Created a dynamic user interface using Handlebar, ensuring an intuitive user experience. Applied PostgreSQL for robust database management.",
-            "AI-IVR-System: Developed an AI-driven interactive voice response system, achieving high customer satisfaction. Implemented FastAPI for efficient backend processing, handling large volumes of data. Created real-time voice interaction features using Twilio. Applied machine learning models to improve customer support automation.",
-            "QR-Code-Generator: Developed a QR code generator system for various data inputs. Implemented ExpressJS for backend development, ensuring fast processing. Created responsive front-end using Bootstrap and Handlebar. Achieved seamless integration with various data sources.",
-            "Personal Portfolio Website: Developed a personal portfolio website showcasing professional projects and skills. Implemented interactive features using JavaScript, enhancing user engagement. Created a visually appealing design with HTML and CSS. Ensured responsive design for compatibility across devices.",
-            "Developed backend technology components using Node.js and Express, performing deployments that ensured smooth and efficient software operations.",
-            "Implemented RESTful API architecture, enhancing system performance.",
-            "Presented findings and solutions at internal tech meetings, receiving recognition for contributions to project success and team efficiency."
-          ],
-          experience: [
-            {
-              company: "Shivay Infotech PVT LTD, Inc",
-              job_title: "Full-Stack Developer Intern",
-              start_date: "2022-10",
-              end_date: "2023-06"
-            }
-          ],
-          education: [
-            {
-              College: "Marwadi University (NAAC A+)",
-              Degree: "Master of Computer Application",
-              start_date: "2023-",
-              end_date: "2025"
-            },
-            {
-              College: "Saurashtra University",
-              Degree: "Bachelor of Computer Application",
-              start_date: "2020-",
-              end_date: "2023"
-            }
-          ],
-          locations: ["Rajkot", "Gujarat", "India"]
-        }}
-      />
+      {/* <ParseCandidate
+        candidateId
+      /> */}
       </motion.div>
       
     </motion.div>
