@@ -207,7 +207,8 @@ const parseResumes = async (uploadedFiles, job_id, user_id, originalfiles) => {
         const isEmailExist = await db.Candidates.findOne({
           where: {
             email: parsedData.email,
-            job_id
+            job_id,
+            is_deleted:false
           },
         });
 

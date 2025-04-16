@@ -51,7 +51,7 @@ type StatCardProps = {
 
 type AnalyticsData = {
   num_of_resumes: number;
-  num_recommended_candidates : number;
+  num_recommended_candidates: number;
   num_of_candidates: number;
   average_screening_score: string;
   day_wise_parse_count: {
@@ -59,7 +59,6 @@ type AnalyticsData = {
     count: string;
   }[];
   outcome: {
-    num_of_candidates_on_hold: number;
     num_of_candidates_rejected: string;
     num_of_candidates_selected: string;
   };
@@ -184,11 +183,6 @@ export default function AdminDashboard() {
       value: parseInt(analyticsData.outcome.num_of_candidates_rejected),
       color: colorPalette.danger,
     },
-    {
-      name: "On Hold",
-      value: analyticsData.outcome.num_of_candidates_on_hold,
-      color: colorPalette.warning,
-    },
   ];
 
   const resumesParsedData = analyticsData.day_wise_parse_count.map((item) => ({
@@ -242,7 +236,7 @@ export default function AdminDashboard() {
             changeDirection="up"
           />
           <StatCard
-            title="Recommended Candidates"
+            title="Recommended"
             value={analyticsData.num_recommended_candidates}
             icon={<Users size={24} className="text-[var(--accent)]" />}
             // change={8.3}
@@ -328,40 +322,46 @@ export default function AdminDashboard() {
             </div>
           </div>
           {/* Candidate Screening Outcome */}
-          <div className="bg-[var(--surface)] p-6 rounded-xl shadow-md border border-[var(--border)] transition-all hover:shadow-lg">
+            <div className="bg-[var(--surface)] p-6 rounded-xl shadow-md border border-[var(--border)] transition-all hover:shadow-lg">
             <h2 className={chartTitle}>Candidate Screening Outcome</h2>
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={screeningOutcomeData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={100}
-                    paddingAngle={5}
-                    dataKey="value"
-                    label={({ name, value, percent }) =>
-                      `${name}: ${value} (${(percent * 100).toFixed(0)}%)`
-                    }
-                  >
-                    {screeningOutcomeData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "var(--accent)",
-                      borderColor: "var(--border)",
-                      borderRadius: "0.5rem",
-                      boxShadow: "0 4px 6px var(--shadow)",
-                    }}
-                    labelStyle={{ color: "var(--text-primary)" }}
+              <PieChart>
+                <Pie
+                data={screeningOutcomeData}
+                cx="50%"
+                cy="50%"
+                innerRadius={60}
+                outerRadius={100}
+                paddingAngle={5}
+                dataKey="value"
+                >
+                {screeningOutcomeData.map((entry, index) => (
+                  <Cell
+                  key={`cell-${index}`}
+                  fill={index === 0 ? "#FFD700" : "var(--accent)"} 
                   />
-                </PieChart>
+                ))}
+                </Pie>
+                <Tooltip
+                contentStyle={{
+                  backgroundColor: "var(--accent)",
+                  borderColor: "var(--border)",
+                  borderRadius: "0.5rem",
+                  boxShadow: "0 4px 6px var(--shadow)",
+                }}
+                labelStyle={{ color: "var(--text-primary)" }}
+                />
+                <Legend
+                layout="horizontal"
+                verticalAlign="bottom"
+                align="center"
+                wrapperStyle={{ fontSize: "12px", paddingTop: "10px" }}
+                />
+              </PieChart>
               </ResponsiveContainer>
             </div>
-          </div>
+            </div>
         </div>
 
         {/* Row 2: Bar Charts */}

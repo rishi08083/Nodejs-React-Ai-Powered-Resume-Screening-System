@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { AnimatePresence ,motion} from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { Candidate } from "./page";
 import ParseCandidate from "../../../../components/ParseCandidate";
 
@@ -94,8 +94,6 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
   };
 
   return (
-
-
     <motion.div
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
@@ -133,7 +131,6 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
                     transition={{ delay: index * 0.05, duration: 0.4 }}
                     className="border-b border-[var(--border)] hover:bg-[var(--bg)] transition-all duration-300"
                   >
-                  </motion.tr>
                     {/* Candidate Name Column */}
                     <td className="px-4 py-4">
                       <div className="flex items-center">
@@ -166,20 +163,20 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
                     {/* Assessment Column */}
                     <td className="px-4 py-4">
                       <div className="flex items-center justify-center">
-                      <span
-                        className={`px-2 py-1 text-xs font-medium rounded border ${
-                        candidate?.is_recommended?.toUpperCase() === "YES"
-                          ? "bg-green-100 text-green-700 border-green-400"
-                          : candidate?.is_recommended?.toUpperCase() === "NO"
-                          ? "bg-red-100 text-red-700 border-red-400"
-                          : "bg-yellow-100 text-yellow-700 border-yellow-400"
-                        }`}
-                        style={{ borderRadius: "4px" }} // Makes the badge square
-                      >
-                        {candidate?.match_score != null
-                        ? `${candidate.match_score}% match`
-                        : "Analyzing..."}
-                      </span>
+                        <span
+                          className={`px-2 py-1 text-xs font-medium rounded border ${
+                            candidate?.is_recommended?.toUpperCase() === "YES"
+                              ? "bg-green-100 text-green-700 border-green-400"
+                              : candidate?.is_recommended?.toUpperCase() === "NO"
+                                ? "bg-red-100 text-red-700 border-red-400"
+                                : "bg-yellow-100 text-yellow-700 border-yellow-400"
+                          }`}
+                          style={{ borderRadius: "4px" }} // Makes the badge square
+                        >
+                          {candidate?.match_score != null
+                            ? `${candidate.match_score}% match`
+                            : "Analyzing..."}
+                        </span>
                       </div>
                     </td>
 
@@ -201,7 +198,7 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
                                 ? "bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-black"
                                 : "bg-[var(--surface-lighter)] text-[var(--text-secondary)]"
                             } 
-                        rounded transition-colors duration-200 font-medium text-xs`}
+                            rounded transition-colors duration-200 font-medium text-xs`}
                             disabled={!candidate?.is_screened}
                           >
                             <svg
@@ -274,11 +271,13 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
                             onMouseLeave={() => setActiveTooltip(null)}
                           >
                             <button
-                              onClick={() =>
-                                handleViewParsedResume(candidate.id)
-                              }
+                              onClick={() => handleViewParsedResume(candidate.id)}
                               className={`p-1.5 bg-[var(--surface)] hover:bg-[var(--surface-lighter)] text-[var(--text-primary)] transition-colors duration-200 
-                          ${viewParsedResume === candidate.id ? "bg-[var(--blue-highlight)]" : ""} border-r border-[var(--border)]`}
+                                ${
+                                  viewParsedResume === candidate.id
+                                    ? "bg-[var(--blue-highlight)]"
+                                    : ""
+                                } border-r border-[var(--border)]`}
                             >
                               <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -344,7 +343,6 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
                                 More Actions
                               </div>
                             )}
-
                             {isOpen === candidate.id && (
                               <motion.div
                                 initial={{ opacity: 0, scale: 0.95 }}
@@ -390,45 +388,46 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
                               </motion.div>
                             )}
                           </div>
-                          
                         </div>
                       </div>
                     </td>
-                    {/* Parsed Resume Modal View */}
-                    <AnimatePresence>
+                  </motion.tr>
+                  
+                  {/* Parsed Resume Modal View */}
+                  <AnimatePresence>
                     {viewParsedResume === candidate.id && (
                       <motion.div
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.9 }}
-                      transition={{ duration: 0.3 }}
-                      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 overflow-y-auto"
                       >
-                      <div className="bg-[var(--surface)] rounded-lg shadow-lg p-6 w-full max-w-3xl relative">
-                        <button
-                        onClick={() => setViewParsedResume(null)}
-                        className="absolute top-2 right-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
-                        >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <line x1="18" y1="6" x2="6" y2="18"></line>
-                          <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
-                        </button>
-                        <ParseCandidate candidateId={candidate.id} />
-                      </div>
+                        <div className="bg-[var(--surface)] rounded-lg shadow-lg p-6 w-full max-w-3xl h-[90vh] relative my-4 mx-auto overflow-y-auto">
+                          <button
+                            onClick={() => setViewParsedResume(null)}
+                            className="absolute top-4 right-4 text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--surface-lighter)] hover:bg-[var(--bg)] p-2 rounded-full transition-colors"
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="20"
+                              height="20"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <line x1="18" y1="6" x2="6" y2="18"></line>
+                              <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                          </button>
+                          <ParseCandidate candidateId={candidate.id} />
+                        </div>
                       </motion.div>
                     )}
-                    </AnimatePresence>
+                  </AnimatePresence>
                 </React.Fragment>
               ))}
             </tbody>
