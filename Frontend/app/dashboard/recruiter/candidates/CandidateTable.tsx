@@ -396,13 +396,13 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
                   {/* Parsed Resume Modal View */}
                   <AnimatePresence>
                     {viewParsedResume === candidate.id && (
-                      <motion.div
+                        <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.3 }}
-                        className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 overflow-y-auto"
-                      >
+                        className="fixed inset-0 z-50 flex items-center justify-center  bg-opacity-50 backdrop-blur-sm overflow-y-auto"
+                        >
                         <div className="bg-[var(--surface)] rounded-lg shadow-lg p-6 w-full max-w-3xl h-[90vh] relative my-4 mx-auto overflow-y-auto">
                           <button
                             onClick={() => setViewParsedResume(null)}

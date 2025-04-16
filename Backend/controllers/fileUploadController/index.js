@@ -73,29 +73,43 @@ exports.uploadResumes = async (req, res) => {
     const job_id = req.body.job_id;
     const user_id = req.user.id;
 
-    // Wait for AI parsing and get errors
-    const parsingErrors = await parseResumes(
+    // Wait for AI parsing and get results
+    const { errors: parsingErrors, successfulUploads } = await parseResumes(
       uploadedFiles,
       job_id,
       user_id,
       req.files
     );
 
-    if (parsingErrors.length > 0) {
-      // Handle errors during parsing
-      console.error("Parsing errors:", parsingErrors);
+    if (parsingErrors.length > 0 && successfulUploads.length === 0) {
+      // Complete failure - all files failed to parse
+      console.error("All parsing failed:", parsingErrors);
       return res.status(400).json({
+        status: "error",
+        message: "All files failed to parse",
+        errors: parsingErrors,
+      });
+    } else if (parsingErrors.length > 0 && successfulUploads.length > 0) {
+      // Partial success - some files parsed, some failed
+      return res.status(207).json({
         status: "partial_success",
-        message: "Parsing Error",
-        data: { files: uploadedFiles },
+        message: "Some resumes were successfully parsed, others failed",
+        data: { 
+          candidates: successfulUploads,
+          files: uploadedFiles 
+        },
         errors: parsingErrors,
       });
     }
 
+    // All files successfully parsed
     res.status(200).json({
       status: "success",
       message: "Files uploaded and parsed successfully",
-      data: { files: uploadedFiles },
+      data: { 
+        candidates: successfulUploads,
+        files: uploadedFiles 
+      },
     });
   } catch (error) {
     console.error("Error uploading files:", error);
@@ -149,10 +163,11 @@ exports.getResume = async (req, res) => {
 const parseResumes = async (uploadedFiles, job_id, user_id, originalfiles) => {
   try {
     const errors = [];
+    const successfulUploads = [];
+
     for (let i = 0; i < uploadedFiles.length; i++) {
       const file = uploadedFiles[i];
       const fileName = originalfiles[i].originalname;
-      console.log(originalfiles[i].originalName)
       let aiEndpoint;
       const fileExtension = path.extname(file.fileName).toLowerCase();
 
@@ -208,7 +223,7 @@ const parseResumes = async (uploadedFiles, job_id, user_id, originalfiles) => {
           where: {
             email: parsedData.email,
             job_id,
-            is_deleted:false
+            is_deleted: false
           },
         });
 
@@ -268,6 +283,16 @@ const parseResumes = async (uploadedFiles, job_id, user_id, originalfiles) => {
             });
           }
         }
+        
+        // Add the successful upload to our tracking array
+        successfulUploads.push({
+          fileName: fileName,
+          candidateId: candidate.id,
+          name: parsedData.name,
+          email: parsedData.email,
+          fileUrl: file.fileUrl
+        });
+        
       } catch (error) {
         if (error.response && error.response.data) {
           const errorData = error.response.data;
@@ -285,9 +310,12 @@ const parseResumes = async (uploadedFiles, job_id, user_id, originalfiles) => {
         }
       }
     }
-    return errors;
+    return { errors, successfulUploads };
   } catch (error) {
     console.log(`Error during parsing: ${error}`);
-    return [{ error: "An unexpected error occurred during parsing." }];
+    return { 
+      errors: [{ error: "An unexpected error occurred during parsing." }],
+      successfulUploads: [] 
+    };
   }
 };
