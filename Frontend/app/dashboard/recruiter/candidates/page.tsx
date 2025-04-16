@@ -229,7 +229,6 @@ const CandidateList = () => {
     setIsFeedbackModalOpen(false);
     setSelectedFeedback(null);
   };
-  console.log(candidates, "dadsaa==========================");
   return (
     <div className="w-full p-6 bg-[var(--bg)] mt-14 min-h-screen text-[var(--text-primary)] transition-all duration-300">
       <motion.div

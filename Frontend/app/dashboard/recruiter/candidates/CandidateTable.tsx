@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { motion } from "framer-motion";
+import { AnimatePresence ,motion} from "framer-motion";
 import { Candidate } from "./page";
+import ParseCandidate from "../../../../components/ParseCandidate";
 
 type CandidateTableProps = {
   currentCandidates: Candidate[];
@@ -22,6 +23,8 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
   const [isOpen, setIsOpen] = useState<string | null>(null);
   const [originalCandidates, setOriginalCandidates] =
     useState(currentCandidates);
+  const [activeTooltip, setActiveTooltip] = useState<string | null>(null);
+  const [viewParsedResume, setViewParsedResume] = useState<string | null>(null);
 
   // Function to fetch and open the resume
   const get_resume = async (candidateId: string, e: React.MouseEvent) => {
@@ -70,7 +73,6 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
           const updatedCandidates = prevCandidates.filter(
             (candidate) => candidate.id !== candidateId
           );
-          console.log("Updated candidates:", updatedCandidates); // Debug log
           return updatedCandidates;
         });
         setOriginalCandidates((prevOriginal) =>
@@ -86,7 +88,14 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
     }
   };
 
+  // Function to view parsed resume
+  const handleViewParsedResume = (candidateId: string) => {
+    setViewParsedResume(viewParsedResume === candidateId ? null : candidateId);
+  };
+
   return (
+
+
     <motion.div
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
@@ -98,168 +107,308 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
           <table className="min-w-full table-auto border-collapse">
             <thead>
               <tr className="bg-[var(--bg)] border-b border-[var(--border)]">
-                <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
+                <th className="px-4 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
                   Candidate Name
                 </th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
+                <th className="px-4 py-4 text-left text-sm font-semibold text-[var(--text-primary)] hidden md:table-cell">
                   Email
                 </th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
+                <th className="px-4 py-4 text-left text-sm font-semibold text-[var(--text-primary)] hidden lg:table-cell">
                   Contact
                 </th>
-
-                <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
-                  Compatibility(%)
-                </th>
-
                 <th className="px-4 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
-                  Recommended
+                  Compatibility Score
                 </th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
-                  Feedback
-                </th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
-                  Resume
-                </th>
-                <th className="px-4 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
+                <th className="px-4 py-4 text-right text-sm font-semibold text-[var(--text-primary)]">
                   Actions
                 </th>
               </tr>
             </thead>
             <tbody>
               {currentCandidates.map((candidate, index) => (
-                // how to print all the keys of the candidate object in the console
+                <React.Fragment key={candidate.id}>
+                  <motion.tr
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.05, duration: 0.4 }}
+                    className="border-b border-[var(--border)] hover:bg-[var(--bg)] transition-all duration-300"
+                  >
+                  </motion.tr>
+                    {/* Candidate Name Column */}
+                    <td className="px-4 py-4">
+                      <div className="flex items-center">
+                        <span className="font-medium text-[var(--text-primary)] truncate max-w-[150px]">
+                          {candidate.name || "Unknown"}
+                        </span>
+                      </div>
+                    </td>
 
-                <motion.tr
-                  key={candidate.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.05, duration: 0.4 }}
-                  className="border-b border-[var(--border)] hover:bg-[var(--bg)] transition-all duration-300"
-                >
-                  <td className="px-6 py-4 text-sm font-medium text-[var(--text-primary)]">
-                    {candidate.name}
-                  </td>
-                  <td className="px-6 py-4 text-sm font-medium text-[var(--text-primary)]">
-                    {candidate.email}
-                  </td>
-                  <td className="px-6 py-4 text-sm font-medium text-[var(--text-primary)]">
-                    {candidate.phone_number}
-                  </td>
+                    {/* Email Column - Separated from Name */}
+                    <td className="px-4 py-4 hidden md:table-cell">
+                      <a
+                        href={`mailto:${candidate.email}`}
+                        className="text-sm text-[var(--text-primary)] truncate max-w-[200px] block hover:underline"
+                      >
+                        {candidate.email}
+                      </a>
+                    </td>
 
-                  {/* Compatibility Score */}
-                  <td className="px-6 py-4 text-sm">
-                    {candidate?.match_score != null ? (
+                    {/* Contact Info Column */}
+                    <td className="px-4 py-4 hidden lg:table-cell">
+                      <a
+                        href={`tel:${candidate.phone_number}`}
+                        className="text-sm text-[var(--text-primary)] hover:underline"
+                      >
+                        {candidate.phone_number || "Not provided"}
+                      </a>
+                    </td>
+
+                    {/* Assessment Column */}
+                    <td className="px-4 py-4">
+                      <div className="flex items-center justify-center">
                       <span
-                        className={`inline-block px-3 py-1 text-sm font-semibold rounded ${
-                          candidate.is_recommended === "YES"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-red-100 text-red-800"
+                        className={`px-2 py-1 text-xs font-medium rounded border ${
+                        candidate?.is_recommended?.toUpperCase() === "YES"
+                          ? "bg-green-100 text-green-700 border-green-400"
+                          : candidate?.is_recommended?.toUpperCase() === "NO"
+                          ? "bg-red-100 text-red-700 border-red-400"
+                          : "bg-yellow-100 text-yellow-700 border-yellow-400"
                         }`}
+                        style={{ borderRadius: "4px" }} // Makes the badge square
                       >
-                        {candidate.match_score} %
+                        {candidate?.match_score != null
+                        ? `${candidate.match_score}% match`
+                        : "Analyzing..."}
                       </span>
-                    ) : (
-                      <motion.div
-                        className="px-4 py-2 bg-[var(--surface)] text-[var(--text-secondary)] font-medium rounded-lg shadow flex items-center justify-center"
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        <svg
-                          className="animate-spin -ml-1 mr-3 h-5 w-5 text-[var(--accent)]"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <circle
-                            className="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                          ></circle>
-                          <path
-                            className="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                          ></path>
-                        </svg>
-                        Loading...
-                      </motion.div>
-                    )}
-                  </td>
-                  {/* Recommended */}
-                  <td className="px-6 py-4 text-sm">
-                    {candidate?.is_recommended.toUpperCase() === "YES" ? (
-                      <span className="text-green-400 font-medium">Yes</span>
-                    ) : candidate?.is_recommended.toUpperCase() === "NO" ? (
-                      <span className="text-red-400 font-medium">No</span>
-                    ) : (
-                      <span className="text-yellow-400 font-medium">
-                        Pending
-                      </span>
-                    )}
-                  </td>
+                      </div>
+                    </td>
 
-                  {/* Feedback Button */}
-                  <td className="px-6 py-4 text-sm">
-                    {candidate?.is_screened ? (
-                      <div className="relative group">
-                        <motion.button
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          onClick={() => handleShowFeedback(candidate)}
-                          className="px-4 py-2 border border-[var(--accent)] text-[var(--accent)] font-medium rounded-lg shadow hover:bg-[var(--accent)] hover:text-[var(--dark-bg)] transition-all duration-300"
-                        >
-                          Feedback
-                        </motion.button>
+                    {/* Actions Column */}
+                    <td className="px-4 py-4">
+                      <div className="flex justify-end space-x-1.5">
+                        {/* Combined Assessment & Feedback Button */}
                         <div
-                          className="absolute z-10 inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-xs opacity-0 tooltip dark:bg-gray-700 group-hover:opacity-100 group-hover:visible transition-opacity duration-300"
-                          style={{
-                            visibility: "hidden",
-                            top: "-40px",
-                            left: "50%",
-                            transform: "translateX(-50%)",
-                          }}
+                          className="relative tooltip-container"
+                          onMouseEnter={() =>
+                            setActiveTooltip(`feedback-${candidate.id}`)
+                          }
+                          onMouseLeave={() => setActiveTooltip(null)}
                         >
-                          View Feedback
+                          <button
+                            onClick={() => handleShowFeedback(candidate)}
+                            className={`p-1.5 flex items-center ${
+                              candidate?.is_screened
+                                ? "bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-black"
+                                : "bg-[var(--surface-lighter)] text-[var(--text-secondary)]"
+                            } 
+                        rounded transition-colors duration-200 font-medium text-xs`}
+                            disabled={!candidate?.is_screened}
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="14"
+                              height="14"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className="mr-1"
+                            >
+                              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                            <span className="hidden sm:inline">Feedback</span>
+                          </button>
+                          {activeTooltip === `feedback-${candidate.id}` && (
+                            <div className="fixed z-50 mt-1 px-2 py-1 rounded text-xs bg-[var(--bg)] border border-[var(--border)] shadow-md text-[var(--text-primary)] whitespace-nowrap">
+                              {candidate?.is_screened
+                                ? "View Feedback"
+                                : "Pending Screening"}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Action Buttons Group */}
+                        <div className="inline-flex rounded-md shadow-sm border border-[var(--border)]">
+                          {/* View Resume Button */}
                           <div
-                            className="tooltip-arrow"
-                            style={{
-                              position: "absolute",
-                              top: "100%",
-                              left: "50%",
-                              transform: "translateX(-50%)",
-                              width: "0",
-                              height: "0",
-                              borderLeft: "5px solid transparent",
-                              borderRight: "5px solid transparent",
-                              borderTop: "5px solid #1a202c",
-                            }}
-                          ></div>
+                            className="relative tooltip-container"
+                            onMouseEnter={() =>
+                              setActiveTooltip(`resume-${candidate.id}`)
+                            }
+                            onMouseLeave={() => setActiveTooltip(null)}
+                          >
+                            <button
+                              onClick={(e) => get_resume(candidate.id, e)}
+                              className="p-1.5 bg-[var(--surface)] hover:bg-[var(--surface-lighter)] text-[var(--text-primary)] rounded-l transition-colors duration-200 border-r border-[var(--border)]"
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                              </svg>
+                            </button>
+                            {activeTooltip === `resume-${candidate.id}` && (
+                              <div className="fixed z-50 mt-1 px-2 py-1 rounded text-xs bg-[var(--bg)] border border-[var(--border)] shadow-md text-[var(--text-primary)] whitespace-nowrap">
+                                View Resume
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Parse Resume Button */}
+                          <div
+                            className="relative tooltip-container"
+                            onMouseEnter={() =>
+                              setActiveTooltip(`parsed-${candidate.id}`)
+                            }
+                            onMouseLeave={() => setActiveTooltip(null)}
+                          >
+                            <button
+                              onClick={() =>
+                                handleViewParsedResume(candidate.id)
+                              }
+                              className={`p-1.5 bg-[var(--surface)] hover:bg-[var(--surface-lighter)] text-[var(--text-primary)] transition-colors duration-200 
+                          ${viewParsedResume === candidate.id ? "bg-[var(--blue-highlight)]" : ""} border-r border-[var(--border)]`}
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <path d="M14 2v6h6"></path>
+                                <path d="M16 13H8"></path>
+                                <path d="M16 17H8"></path>
+                                <path d="M10 9H8"></path>
+                              </svg>
+                            </button>
+                            {activeTooltip === `parsed-${candidate.id}` && (
+                              <div className="fixed z-50 mt-1 px-2 py-1 rounded text-xs bg-[var(--bg)] border border-[var(--border)] shadow-md text-[var(--text-primary)] whitespace-nowrap">
+                                {viewParsedResume === candidate.id
+                                  ? "Hide Parsed Resume"
+                                  : "View Parsed Resume"}
+                              </div>
+                            )}
+                          </div>
+
+                          {/* More Actions Button */}
+                          <div
+                            className="relative tooltip-container"
+                            onMouseEnter={() =>
+                              setActiveTooltip(`more-${candidate.id}`)
+                            }
+                            onMouseLeave={() => setActiveTooltip(null)}
+                          >
+                            <button
+                              onClick={() =>
+                                setIsOpen(
+                                  isOpen === candidate.id ? null : candidate.id
+                                )
+                              }
+                              className="p-1.5 bg-[var(--surface)] hover:bg-[var(--surface-lighter)] text-[var(--text-primary)] rounded-r transition-colors duration-200"
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <circle cx="12" cy="12" r="1"></circle>
+                                <circle cx="12" cy="5" r="1"></circle>
+                                <circle cx="12" cy="19" r="1"></circle>
+                              </svg>
+                            </button>
+                            {activeTooltip === `more-${candidate.id}` && (
+                              <div className="fixed z-50 mt-1 px-2 py-1 rounded text-xs bg-[var(--bg)] border border-[var(--border)] shadow-md text-[var(--text-primary)] whitespace-nowrap">
+                                More Actions
+                              </div>
+                            )}
+
+                            {isOpen === candidate.id && (
+                              <motion.div
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ duration: 0.2 }}
+                                className="absolute right-0 mt-1 w-36 rounded-md shadow-lg bg-[var(--surface)] ring-1 ring-[var(--border)] focus:outline-none z-50"
+                                tabIndex={-1}
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <div
+                                  className="py-1"
+                                  role="menu"
+                                  aria-orientation="vertical"
+                                  aria-labelledby="options-menu"
+                                >
+                                  <button
+                                    onClick={() => {
+                                      handleDeleteCandidate(candidate.id);
+                                      setIsOpen(null);
+                                    }}
+                                    className="block w-full px-4 py-2 text-sm text-red-400 hover:bg-[var(--border)] hover:text-red-300 transition-colors duration-300 text-left"
+                                    role="menuitem"
+                                  >
+                                    <div className="flex items-center">
+                                      <svg
+                                        className="mr-2 h-4 w-4"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                      >
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          strokeWidth="2"
+                                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                        ></path>
+                                      </svg>
+                                      Delete
+                                    </div>
+                                  </button>
+                                </div>
+                              </motion.div>
+                            )}
+                          </div>
+                          
                         </div>
                       </div>
-                    ) : (
-                      <span className="text-[var(--text-secondary)]">
-                        {candidate.is_screened === false
-                          ? "Pending Screening"
-                          : "Not Available"}
-                      </span>
-                    )}
-                  </td>
-
-                  {/* Resume Button */}
-                  <td className="px-6 py-4 text-sm">
-                    <div className="relative group">
-                      <button
-                        onClick={(e) => {
-                          get_resume(candidate.id, e);
-                        }}
-                        className="px-3 py-2 bg-[var(--border)] text-[var(--text-primary)] font-medium rounded-lg hover:bg-[var(--blue-highlight)] transition-colors duration-200 shadow-md hover:shadow-lg flex items-center space-x-1"
-                        tabIndex={0}
-                        style={{ transform: "none" }}
+                    </td>
+                    {/* Parsed Resume Modal View */}
+                    <AnimatePresence>
+                    {viewParsedResume === candidate.id && (
+                      <motion.div
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.9 }}
+                      transition={{ duration: 0.3 }}
+                      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
                       >
+                      <div className="bg-[var(--surface)] rounded-lg shadow-lg p-6 w-full max-w-3xl relative">
+                        <button
+                        onClick={() => setViewParsedResume(null)}
+                        className="absolute top-2 right-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                        >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           width="24"
@@ -270,103 +419,17 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
                           strokeWidth="2"
                           strokeLinecap="round"
                           strokeLinejoin="round"
-                          className="lucide lucide-eye h-4 w-4"
                         >
-                          <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"></path>
-                          <circle cx="12" cy="12" r="3"></circle>
+                          <line x1="18" y1="6" x2="6" y2="18"></line>
+                          <line x1="6" y1="6" x2="18" y2="18"></line>
                         </svg>
-                      </button>
-                      <div className="absolute z-50 bg-[var(--surface)] text-[var(--text-secondary)] text-sm p-2 rounded shadow-lg border border-[var(--border)] top-[-40px] left-1/2 transform -translate-x-1/2 whitespace-nowrap group-hover:block hidden">
-                        View Resume
-                      </div>
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="absolute top-[-50px] left-1/2 transform -translate-x-1/2 h-4 w-4 text-[var(--text-secondary)] hidden group-hover:block"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M12 4v16m8-8H4"
-                        />
-                      </svg>
-                    </div>
-                  </td>
-
-                  {/* Actions Dropdown */}
-                  <td className="px-6 py-4 text-sm relative">
-                    <button
-                      onClick={() =>
-                        setIsOpen(isOpen === candidate.id ? null : candidate.id)
-                      }
-                      className="px-3 py-2 bg-[var(--border)] text-[var(--text-primary)] font-medium rounded-lg hover:bg-[var(--blue-highlight)] transition-colors duration-200 shadow-md hover:shadow-lg flex items-center space-x-1"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="lucide lucide-more-vertical h-4 w-4"
-                      >
-                        <circle cx="12" cy="12" r="1"></circle>
-                        <circle cx="12" cy="5" r="1"></circle>
-                        <circle cx="12" cy="19" r="1"></circle>
-                      </svg>
-                    </button>
-                  </td>
-                  {isOpen === candidate.id && (
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ duration: 0.2 }}
-                      className="absolute right-0 mt-15 w-36 rounded-md shadow-lg bg-[var(--surface)] ring-1 ring-[var(--border)] focus:outline-none z-50"
-                      tabIndex={-1}
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <div
-                        className="py-1"
-                        role="menu"
-                        aria-orientation="vertical"
-                        aria-labelledby="options-menu"
-                      >
-                        <button
-                          onClick={() => {
-                            handleDeleteCandidate(candidate.id); // Ensure this uses the correct candidate.id
-                            setIsOpen(null); // Close dropdown after action
-                          }}
-                          className="block w-full px-4 py-2 text-sm text-red-400 hover:bg-[var(--border)] hover:text-red-300 transition-colors duration-300 text-left"
-                          role="menuitem"
-                        >
-                          <div className="flex items-center">
-                            <svg
-                              className="mr-2 h-4 w-4"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                              ></path>
-                            </svg>
-                            Delete
-                          </div>
                         </button>
+                        <ParseCandidate candidateId={candidate.id} />
                       </div>
-                    </motion.div>
-                  )}
-                </motion.tr>
+                      </motion.div>
+                    )}
+                    </AnimatePresence>
+                </React.Fragment>
               ))}
             </tbody>
           </table>
@@ -396,7 +459,7 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
             <h3 className="text-xl font-medium text-[var(--text-primary)] mb-2">
               No Candidates Found
             </h3>
-            <p className="text-[var(--text-secondary)] max-w-md">
+            <p className="text-[var(--text-secondary)] max-w-md mx-auto">
               {selectedJob
                 ? "No candidates have applied for this job position yet. Check back later or select another job."
                 : "Please select a job from the dropdown to view candidates."}

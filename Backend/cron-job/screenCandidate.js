@@ -44,6 +44,12 @@ async function screenCandidate(candidate) {
         },
       }
     );
+    // console.log("Candidate Details:");
+    // console.log(JSON.stringify({
+    //   jd: candidateDetails.jd,
+    //   rcd_file_key: candidateDetails.rcd_file_key,
+    //   candidate: candidateDetails.candidate,
+    // }, null, 2)); 
     console.log(aiResponse.data.feedback);
 
     const payload = {
