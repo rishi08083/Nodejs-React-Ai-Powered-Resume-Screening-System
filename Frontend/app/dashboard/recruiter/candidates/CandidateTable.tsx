@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence ,motion} from "framer-motion";
 import { Candidate } from "./page";
 import ParseCandidate from "../../../../components/ParseCandidate";
 
@@ -94,6 +94,8 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
   };
 
   return (
+
+
     <motion.div
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
@@ -131,6 +133,7 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
                     transition={{ delay: index * 0.05, duration: 0.4 }}
                     className="border-b border-[var(--border)] hover:bg-[var(--bg)] transition-all duration-300"
                   >
+                  </motion.tr>
                     {/* Candidate Name Column */}
                     <td className="px-4 py-4">
                       <div className="flex items-center">
@@ -387,19 +390,45 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
                               </motion.div>
                             )}
                           </div>
+                          
                         </div>
                       </div>
                     </td>
-                  </motion.tr>
-
-                  {/* Parsed Resume Expanded View */}
-                  <AnimatePresence>
+                    {/* Parsed Resume Modal View */}
+                    <AnimatePresence>
                     {viewParsedResume === candidate.id && (
-                      <ParseCandidate 
-                        candidateId={candidate.id}
-                      />
+                      <motion.div
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.9 }}
+                      transition={{ duration: 0.3 }}
+                      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+                      >
+                      <div className="bg-[var(--surface)] rounded-lg shadow-lg p-6 w-full max-w-3xl relative">
+                        <button
+                        onClick={() => setViewParsedResume(null)}
+                        className="absolute top-2 right-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                        >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <line x1="18" y1="6" x2="6" y2="18"></line>
+                          <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                        </button>
+                        <ParseCandidate candidateId={candidate.id} />
+                      </div>
+                      </motion.div>
                     )}
-                  </AnimatePresence>
+                    </AnimatePresence>
                 </React.Fragment>
               ))}
             </tbody>
