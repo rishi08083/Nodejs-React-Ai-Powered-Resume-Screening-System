@@ -39,7 +39,7 @@ module.exports.addCandidate = async (req, res) => {
       hiring_bull_status,
       status,
       is_deleted: false,
-    });  
+    });
 
     return res.status(201).json({
       status: "success",
@@ -104,6 +104,11 @@ module.exports.deleteCandidate = async (req, res) => {
 
     const candidate = await db.Candidates.findByPk(candidate_id);
 
+    await db.ParseResume.update(
+      { is_deleted: true },
+      { where: { candidate_id: candidate_id } }
+    );
+
     if (!candidate) {
       return res.status(404).json({
         status: "error",
@@ -139,21 +144,22 @@ module.exports.getRecommendedCandidates = async (req, res) => {
     }
 
     const recommendedCandidates = await db.Candidates.findAll({
-      where: { 
-        job_id: parseInt(job_id), 
+      where: {
+        job_id: parseInt(job_id),
         is_deleted: false,
         match_score: {
-          [db.Sequelize.Op.gt]: 40 // Greater than 40
+          [db.Sequelize.Op.gt]: 40, // Greater than 40
         },
-        user_id: user.id
+        user_id: user.id,
       },
-      order: [['match_score', 'DESC']], // Order by match score in descending order
+      order: [["match_score", "DESC"]], // Order by match score in descending order
     });
 
     if (recommendedCandidates.length === 0) {
       return res.status(200).json({
         status: "success",
-        message: "No recommended candidates found with match score greater than 40",
+        message:
+          "No recommended candidates found with match score greater than 40",
       });
     }
 
