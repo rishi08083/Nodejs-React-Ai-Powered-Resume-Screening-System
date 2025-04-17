@@ -10,7 +10,14 @@ const router = express.Router();
 
 router.post("/add", authMiddleware.authMiddleware, addCandidate);
 router.get("/list/:job_id", authMiddleware.authMiddleware, listCandidate);
-router.get("/recommended/:job_id", authMiddleware.authMiddleware, getRecommendedCandidates);
+router.get(
+  "/recommended/:job_id",
+  authMiddleware.authMiddleware,
+  getRecommendedCandidates
+);
 router.delete(
-  "/delete/:candidate_id",authMiddleware.authMiddleware,deleteCandidate);
+  "/delete/:candidate_id",
+  authMiddleware.authMiddleware,
+  deleteCandidate
+);
 module.exports = router;
