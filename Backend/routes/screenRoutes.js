@@ -8,7 +8,6 @@ const { screenCandidate, getFeedback } = require("../controllers/screeningContro
 // router.post("/screen_candidate", screenCandidate);
 
 // Fetch stored feedback by candidate_id
-// not used
-// router.get("/get_feedback/:candidate_id", getFeedback);
+router.get("/get_feedback/:candidate_id", getFeedback);
 
 module.exports = router;
