@@ -94,9 +94,9 @@ exports.uploadResumes = async (req, res) => {
       return res.status(207).json({
         status: "partial_success",
         message: "Some resumes were successfully parsed, others failed",
-        data: { 
+        data: {
           candidates: successfulUploads,
-          files: uploadedFiles 
+          files: uploadedFiles,
         },
         errors: parsingErrors,
       });
@@ -106,9 +106,9 @@ exports.uploadResumes = async (req, res) => {
     res.status(200).json({
       status: "success",
       message: "Files uploaded and parsed successfully",
-      data: { 
+      data: {
         candidates: successfulUploads,
-        files: uploadedFiles 
+        files: uploadedFiles,
       },
     });
   } catch (error) {
@@ -223,7 +223,7 @@ const parseResumes = async (uploadedFiles, job_id, user_id, originalfiles) => {
           where: {
             email: parsedData.email,
             job_id,
-            is_deleted: false
+            is_deleted: false,
           },
         });
 
@@ -283,16 +283,15 @@ const parseResumes = async (uploadedFiles, job_id, user_id, originalfiles) => {
             });
           }
         }
-        
+
         // Add the successful upload to our tracking array
         successfulUploads.push({
           fileName: fileName,
           candidateId: candidate.id,
           name: parsedData.name,
           email: parsedData.email,
-          fileUrl: file.fileUrl
+          fileUrl: file.fileUrl,
         });
-        
       } catch (error) {
         if (error.response && error.response.data) {
           const errorData = error.response.data;
@@ -313,9 +312,9 @@ const parseResumes = async (uploadedFiles, job_id, user_id, originalfiles) => {
     return { errors, successfulUploads };
   } catch (error) {
     console.log(`Error during parsing: ${error}`);
-    return { 
+    return {
       errors: [{ error: "An unexpected error occurred during parsing." }],
-      successfulUploads: [] 
+      successfulUploads: [],
     };
   }
 };
