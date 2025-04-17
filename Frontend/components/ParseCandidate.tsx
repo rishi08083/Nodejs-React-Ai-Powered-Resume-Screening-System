@@ -416,27 +416,7 @@ const ParseCandidate: React.FC<{
 
       {/* Actions Footer */}
       <div className="mt-8 flex justify-end">
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-black px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 font-medium flex items-center"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="mr-2"
-          >
-            <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
-          </svg>
-          Add to Shortlist
-        </motion.button>
+        
       </div>
     </div>
   );
