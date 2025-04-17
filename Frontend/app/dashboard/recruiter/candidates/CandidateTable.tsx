@@ -101,7 +101,7 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay: 0.3 }}
-      className="bg-[var(--surface)] rounded-xl shadow-lg overflow-hidden border border-[var(--border)]"
+      className="mb-3 bg-[var(--surface)] rounded-xl shadow-lg overflow-hidden border border-[var(--border)]"
     >
       {currentCandidates.length > 0 ? (
         <div className="overflow-x-auto">
@@ -145,12 +145,43 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
 
                     {/* Email Column - Separated from Name */}
                     <td className="px-4 py-4 hidden md:table-cell">
-                      <a
-                        href={`mailto:${candidate.email}`}
-                        className="text-sm text-[var(--text-primary)] truncate max-w-[200px] block hover:underline"
-                      >
-                        {candidate.email}
-                      </a>
+                      <div className="flex items-center space-x-2">
+                        <a
+                          href={`mailto:${candidate.email}`}
+                          className="text-sm text-[var(--text-primary)] truncate max-w-[200px] block hover:underline"
+                        >
+                          {candidate.email}
+                        </a>
+                        <button
+                          onClick={() =>
+                            navigator.clipboard.writeText(candidate.email)
+                          }
+                          className="p-1 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+                          title="Copy Email"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <rect
+                              x="9"
+                              y="9"
+                              width="13"
+                              height="13"
+                              rx="2"
+                              ry="2"
+                            ></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                          </svg>
+                        </button>
+                      </div>
                     </td>
 
                     {/* Contact Info Column */}
@@ -202,7 +233,7 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
                                 ? "bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-black"
                                 : "bg-[var(--surface-lighter)] text-[var(--text-secondary)]"
                             } 
-                            rounded transition-colors duration-200 font-medium text-xs`}
+                        rounded transition-colors duration-200 font-medium text-xs`}
                             disabled={!candidate?.is_screened}
                           >
                             <svg
@@ -222,7 +253,7 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
                             <span className="hidden sm:inline">Feedback</span>
                           </button>
                           {activeTooltip === `feedback-${candidate.id}` && (
-                            <div className="fixed z-50 mt-1 px-2 py-1 rounded text-xs bg-[var(--bg)] border border-[var(--border)] shadow-md text-[var(--text-primary)] whitespace-nowrap">
+                            <div className="absolute z-50 top-full left-1/2 transform -translate-x-1/2 mt-1 px-2 py-1 rounded text-xs bg-[var(--bg)] border border-[var(--border)] shadow-md text-[var(--text-primary)] whitespace-nowrap">
                               {candidate?.is_screened
                                 ? "View Feedback"
                                 : "Pending Screening"}
@@ -260,7 +291,7 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
                               </svg>
                             </button>
                             {activeTooltip === `resume-${candidate.id}` && (
-                              <div className="fixed z-50 mt-1 px-2 py-1 rounded text-xs bg-[var(--bg)] border border-[var(--border)] shadow-md text-[var(--text-primary)] whitespace-nowrap">
+                              <div className="absolute z-50 top-full left-1/2 transform -translate-x-1/2 mt-1 px-2 py-1 rounded text-xs bg-[var(--bg)] border border-[var(--border)] shadow-md text-[var(--text-primary)] whitespace-nowrap">
                                 View Resume
                               </div>
                             )}
@@ -279,11 +310,11 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
                                 handleViewParsedResume(candidate.id)
                               }
                               className={`p-1.5 bg-[var(--surface)] hover:bg-[var(--surface-lighter)] text-[var(--text-primary)] transition-colors duration-200 
-                                ${
-                                  viewParsedResume === candidate.id
-                                    ? "bg-[var(--blue-highlight)]"
-                                    : ""
-                                } border-r border-[var(--border)]`}
+                          ${
+                            viewParsedResume === candidate.id
+                              ? "bg-[var(--blue-highlight)]"
+                              : ""
+                          } border-r border-[var(--border)]`}
                             >
                               <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -304,7 +335,7 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
                               </svg>
                             </button>
                             {activeTooltip === `parsed-${candidate.id}` && (
-                              <div className="fixed z-50 mt-1 px-2 py-1 rounded text-xs bg-[var(--bg)] border border-[var(--border)] shadow-md text-[var(--text-primary)] whitespace-nowrap">
+                              <div className="absolute z-50 top-full left-1/2 transform -translate-x-1/2 mt-1 px-2 py-1 rounded text-xs bg-[var(--bg)] border border-[var(--border)] shadow-md text-[var(--text-primary)] whitespace-nowrap">
                                 {viewParsedResume === candidate.id
                                   ? "Hide Parsed Resume"
                                   : "View Parsed Resume"}
@@ -345,67 +376,67 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
                               </svg>
                             </button>
                             {activeTooltip === `more-${candidate.id}` && (
-                              <div className="fixed z-50 mt-1 px-2 py-1 rounded text-xs bg-[var(--bg)] border border-[var(--border)] shadow-md text-[var(--text-primary)] whitespace-nowrap">
+                              <div className="absolute z-50 top-full left-1/2 transform -translate-x-1/2 mt-1 px-2 py-1 rounded text-xs bg-[var(--bg)] border border-[var(--border)] shadow-md text-[var(--text-primary)] whitespace-nowrap">
                                 More Actions
                               </div>
                             )}
-                            {isOpen === candidate.id && (
-                              <motion.div
-                                initial={{ opacity: 0, scale: 0.95 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                transition={{ duration: 0.2 }}
-                                className="absolute right-0 mt-1 w-36 rounded-md shadow-lg bg-[var(--surface)] ring-1 ring-[var(--border)] focus:outline-none z-50"
-                                tabIndex={-1}
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                <DeleteModal
-                                  isOpen={isDeleteModalOpen}
-                                  onClose={() => setIsDeleteModalOpen(false)}
-                                  onDelete={() =>
-                                    handleDeleteCandidate(candidate.id)
-                                  }
-                                  title={candidate.name}
-                                  hoverAnimation={true}
-                                  animationType={AnimationType.FadeIn}
-                                  deleteButtonAnimation={true}
-                                  animationDuration={300}
-                                  message="Are you sure you want to delete this candidate? This action cannot be undone."
-                                />
-                                <div
-                                  className="py-1"
-                                  role="menu"
-                                  aria-orientation="vertical"
-                                  aria-labelledby="options-menu"
-                                >
-                                  <button
-                                    onClick={() => {
-                                      setIsDeleteModalOpen(true);
-                                    }}
-                                    className="block w-full px-4 py-2 text-sm text-red-400 hover:bg-[var(--border)] hover:text-red-300 transition-colors duration-300 text-left"
-                                    role="menuitem"
-                                  >
-                                    <div className="flex items-center">
-                                      <svg
-                                        className="mr-2 h-4 w-4"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                      >
-                                        <path
-                                          strokeLinecap="round"
-                                          strokeLinejoin="round"
-                                          strokeWidth="2"
-                                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                                        ></path>
-                                      </svg>
-                                      Delete
-                                    </div>
-                                  </button>
-                                </div>
-                              </motion.div>
-                            )}
                           </div>
+                          {isOpen === candidate.id && (
+                            <motion.div
+                              initial={{ opacity: 0, scale: 0.95 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              transition={{ duration: 0.2 }}
+                              className="absolute right-0 mt-7 w-36 rounded-md shadow-lg bg-[var(--surface)] ring-1 ring-[var(--border)] focus:outline-none z-50"
+                              tabIndex={-1}
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <DeleteModal
+                                isOpen={isDeleteModalOpen}
+                                onClose={() => setIsDeleteModalOpen(false)}
+                                onDelete={() =>
+                                  handleDeleteCandidate(candidate.id)
+                                }
+                                title={candidate.name}
+                                hoverAnimation={true}
+                                animationType={AnimationType.FadeIn}
+                                deleteButtonAnimation={true}
+                                animationDuration={300}
+                                message="Are you sure you want to delete this candidate? This action cannot be undone."
+                              />
+                              <div
+                                className="py-1"
+                                role="menu"
+                                aria-orientation="vertical"
+                                aria-labelledby="options-menu"
+                              >
+                                <button
+                                  onClick={() => {
+                                    setIsDeleteModalOpen(true);
+                                  }}
+                                  className="block w-full px-4 py-2 text-sm text-red-400 hover:bg-[var(--border)] hover:text-red-300 transition-colors duration-300 text-left"
+                                  role="menuitem"
+                                >
+                                  <div className="flex items-center">
+                                    <svg
+                                      className="mr-2 h-4 w-4"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      viewBox="0 0 24 24"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth="2"
+                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                      ></path>
+                                    </svg>
+                                    Delete
+                                  </div>
+                                </button>
+                              </div>
+                            </motion.div>
+                          )}
                         </div>
                       </div>
                     </td>
