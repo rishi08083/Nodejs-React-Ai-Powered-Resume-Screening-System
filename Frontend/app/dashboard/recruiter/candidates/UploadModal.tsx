@@ -37,6 +37,11 @@ const UploadModal: React.FC<UploadModalProps> = ({
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
+  const [jobId, setJobId] = useState<string>("");
+  const [JobTitle, setJobTitle] = useState<string>("");
+
   const getJobDetails = async () => {
     try {
       const response = await fetch(
@@ -156,7 +161,8 @@ const UploadModal: React.FC<UploadModalProps> = ({
 
     const formData = new FormData();
     files.forEach((file) => formData.append("resume-files", file));
-    formData.append("job_id", selectedJob);
+    // formData.append("job_id", selectedJob);
+    formData.append("job_id", jobId);
 
     const token = localStorage.getItem("token");
 
@@ -167,6 +173,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
         body: formData,
       });
       setUploadProgress(100);
+      setUploadProgress(0);
 
       if (response.ok) {
         // Add successfully uploaded files to the list
@@ -291,24 +298,53 @@ const UploadModal: React.FC<UploadModalProps> = ({
         </div>
 
         {/* Job Dropdown */}
-        <div className="mb-4">
-          <label className="block mb-2 text-[var(--text-primary)] font-medium">
-            Select Job:
-          </label>
-          <select
-            className="w-full p-2 rounded border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)]"
-            value={selectedJob ?? ""}
-            onChange={(e) => setSelectedJob(e.target.value)}
+        <div className="relative mb-6" ref={dropdownRef}>
+          <div
+            className={`w-full p-3 pl-10 border-2 rounded-lg bg-[var(--surface)] border-[var(--border)] hover:border-[var(--accent)] cursor-pointer transition-all duration-300 flex justify-between items-center ${
+              selectedJob
+                ? "font-medium text-[var(--text-primary)]"
+                : "text-[var(--text-secondary)]"
+            }`}
+            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           >
-            <option value="" disabled>
-              -- Choose a job --
-            </option>
-            {jobs?.map((job) => (
-              <option key={job.id} value={job.id}>
-                {job.title}
-              </option>
-            ))}
-          </select>
+            <div className="flex items-center">
+              <span className="absolute left-3 text-[var(--text-secondary)]">
+                🔍
+              </span>
+              {JobTitle || "Select a Job Position"}
+            </div>
+            <span className="text-[var(--text-secondary)]">
+              {isDropdownOpen ? "▲" : "▼"}
+            </span>
+          </div>
+
+          {isDropdownOpen && (
+            <div className="absolute z-10 w-full mt-1 bg-[var(--surface)] border border-[var(--border)] rounded-lg shadow-lg max-h-60 overflow-y-auto">
+              <div
+                className="p-3 hover:bg-[var(--surface-lighter)] cursor-pointer transition-colors duration-200 border-l-4 border-transparent hover:border-[var(--accent)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                onClick={() => {
+                  setSelectedJob("");
+                  setIsDropdownOpen(false);
+                }}
+              >
+                Select a Job Position
+              </div>
+              {jobs?.map((job, index) => (
+                <div
+                  key={index}
+                  className="p-3 hover:bg-[var(--surface-lighter)] cursor-pointer transition-colors duration-200 border-l-4 border-transparent hover:border-[var(--accent)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                  onClick={() => {
+                    setSelectedJob(job.id);
+                    setJobTitle(job.title);
+                    setJobId(job.id);
+                    setIsDropdownOpen(false);
+                  }}
+                >
+                  {job.title}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Drop Zone */}
@@ -327,6 +363,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
           onDragEnter={() => setIsDragging(true)}
           onDragLeave={() => setIsDragging(false)}
         >
+          <span className="text-4xl mb-3">📁</span>
           <p className="mb-2">Drag & drop resumes here</p>
           <p className="mb-3 text-[var(--text-muted)]">or</p>
           <input
@@ -342,6 +379,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
             className="px-6 py-2 bg-[var(--accent)] text-white rounded hover:bg-[var(--accent-hover)]"
             onClick={() => fileInputRef.current?.click()}
           >
+            <span className="mr-2">📂</span>
             Select Resumes
           </button>
           <p className="mt-4 text-sm text-[var(--text-muted)]">
@@ -430,15 +468,42 @@ const UploadModal: React.FC<UploadModalProps> = ({
                 </li>
               ))}
             </ul>
+
             <button
+              type="button"
+              className="mt-5 w-full px-6 py-3 bg-[var(--accent)] text-[var(--dark-bg)] rounded-lg hover:bg-[var(--accent-hover)] transform hover:-translate-y-1 transition-all duration-300 flex items-center justify-center disabled:opacity-70 disabled:transform-none"
               onClick={handleUploadResume}
               disabled={isLoading}
-              className="mt-5 w-full px-6 py-3 bg-[var(--accent)] text-white rounded hover:bg-[var(--accent-hover)]"
             >
-              {isLoading
-                ? `Uploading... ${uploadProgress}%`
-                : "📤 Upload Resumes"}
+              <span className="mr-2">📤</span>
+              Upload Files
             </button>
+            {/* Full-screen Loading Overlay */}
+            {isLoading && (
+              <div className="fixed inset-0  bg-opacity-90 flex items-center justify-center z-50">
+                <div className="bg-[var(--surface)] p-8 rounded-xl shadow-2xl max-w-md w-full transform transition-all duration-300 scale-105 border border-[var(--border)]">
+                  <div className="flex flex-col items-center">
+                    <div className="text-6xl mb-6 animate-bounce">⏳</div>
+                    <h3 className="text-2xl font-bold text-[var(--accent)] mb-4">
+                      Uploading Files
+                    </h3>
+                    <p className="text-[var(--text-secondary)] mb-6 text-center">
+                      Please wait while we process your files...
+                    </p>
+
+                    <div className="w-full bg-[var(--border)] rounded-full h-4 mb-3">
+                      <div
+                        className="bg-[var(--accent)] h-4 rounded-full transition-all duration-300"
+                        style={{ width: `${uploadProgress}%` }}
+                      ></div>
+                    </div>
+                    <p className="text-[var(--accent)] font-medium">
+                      {uploadProgress}%
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </motion.div>
