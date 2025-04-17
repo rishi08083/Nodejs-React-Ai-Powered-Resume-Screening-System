@@ -1,7 +1,6 @@
 const db = require("../../models"); // Load models
 const axios = require("axios");
 const { generateToken } = require("../../utils/tokenGeneration"); // Token generator utility
-const { where } = require("sequelize");
 
 const screenCandidate = async (req, res) => {
   try {
