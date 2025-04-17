@@ -52,7 +52,7 @@ export default function Navbar({
       <div className="flex items-center gap-4">
         {user?.role === "recruiter" && (
           <>
-            {/* <button
+            <button
               type="button"
               className="h-10 px-4 py-2 bg-[var(--accent)] text-[var(--dark-bg)] rounded-lg flex items-center hover:bg-[var(--accent-hover)] transition-all duration-300 disabled:bg-[var(--border)] disabled:cursor-not-allowed disabled:text-[var(--text-secondary)]"
               onClick={() => setIsUploadModalOpen(true)}
@@ -82,14 +82,14 @@ export default function Navbar({
                 />
               </svg>
               Upload Resume
-            </button> */}
-            <div className="mr-5 cursor-pointer">
+            </button>
+            {/* <div className="mr-5 cursor-pointer">
               <Upload
                 onClick={() => {
                   navigate.push("/dashboard/recruiter/upload");
                 }}
               />
-            </div>
+            </div> */}
 
             {isUploadModalOpen && (
               <UploadModal
