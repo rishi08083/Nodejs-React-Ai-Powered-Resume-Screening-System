@@ -123,10 +123,15 @@ const ParseCandidate: React.FC<{
   };
 
   useEffect(() => {
+    setCandidate(null);
+    setLoading(true);
+    setError(null);
+    
+    // Then fetch the new data
     if (candidateId) {
       getParseResume(candidateId);
     }
-  }, [candidateId]);
+  }, [candidateId]); 
 
   if (loading) {
     return (

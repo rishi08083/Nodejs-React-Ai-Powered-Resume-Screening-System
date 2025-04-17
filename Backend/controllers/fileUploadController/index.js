@@ -223,7 +223,8 @@ const parseResumes = async (uploadedFiles, job_id, user_id, originalfiles) => {
           where: {
             email: parsedData.email,
             job_id,
-            is_deleted: false
+            is_deleted: false,
+            user_id 
           },
         });
 
