@@ -138,7 +138,7 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
                     <td className="px-4 py-4">
                       <div className="flex items-center">
                         <span className="font-medium text-[var(--text-primary)] truncate max-w-[150px]">
-                          {candidate.name || "Unknown"}
+                            {candidate.name ? candidate.name.replace(/\s+/g, ' ').toLowerCase().replace(/\b\w/g, char => char.toUpperCase()) : "Unknown"}
                         </span>
                       </div>
                     </td>
