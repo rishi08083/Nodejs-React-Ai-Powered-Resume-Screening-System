@@ -59,7 +59,7 @@ export default function Navbar({
               onClick={() => setIsUploadModalOpen(true)}
             >
               <FileUp className="mr-1" />
-              <span className="text-sm sm:text-base">Upload Resume</span>
+              <span className="text-sm sm:text-base">Upload Resumes</span>
             </button>
             {isUploadModalOpen && (
               <UploadModal

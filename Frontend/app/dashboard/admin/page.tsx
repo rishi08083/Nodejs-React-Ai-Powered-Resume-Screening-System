@@ -255,7 +255,7 @@ export default function AdminDashboard() {
             changeDirection="down"
           />
           <StatCard
-            title="Avg. Screening Score"
+            title="Average Screening Score"
             value={`${parseFloat(analyticsData.average_screening_score).toFixed(1)}%`}
             icon={<UserCheck size={24} className="text-[var(--accent)]" />}
             // change={2.4}
