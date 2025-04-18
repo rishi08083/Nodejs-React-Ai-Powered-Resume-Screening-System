@@ -169,7 +169,7 @@ const CandidateList = () => {
       if (data.data) {
         const payload = data.data;
 
-        console.log("Feedback data:", payload);
+        // console.log("Feedback data:", payload);
         setSelectedFeedback(payload || {});
         setIsFeedbackModalOpen(true);
       }

@@ -42,7 +42,7 @@ const UploadForm = () => {
       );
       if (response.ok) {
         const data = await response.json();
-        console.log(data);
+        // console.log(data);
         setJobs(data.data);
         setIsLoading(false);
       } else {
