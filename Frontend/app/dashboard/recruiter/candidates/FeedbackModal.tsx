@@ -51,8 +51,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
   const rcdMismatchSkills = selectedFeedback.rcd_mismatch ? parseSkills(selectedFeedback.rcd_mismatch) : [];
 
   // Calculate match percentages
-  // console.log("selected feedback", selectedFeedback);
-  const jdMatchPercent =Math.round(selectedFeedback.jd_match_score)  || 0;
+  const jdMatchPercent = Math.round(selectedFeedback.jd_match_score) || 0;
   const rcdMatchPercent = Math.round(selectedFeedback.rcd_match_score) || 0;
   const overallMatchPercent = Math.round(selectedFeedback.rating) || 0;
 
@@ -68,11 +67,11 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ type: "spring", duration: 0.5 }}
-        className="bg-[var(--surface)] rounded-xl shadow-2xl p-8 w-full max-w-3xl border border-[var(--border)] max-h-[85vh] overflow-y-auto"
+        className="bg-[var(--surface)] rounded-xl shadow-2xl p-8 w-full max-w-3xl border border-[var(--border)] max-h-[85vh] overflow-y-auto custom-scrollbar"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex justify-between items-center mb-6 top-0 bg-[var(--surface)] z-10 pb-4 border-b border-[var(--border)]">
+        <div className="flex justify-between items-center mb-6 pb-4 border-b border-[var(--border)]">
           <div>
             <h2 className="text-2xl font-bold text-[var(--text-primary)]">
               Candidate Assessment Report
@@ -129,31 +128,31 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
                 <p className="text-[var(--text-secondary)] text-sm">Compatibility Score</p>
                 <p className="text-3xl font-bold text-[var(--text-primary)]">{overallMatchPercent}%</p>
               </div>
-                <div className="w-24 h-24 relative flex items-center justify-center">
+              <div className="w-24 h-24 relative flex items-center justify-center">
                 <svg viewBox="0 0 36 36" className="absolute inset-0 w-full h-full">
                   <path
-                  className="stroke-current text-[var(--border)]"
-                  fill="none"
-                  strokeWidth="3"
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  strokeDasharray="100, 100"
+                    className="stroke-current text-[var(--border)]"
+                    fill="none"
+                    strokeWidth="3"
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                    strokeDasharray="100, 100"
                   />
                   <path
-                  className={`stroke-current ${
-                    overallMatchPercent >= 70 ? "text-green-400" : 
-                    overallMatchPercent >= 40 ? "text-yellow-400" : "text-red-400"
-                  }`}
-                  fill="none"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  strokeDasharray={`${overallMatchPercent}, 100`}
+                    className={`stroke-current ${
+                      overallMatchPercent >= 70 ? "text-green-400" : 
+                      overallMatchPercent >= 40 ? "text-yellow-400" : "text-red-400"
+                    }`}
+                    fill="none"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                    strokeDasharray={`${overallMatchPercent}, 100`}
                   />
                 </svg>
                 <span className="text-[var(--text-primary)] text-3xl font-semibold">
                   {overallMatchPercent}%
                 </span>
-                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -221,7 +220,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
             {jdMatchSkills.length > 0 && (
               <div className="mb-3">
                 <p className="text-sm font-medium text-green-400 mb-2">Matching Skills:</p>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 max-h-36 overflow-y-auto custom-scrollbar pr-2">
                   {jdMatchSkills.map((skill, index) => (
                     <span key={index} className="bg-green-100/10 text-green-400 text-xs px-2 py-1 rounded-full border border-green-500/30">
                       {skill}
@@ -234,7 +233,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
             {jdMismatchSkills.length > 0 && (
               <div>
                 <p className="text-sm font-medium text-red-400 mb-2">Missing Skills:</p>
-                <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
+                <div className="flex flex-wrap gap-2 max-h-36 overflow-y-auto custom-scrollbar pr-2">
                   {jdMismatchSkills.map((skill, index) => (
                     <span key={index} className="bg-red-100/10 text-red-400 text-xs px-2 py-1 rounded-full border border-red-500/30">
                       {skill}
@@ -264,7 +263,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
             {rcdMatchSkills.length > 0 && (
               <div className="mb-3">
                 <p className="text-sm font-medium text-green-400 mb-2">Matching Skills:</p>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 max-h-36 overflow-y-auto custom-scrollbar pr-2">
                   {rcdMatchSkills.map((skill, index) => (
                     <span key={index} className="bg-green-100/10 text-green-400 text-xs px-2 py-1 rounded-full border border-green-500/30">
                       {skill}
@@ -277,7 +276,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
             {rcdMismatchSkills.length > 0 && (
               <div>
                 <p className="text-sm font-medium text-red-400 mb-2">Missing Skills:</p>
-                <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
+                <div className="flex flex-wrap gap-2 max-h-36 overflow-y-auto custom-scrollbar pr-2">
                   {rcdMismatchSkills.map((skill, index) => (
                     <span key={index} className="bg-red-100/10 text-red-400 text-xs px-2 py-1 rounded-full border border-red-500/30">
                       {skill}
@@ -297,7 +296,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
             </svg>
             Recommendation Summary
           </h3>
-          <div className="p-4 bg-[var(--dark-bg)] rounded-lg border border-[var(--border)]">
+          <div className="p-4 bg-[var(--dark-bg)] rounded-lg border border-[var(--border)] max-h-60 overflow-y-auto custom-scrollbar">
             <p className="text-[var(--text-primary)]">{selectedFeedback.feedback}</p>
           </div>
         </div>
@@ -312,14 +311,6 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
           >
             Close
           </motion.button>
-          {/* <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="px-4 py-2 bg-[var(--accent)] text-[var(--dark-bg)] rounded-lg"
-            onClick={() => window.print()}
-          >
-            Export Report
-          </motion.button> */}
         </div>
       </motion.div>
     </motion.div>
