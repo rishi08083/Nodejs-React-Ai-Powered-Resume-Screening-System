@@ -12,9 +12,9 @@ const adminRegister = async (req, res) => {
       const hashedPassword = await bcrypt.hash(password, 10);
       const is_exist = await db.Users.findOne({
         where: {
-          email
-        }
-      })
+          email,
+        },
+      });
       if (is_exist) {
         return res.status(400).json({
           status: "error",
@@ -27,7 +27,7 @@ const adminRegister = async (req, res) => {
         password_hash: hashedPassword,
         role: "admin",
         is_active: "accepted",
-        is_verified: true
+        is_verified: true,
       });
 
       res.status(201).json({
@@ -43,7 +43,7 @@ const adminRegister = async (req, res) => {
       });
     }
   } catch (error) {
-    console.log(error)
+    console.log(error);
     res.status(500).json({
       status: "error",
       message: "Internal Server Error",
@@ -67,7 +67,9 @@ const recruiterRegister = async (req, res) => {
 
     const tokenExpiry = Date.now() + 10 * 60 * 1000;
     // 4 digit random number in string
-    const token = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+    const token = Math.floor(Math.random() * 10000)
+      .toString()
+      .padStart(4, "0");
 
     const mailOptions = {
       from: process.env.EMAIL_USER,
@@ -102,7 +104,7 @@ const recruiterRegister = async (req, res) => {
           </div>
           <p style="font-size: 11px; color: #aaa; text-align: center; margin-top: 20px;">This is an automated message. Please do not reply to this email.</p>
         </div>
-      `
+      `,
     };
 
     const user = await db.Users.create({
@@ -111,7 +113,7 @@ const recruiterRegister = async (req, res) => {
       password_hash: hashedPassword,
       role: "recruiter",
       token: token,
-      token_expires: tokenExpiry
+      token_expires: tokenExpiry,
     });
 
     res.status(201).json({
@@ -136,7 +138,7 @@ const userLogin = async (req, res) => {
     const user = await db.Users.findOne({
       where: {
         email,
-      }
+      },
     });
 
     if (!user) {
@@ -171,11 +173,20 @@ const userLogin = async (req, res) => {
         process.env.JWT_SECRET,
         { expiresIn: "1h" }
       );
+
+      const res_user = {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        is_active: user.is_active,
+        is_verified: user.is_verified,
+      };
       res.status(200).json({
         status: "success",
         message: "Logged in successfully",
         token,
-        data: { user }
+        data: { user: res_user },
       });
     } else {
       res.status(401).json({
@@ -185,6 +196,7 @@ const userLogin = async (req, res) => {
       });
     }
   } catch (error) {
+    console.log(error);
     res.status(500).json({
       status: "error",
       message: "Internal Server Error",

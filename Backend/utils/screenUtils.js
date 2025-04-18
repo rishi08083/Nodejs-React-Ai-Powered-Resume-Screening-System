@@ -114,7 +114,7 @@ module.exports.saveScreeningResult = async (resultData) => {
     // Save feedback in Feedback table
     await db.Feedback.create({
       candidate_id,
-      feedback_text: JSON.stringify(feedback_json), // Store full AI response JSON
+      feedback_text: JSON.stringify(feedback_json), 
       rating: Math.round(match_score),
       given_by: "AI Screening",
       is_deleted: false,

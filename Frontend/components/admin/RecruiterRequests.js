@@ -21,7 +21,7 @@ export default function RecruiterRequests() {
       setIsLoading(true);
       try {
         const data = await fetchRecruiterRequests();
-        console.log("Fetched recruiter requests:", data.data.users);
+        // console.log("Fetched recruiter requests:", data.data.users);
         setRequests(data.data.users); // Assuming API returns all requests
       } catch (error) {
         console.error("Error fetching recruiter requests:", error);

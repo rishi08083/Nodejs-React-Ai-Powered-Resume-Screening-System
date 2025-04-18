@@ -42,7 +42,7 @@ const UploadForm = () => {
       );
       if (response.ok) {
         const data = await response.json();
-        console.log(data);
+        // console.log(data);
         setJobs(data.data);
         setIsLoading(false);
       } else {
@@ -109,7 +109,7 @@ const UploadForm = () => {
       setErrorMessage(
         `Invalid file types: ${invalidFiles.join(
           ", ",
-        )}. Please upload PDF, DOCX, or JPG files.`,
+        )}. Please upload PDF, DOCX, or JPG,JPEG files.`,
       );
     } else {
       setErrorMessage("");
@@ -305,7 +305,7 @@ const UploadForm = () => {
           </label>
         </div>
         <p className="mt-4 text-xs text-gray-500">
-          Supported formats: PDF, DOCX, JPG
+          Supported formats: PDF, DOCX, JPG ,JPEG
         </p>
       </div>
 

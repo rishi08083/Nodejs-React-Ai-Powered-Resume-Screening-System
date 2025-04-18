@@ -56,9 +56,9 @@ const UploadModal: React.FC<UploadModalProps> = ({
       );
       if (response.ok) {
         const data = await response.json();
-        console.log(data);
+        // console.log(data);
         setJobs(data.data);
-        console.log(data.data);
+        // console.log(data.data);
         setIsLoading(false);
       } else {
         const errorData = await response.json();
@@ -70,7 +70,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
   };
 
   useEffect(() => {
-    console.log(errorMessage);
+    // console.log(errorMessage);
     if (errorMessage) {
       toast.error(`⚠️ ${errorMessage}`);
     }
@@ -101,7 +101,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
 
     if (invalidFiles.length > 0) {
       toast.error(
-        `Invalid file types: ${invalidFiles.join(", ")}. Please upload PDF, DOCX, or JPG files.`
+        `Invalid file types: ${invalidFiles.join(", ")}. Please upload PDF, DOCX, or JPG, JPEG files.`
       );
     }
 
@@ -131,7 +131,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
     }
 
     if (candidateId) {
-      console.log("📎 Opening parsed resume for candidate ID:", candidateId);
+      // console.log("📎 Opening parsed resume for candidate ID:", candidateId);
       setViewParsedResume(candidateId);
     } else {
       toast.error("Candidate ID not found for this file.");
@@ -199,7 +199,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
           );
 
           setSuccessfullyUploadedFiles((prev) => [...prev, ...uploadedFiles]);
-          console.log("✅ Uploaded with candidate IDs:", uploadedFiles);
+          // console.log("✅ Uploaded with candidate IDs:", uploadedFiles);
         } else {
           // If API doesn't return file details, at least track the names
           const newUploadedFiles = files.map((file) => ({
@@ -383,7 +383,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
             {files.length === 1 ? "Select Resume" : "Select Resumes"}
             </button>
           <p className="mt-4 text-sm text-[var(--text-muted)]">
-            Supported formats: PDF, DOCX, JPG
+            Supported formats: PDF, DOCX, JPG, JPEG files only
           </p>
         </div>
 

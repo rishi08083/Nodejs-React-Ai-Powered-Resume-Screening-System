@@ -159,7 +159,7 @@ const ParseCandidate: React.FC<{
   }
 
   return (
-    <div className="max-h-[80vh] overflow-y-auto">
+    <div className="max-h-[80vh] overflow-y-auto custom-scrollbar pr-2">
       {/* Header Section */}
       <div className="mb-8 bg-[var(--surface)] rounded-xl shadow-lg overflow-hidden border border-[var(--border)]">
         <div className="md:flex">
@@ -273,7 +273,7 @@ const ParseCandidate: React.FC<{
           </svg>
         }
       >
-        <div className="flex flex-wrap">
+        <div className={`flex flex-wrap ${candidate.skills && candidate.skills.length > 15 ? 'max-h-60 overflow-y-auto custom-scrollbar pr-2' : ''}`}>
           {candidate.skills && candidate.skills.length > 0 ? (
             candidate.skills.map((skill, index) => (
               <SkillBadge key={index} skill={skill} />
@@ -313,7 +313,7 @@ const ParseCandidate: React.FC<{
             </svg>
           }
         >
-          <div className="space-y-4">
+          <div className={`space-y-4 ${candidate.experience.length > 3 ? 'max-h-72 overflow-y-auto custom-scrollbar pr-2' : ''}`}>
             {candidate.experience.map((exp, index) => (
               <div
                 key={index}
@@ -357,7 +357,7 @@ const ParseCandidate: React.FC<{
             </svg>
           }
         >
-          <div className="space-y-4">
+          <div className={`space-y-4 ${candidate.education.length > 3 ? 'max-h-72 overflow-y-auto custom-scrollbar pr-2' : ''}`}>
             {candidate.education.map((edu, index) => (
               <div
                 key={index}
@@ -401,7 +401,7 @@ const ParseCandidate: React.FC<{
             </svg>
           }
         >
-          <div className="flex flex-wrap">
+          <div className={`flex flex-wrap ${candidate.locations.length > 8 ? 'max-h-40 overflow-y-auto custom-scrollbar pr-2' : ''}`}>
             {candidate.locations.map((location, index) => (
               <span
                 key={index}

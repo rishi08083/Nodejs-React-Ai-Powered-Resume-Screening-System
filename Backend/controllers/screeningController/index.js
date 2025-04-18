@@ -1,7 +1,6 @@
 const db = require("../../models"); // Load models
 const axios = require("axios");
 const { generateToken } = require("../../utils/tokenGeneration"); // Token generator utility
-const { where } = require("sequelize");
 
 const screenCandidate = async (req, res) => {
   try {
@@ -265,12 +264,12 @@ async function getFeedbackByCandidateId(candidate_id) {
         candidate_id: candidate_id,
       },
     });
-    console.log(ScreeningResults, "ScreeningResults------------------");
+    // console.log(ScreeningResults, "ScreeningResults------------------");
 
     if (!ScreeningResults) {
       return null;
     }
-    console.log(candidate);
+    // console.log(candidate);
     const formattedFeedback = ScreeningResults; // Assuming feedback_json contains the required data
     const res = {
       feedback: formattedFeedback.missing_skills.feedback,

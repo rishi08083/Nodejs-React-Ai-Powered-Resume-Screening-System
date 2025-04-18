@@ -50,7 +50,7 @@ async function screenCandidate(candidate) {
     //   rcd_file_key: candidateDetails.rcd_file_key,
     //   candidate: candidateDetails.candidate,
     // }, null, 2)); 
-    console.log(aiResponse.data.feedback);
+    // console.log(aiResponse.data.feedback);
 
     const payload = {
       candidate_id,
