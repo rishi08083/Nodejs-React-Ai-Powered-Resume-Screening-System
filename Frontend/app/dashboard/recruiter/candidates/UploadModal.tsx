@@ -101,7 +101,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
 
     if (invalidFiles.length > 0) {
       toast.error(
-        `Invalid file types: ${invalidFiles.join(", ")}. Please upload PDF, DOCX, or JPG files.`
+        `Invalid file types: ${invalidFiles.join(", ")}. Please upload PDF, DOCX, or JPG, JPEG files.`
       );
     }
 
@@ -383,7 +383,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
             Select Resumes
           </button>
           <p className="mt-4 text-sm text-[var(--text-muted)]">
-            Supported formats: PDF, DOCX, JPG
+            Supported formats: PDF, DOCX, JPG, JPEG files only
           </p>
         </div>
 
