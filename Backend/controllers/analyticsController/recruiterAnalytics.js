@@ -131,7 +131,7 @@ exports.recruiterAnalytics = async (req, res) => {
           candidate_count: job.candidate_count,
         })),
         candidate_count_by_skill: candidateCountBySkill.filter((skillMap) => {
-          console.log(skillMap.skill_name);
+          // console.log(skillMap.skill_name);
           return skillMap.skill_name.length < 10;
         }),
       },
@@ -141,7 +141,7 @@ exports.recruiterAnalytics = async (req, res) => {
     // } catch (error) {
     //   console.log("Cache settings failed ");
     // }
-    console.log(fullResponse)
+    // console.log(fullResponse)
 
     res.status(200).json(fullResponse);
   } catch (error) {

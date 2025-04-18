@@ -124,11 +124,16 @@ exports.parseResumes = async (
 
         if (parsedData.education && Array.isArray(parsedData.education)) {
           for (let edu of parsedData.education) {
+            
+            const startDate = edu.start_date ? new Date(edu.start_date) : null;
+            const endDate = edu.end_date ? new Date(edu.end_date) : null;
+            const isValidDate = (date) => date instanceof Date && !isNaN(date);
+
             await candidate.createEducation({
               institution_name: edu?.College || "Unknown Institution",
               degree: edu?.Degree || "Unknown Degree",
-              start_date: edu?.start_date || null,
-              end_date: edu?.end_date || null,
+              start_date: isValidDate(startDate) ? startDate : null,
+              end_date: isValidDate(endDate) ? endDate : null,
             });
           }
         }
