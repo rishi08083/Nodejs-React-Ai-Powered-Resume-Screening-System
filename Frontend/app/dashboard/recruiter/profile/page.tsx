@@ -32,6 +32,7 @@ export default function Profile() {
     newPassword: "",
     confirmPassword: "",
     isFormValid: false,
+    isProfileFormValid: false,
   });
 
   useEffect(() => {
@@ -53,46 +54,79 @@ export default function Profile() {
     const { name, email } = formData;
     let nameError = "";
     let emailError = "";
+    let isValid = true;
 
     const trimmedName = name.trim().replace(/\s+/g, " ");
     const nameRegex = /^[A-Za-z]+( [A-Za-z]+)?$/;
 
     if (!trimmedName) {
       nameError = "Name is required.";
+      isValid = false;
     } else if (!nameRegex.test(trimmedName)) {
       nameError =
         "Name must contain only alphabets and a single space between first and last name.";
+      isValid = false;
     } else if (trimmedName.length < 2) {
       nameError = "Name must be at least 2 characters long.";
+      isValid = false;
     } else if (trimmedName.length > 50) {
       nameError = "Name must be less than 50 characters long.";
+      isValid = false;
     }
 
     const trimmedEmail = email.trim().toLowerCase();
     const emailRegex =
-      /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(\.[a-zA-Z]{2,})?$/;
+      /^[a-zA-Z0-9]([a-zA-Z0-9._-]){0,48}[a-zA-Z0-9]@([a-zA-Z0-9]([a-zA-Z0-9-]){0,48}[a-zA-Z0-9]\.){1,2}[a-zA-Z]{2,6}$/;
 
     if (!trimmedEmail) {
       emailError = "Email is required.";
+      isValid = false;
     } else if (trimmedEmail.length < 8) {
       emailError = "Email must be at least 8 characters long.";
+      isValid = false;
     } else if (trimmedEmail.length > 100) {
       emailError = "Email must be less than 100 characters long.";
+      isValid = false;
     } else if (/\.{2,}/.test(trimmedEmail)) {
       emailError = "Email cannot contain consecutive dots.";
+      isValid = false;
     } else if (!emailRegex.test(trimmedEmail)) {
-      emailError = "Please provide a valid email domain.";
+      emailError = "Please enter a valid email address.";
+      isValid = false;
+    } else if (/[^a-zA-Z0-9.@_-]/.test(trimmedEmail)) {
+      emailError = "Email can only contain letters, numbers, and . @ _ -";
+      isValid = false;
+    } else if (
+      /^[^a-zA-Z0-9]/.test(trimmedEmail) ||
+      /[^a-zA-Z0-9]$/.test(trimmedEmail.split("@")[0])
+    ) {
+      emailError = "Email username must start and end with a letter or number.";
+      isValid = false;
     }
 
-    // Additional check for .com.com
-    if (trimmedEmail.includes(".com.com")) {
-      emailError = "Email cannot contain consecutive '.com' in domain.";
+    // Additional checks for domain
+    const domainPart = trimmedEmail.split("@")[1];
+    if (domainPart) {
+      if (
+        !/^[a-zA-Z0-9]/.test(domainPart) ||
+        !/[a-zA-Z0-9]$/.test(domainPart)
+      ) {
+        emailError = "Domain must start and end with a letter or number.";
+        isValid = false;
+      } else if (domainPart.split(".").some((part) => part.length < 2)) {
+        emailError = "Each domain part must be at least 2 characters long.";
+        isValid = false;
+      } else if (domainPart.split(".").length > 3) {
+        emailError = "Email domain cannot have more than 2 dots.";
+        isValid = false;
+      }
     }
 
     setValidationErrors((prev) => ({
       ...prev,
       name: nameError,
       email: emailError,
+      isProfileFormValid: isValid && hasChanges,
     }));
   };
 
@@ -144,6 +178,7 @@ export default function Profile() {
     formData.currentPassword,
     formData.name,
     formData.email,
+    hasChanges,
   ]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -328,7 +363,7 @@ export default function Profile() {
                 <button
                   type="submit"
                   className="btn-save"
-                  disabled={!hasChanges || loading}
+                  disabled={!validationErrors.isProfileFormValid || loading}
                 >
                   {loading ? "Saving..." : "Save Changes"}
                 </button>
