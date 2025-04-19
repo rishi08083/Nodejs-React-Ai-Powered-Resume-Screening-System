@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { PencilRuler } from "lucide-react";
 
 type Candidate = {
   name: string;
@@ -170,7 +171,7 @@ const ParseCandidate: React.FC<{
           </div>
           <div className="p-6">
             <div className="uppercase tracking-wide text-sm text-[var(--accent)] font-semibold">
-              Candidate Data
+              Parsed Resume Data
             </div>
             <h1 className="text-2xl font-bold text-[var(--text-primary)] mt-1">
               {candidate.name}
@@ -195,9 +196,7 @@ const ParseCandidate: React.FC<{
                   </svg>
                 </div>
                 <div>
-                  <p className="text-sm text-[var(--text-secondary)]">
-                    Phone
-                  </p>
+                  <p className="text-sm text-[var(--text-secondary)]">Phone</p>
                   {candidate.phone ? (
                     <a
                       href={`tel:${candidate.phone}`}
@@ -231,9 +230,7 @@ const ParseCandidate: React.FC<{
                   </svg>
                 </div>
                 <div>
-                  <p className="text-sm text-[var(--text-secondary)]">
-                    Email
-                  </p>
+                  <p className="text-sm text-[var(--text-secondary)]">Email</p>
                   {candidate.email ? (
                     <a
                       href={`mailto:${candidate.email}`}
@@ -254,26 +251,10 @@ const ParseCandidate: React.FC<{
       </div>
 
       {/* Skills Section */}
-      <AccordionItem
-        title="Skills"
-        defaultOpen={true}
-        icon={
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="22"
-            height="22"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"></path>
-          </svg>
-        }
-      >
-        <div className={`flex flex-wrap ${candidate.skills && candidate.skills.length > 15 ? 'max-h-60 overflow-y-auto custom-scrollbar pr-2' : ''}`}>
+      <AccordionItem title="Skills" defaultOpen={true} icon={<PencilRuler />}>
+        <div
+          className={`flex flex-wrap ${candidate.skills && candidate.skills.length > 15 ? "max-h-60 overflow-y-auto custom-scrollbar pr-2" : ""}`}
+        >
           {candidate.skills && candidate.skills.length > 0 ? (
             candidate.skills.map((skill, index) => (
               <SkillBadge key={index} skill={skill} />
@@ -313,7 +294,9 @@ const ParseCandidate: React.FC<{
             </svg>
           }
         >
-          <div className={`space-y-4 ${candidate.experience.length > 3 ? 'max-h-72 overflow-y-auto custom-scrollbar pr-2' : ''}`}>
+          <div
+            className={`space-y-4 ${candidate.experience.length > 3 ? "max-h-72 overflow-y-auto custom-scrollbar pr-2" : ""}`}
+          >
             {candidate.experience.map((exp, index) => (
               <div
                 key={index}
@@ -327,9 +310,7 @@ const ParseCandidate: React.FC<{
                     {exp.start_date} - {exp.end_date || "Present"}
                   </span>
                 </div>
-                <p className="text-[var(--text-secondary)]">
-                  {exp.company}
-                </p>
+                <p className="text-[var(--text-secondary)]">{exp.company}</p>
               </div>
             ))}
           </div>
@@ -357,7 +338,9 @@ const ParseCandidate: React.FC<{
             </svg>
           }
         >
-          <div className={`space-y-4 ${candidate.education.length > 3 ? 'max-h-72 overflow-y-auto custom-scrollbar pr-2' : ''}`}>
+          <div
+            className={`space-y-4 ${candidate.education.length > 3 ? "max-h-72 overflow-y-auto custom-scrollbar pr-2" : ""}`}
+          >
             {candidate.education.map((edu, index) => (
               <div
                 key={index}
@@ -371,9 +354,7 @@ const ParseCandidate: React.FC<{
                     {edu.start_date} - {edu.end_date || "Present"}
                   </span>
                 </div>
-                <p className="text-[var(--text-secondary)]">
-                  {edu.College}
-                </p>
+                <p className="text-[var(--text-secondary)]">{edu.College}</p>
               </div>
             ))}
           </div>
@@ -401,7 +382,9 @@ const ParseCandidate: React.FC<{
             </svg>
           }
         >
-          <div className={`flex flex-wrap ${candidate.locations.length > 8 ? 'max-h-40 overflow-y-auto custom-scrollbar pr-2' : ''}`}>
+          <div
+            className={`flex flex-wrap ${candidate.locations.length > 8 ? "max-h-40 overflow-y-auto custom-scrollbar pr-2" : ""}`}
+          >
             {candidate.locations.map((location, index) => (
               <span
                 key={index}
@@ -415,9 +398,7 @@ const ParseCandidate: React.FC<{
       )}
 
       {/* Actions Footer */}
-      <div className="mt-8 flex justify-end">
-        
-      </div>
+      <div className="mt-8 flex justify-end"></div>
     </div>
   );
 };

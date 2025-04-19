@@ -150,7 +150,6 @@ const CandidateList = () => {
     return () => clearInterval(intervalId);
   }, [selectedJob, selectedRecommendation]);
 
-
   const fetchCandidateFeedback = async (candidateId: string) => {
     try {
       const response = await axios.get(
@@ -186,7 +185,7 @@ const CandidateList = () => {
     return candidates.filter(
       (candidate) =>
         candidate.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        candidate.email.toString().includes(searchTerm) 
+        candidate.email.toString().includes(searchTerm)
     );
   }, [candidates, searchTerm]);
 
@@ -242,7 +241,7 @@ const CandidateList = () => {
         </h1>
         <div className="h-1 w-24 bg-[var(--accent)] rounded-full mb-4"></div>
         <p className="text-[var(--text-secondary)] mt-2">
-          Find and view candidates for job postings.
+          Find and view candidates.
         </p>
       </motion.div>
 
@@ -276,8 +275,24 @@ const CandidateList = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.5 }}
-          className="flex justify-center space-x-2 mt-8"
+          className="flex justify-center items-center space-x-4 mt-8"
         >
+          {/* Previous Button */}
+          <motion.button
+            onClick={() => paginate(currentPage - 1)}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            disabled={currentPage === 1}
+            className={`px-4 py-2 rounded-lg shadow-md transition-all duration-300 ${
+              currentPage === 1
+                ? "bg-[var(--surface)] text-[var(--text-secondary)] cursor-not-allowed opacity-50"
+                : "bg-[var(--surface)] text-[var(--text-secondary)] border border-[var(--border)] hover:border-[var(--accent)] hover:text-[var(--accent)]"
+            }`}
+          >
+            Previous
+          </motion.button>
+
+          {/* Page Numbers */}
           {[
             ...Array(
               Math.ceil(filteredCandidates.length / candidatesPerPage)
@@ -290,13 +305,32 @@ const CandidateList = () => {
               whileTap={{ scale: 0.9 }}
               className={`px-4 py-2 rounded-lg shadow-md transition-all duration-300 ${
                 currentPage === number + 1
-                  ? "bg-[var(--accent)] text-[var(--dark-bg)] font-medium"
+                  ? "bg-[var(--accent)] text-[var(--dark-bg)] font-medium scale-110"
                   : "bg-[var(--surface)] text-[var(--text-secondary)] border border-[var(--border)] hover:border-[var(--accent)] hover:text-[var(--accent)]"
               }`}
             >
               {number + 1}
             </motion.button>
           ))}
+
+          {/* Next Button */}
+          <motion.button
+            onClick={() => paginate(currentPage + 1)}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            disabled={
+              currentPage ===
+              Math.ceil(filteredCandidates.length / candidatesPerPage)
+            }
+            className={`px-4 py-2 rounded-lg shadow-md transition-all duration-300 ${
+              currentPage ===
+              Math.ceil(filteredCandidates.length / candidatesPerPage)
+                ? "bg-[var(--surface)] text-[var(--text-secondary)] cursor-not-allowed opacity-50"
+                : "bg-[var(--surface)] text-[var(--text-secondary)] border border-[var(--border)] hover:border-[var(--accent)] hover:text-[var(--accent)]"
+            }`}
+          >
+            Next
+          </motion.button>
         </motion.div>
       )}
 
