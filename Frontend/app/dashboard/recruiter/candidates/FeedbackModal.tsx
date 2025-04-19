@@ -74,7 +74,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
         <div className="flex justify-between items-center mb-6 pb-4 border-b border-[var(--border)]">
           <div>
             <h2 className="text-2xl font-bold text-[var(--text-primary)]">
-              Candidate Assessment Report
+              Candidate Recommedation Report
             </h2>
             <p className="text-[var(--text-secondary)] mt-1">
               Detailed analysis of candidate skills and experience
@@ -110,7 +110,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              Overall Assessment
+              Overall Recommedation
             </h3>
             <div className={`px-3 py-1 rounded-full text-sm font-medium ${
               selectedFeedback.is_recommended === "YES" 
@@ -125,7 +125,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
           <div className="bg-[var(--blue-highlight)] rounded-lg p-4 mb-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-[var(--text-secondary)] text-sm">Compatibility Score</p>
+                <p className="text-[var(--text-secondary)] text-sm">Screening Score</p>
                 <p className="text-3xl font-bold text-[var(--text-primary)]">{overallMatchPercent}%</p>
               </div>
               <div className="w-24 h-24 relative flex items-center justify-center">
@@ -204,7 +204,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
           {/* JD Skills Match */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-lg font-semibold text-[var(--text-primary)]">Job Description Skills Match</h3>
+              <h3 className="text-lg font-semibold text-[var(--text-primary)]">Job Description Skills</h3>
               <div className="text-sm font-medium text-[var(--text-primary)]">{jdMatchPercent}%</div>
             </div>
             <div className="h-2 bg-[var(--border)] rounded-full mb-4">
@@ -247,7 +247,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
           {/* RCD Skills Match */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-lg font-semibold text-[var(--text-primary)]">Role clarity Skills Match</h3>
+              <h3 className="text-lg font-semibold text-[var(--text-primary)]">Role clarity Skills</h3>
               <div className="text-sm font-medium text-[var(--text-primary)]">{rcdMatchPercent}%</div>
             </div>
             <div className="h-2 bg-[var(--border)] rounded-full mb-4">
@@ -294,7 +294,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
-            Recommendation Summary
+            Summary
           </h3>
           <div className="p-4 bg-[var(--dark-bg)] rounded-lg border border-[var(--border)] max-h-60 overflow-y-auto custom-scrollbar">
             <p className="text-[var(--text-primary)]">{selectedFeedback.feedback}</p>

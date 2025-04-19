@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Candidate } from "./page";
 import ParseCandidate from "../../../../components/ParseCandidate";
 import DeleteModal, {
   AnimationType,
 } from "../../../../components/recruiter/DeleteModal/DeleteModal";
+import { Info } from "lucide-react";
 type CandidateTableProps = {
   currentCandidates: Candidate[];
   selectedJob: string;
@@ -28,6 +29,42 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [activeTooltip, setActiveTooltip] = useState<string | null>(null);
   const [viewParsedResume, setViewParsedResume] = useState<string | null>(null);
+  const [tooltipPosition, setTooltipPosition] = useState({
+    x: 0,
+    y: 0,
+    placement: "bottom",
+  });
+
+  // Function to calculate and set tooltip position
+  const handleTooltipHover = (e: React.MouseEvent, tooltipId: string) => {
+    // Get viewport dimensions
+    const viewportHeight = window.innerHeight;
+    const viewportWidth = window.innerWidth;
+
+    // Get the target element and its position
+    const target = e.currentTarget as HTMLElement;
+    const rect = target.getBoundingClientRect();
+
+    // Calculate tooltip position
+    let placement = "bottom";
+    let x = rect.left + rect.width / 2; // Center by default
+    let y = rect.bottom + 5; // Below the element with small gap
+
+    // Check if tooltip would be too close to bottom of viewport
+    const spaceBelow = viewportHeight - rect.bottom;
+    if (spaceBelow < 40) {
+      // Not enough space below
+      y = rect.top - 5; // Position above the element
+      placement = "top";
+    }
+
+    // Ensure X position doesn't go off-screen
+    if (x < 10) x = 10;
+    if (x > viewportWidth - 10) x = viewportWidth - 10;
+
+    setActiveTooltip(tooltipId);
+    setTooltipPosition({ x, y, placement });
+  };
 
   // Function to fetch and open the resume
   const get_resume = async (candidateId: string, e: React.MouseEvent) => {
@@ -104,23 +141,26 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
       className="mb-3 bg-[var(--surface)] rounded-xl shadow-lg overflow-hidden border border-[var(--border)]"
     >
       {currentCandidates.length > 0 ? (
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto h-[600px] flex flex-col">
+          {" "}
+          {/* Set a fixed height and use flex column */}
           <table className="min-w-full table-auto border-collapse">
+            {/* Make the header sticky */}
             <thead>
               <tr className="bg-[var(--bg)] border-b border-[var(--border)]">
                 <th className="px-4 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
                   Candidate Name
                 </th>
-                <th className="px-4 py-4 text-left text-sm font-semibold text-[var(--text-primary)] hidden md:table-cell">
+                <th className="px-4 py-4 text-left text-sm font-semibold text-[var(--text-primary)]  md:table-cell">
                   Email
                 </th>
-                <th className="px-4 py-4 text-left text-sm font-semibold text-[var(--text-primary)] hidden lg:table-cell">
+                <th className="px-4 py-4 text-left text-sm font-semibold text-[var(--text-primary)]  lg:table-cell">
                   Contact
                 </th>
                 <th className="px-4 py-4 text-left text-sm font-semibold text-[var(--text-primary)]">
-                  Compatibility Score
+                  Screening Score
                 </th>
-                <th className="px-4 py-4 text-right text-sm font-semibold text-[var(--text-primary)]">
+                <th className="px-4 py-4 text-center text-sm font-semibold text-[var(--text-primary)]">
                   Actions
                 </th>
               </tr>
@@ -138,14 +178,19 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
                     <td className="px-4 py-4">
                       <div className="flex items-center">
                         <span className="font-medium text-[var(--text-primary)] truncate max-w-[150px]">
-                            {candidate.name ? candidate.name.replace(/\s+/g, ' ').toLowerCase().replace(/\b\w/g, char => char.toUpperCase()) : "Unknown"}
+                          {candidate.name
+                            ? candidate.name
+                                .replace(/\s+/g, " ")
+                                .toLowerCase()
+                                .replace(/\b\w/g, (char) => char.toUpperCase())
+                            : "Unknown"}
                         </span>
                       </div>
                     </td>
 
                     {/* Email Column - Separated from Name */}
-                    <td className="px-4 py-4 hidden md:table-cell">
-                      <div className="flex items-center space-x-2">
+                    <td className="px-4 py-4  md:table-cell">
+                      <div className="flex items-center space-x-2 relative">
                         <a
                           href={`mailto:${candidate.email}`}
                           className="text-sm text-[var(--text-primary)] truncate max-w-[200px] block hover:underline"
@@ -153,11 +198,42 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
                           {candidate.email}
                         </a>
                         <button
-                          onClick={() =>
-                            navigator.clipboard.writeText(candidate.email)
-                          }
+                          onClick={(e) => {
+                            navigator.clipboard.writeText(candidate.email);
+                            // Use the event parameter from the onClick handler
+                            const target = e.currentTarget;
+                            const rect = target.getBoundingClientRect();
+
+                            // Calculate tooltip position considering viewport boundaries
+                            const viewportHeight = window.innerHeight;
+                            const viewportWidth = window.innerWidth;
+
+                            let placement = "bottom";
+                            let x = rect.left + rect.width / 2;
+                            let y = rect.bottom + 5;
+
+                            // Check if tooltip would be too close to bottom of viewport
+                            const spaceBelow = viewportHeight - rect.bottom;
+                            if (spaceBelow < 40) {
+                              y = rect.top - 5;
+                              placement = "top";
+                            }
+
+                            // Ensure X position doesn't go off-screen
+                            if (x < 10) x = 10;
+                            if (x > viewportWidth - 10) x = viewportWidth - 10;
+
+                            setTooltipPosition({
+                              x: x,
+                              y: y,
+                              placement: placement,
+                            });
+
+                            setActiveTooltip(`copied-${candidate.id}`);
+                            setTimeout(() => setActiveTooltip(null), 2000);
+                          }}
                           className="p-1 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
-                          title="Copy Email"
+                          aria-label="Copy Email"
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -185,7 +261,7 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
                     </td>
 
                     {/* Contact Info Column */}
-                    <td className="px-4 py-4 hidden lg:table-cell">
+                    <td className="px-4 py-4 lg:table-cell">
                       <a
                         href={`tel:${candidate.phone_number}`}
                         className="text-sm text-[var(--text-primary)] hover:underline"
@@ -194,80 +270,59 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
                       </a>
                     </td>
 
-                    {/* Assessment Column */}
+                    {/* Feedback Button with score */}
                     <td className="px-4 py-4">
-                      <div className="flex items-center justify-center">
-                        <span
-                          className={`px-2 py-1 text-xs font-medium rounded border ${
-                            candidate?.is_recommended?.toUpperCase() === "YES"
-                              ? "bg-green-100 text-green-700 border-green-400"
-                              : candidate?.is_recommended?.toUpperCase() ===
-                                  "NO"
-                                ? "bg-red-100 text-red-700 border-red-400"
-                                : "bg-yellow-100 text-yellow-700 border-yellow-400"
-                          }`}
-                          style={{ borderRadius: "4px" }} // Makes the badge square
+                      <div
+                        className="relative tooltip-container"
+                        onMouseEnter={(e) =>
+                          handleTooltipHover(e, `feedback-${candidate.id}`)
+                        }
+                        onMouseLeave={() => setActiveTooltip(null)}
+                      >
+                        <button
+                          onClick={() => handleShowFeedback(candidate)}
+                          disabled={!candidate?.is_recommended}
+                          className={`flex items-center space-x-2 px-2 py-0.5 rounded-md transition-all duration-300 ${
+                            candidate?.match_score > 70
+                              ? "bg-green-100/20 text-green-1000 border border-green-500/30"
+                              : candidate?.match_score > 40
+                                ? "bg-yellow-100/20 text-yellow-1000 border border-yellow-500/30"
+                                : "bg-red-100/20 text-red-1000 border border-red-500/30"
+                          } hover:shadow-md`}
                         >
-                          {candidate?.match_score != null
-                            ? `${candidate.match_score}% match`
-                            : "Analyzing..."}
-                        </span>
+                          <div
+                            className={`relative w-8 h-8 rounded-full flex items-center justify-center ${
+                              candidate?.match_score > 70
+                                ? "bg-green-500/20"
+                                : candidate?.match_score > 40
+                                  ? "bg-yellow-500/20"
+                                  : "bg-red-500/20"
+                            }`}
+                          >
+                            <span className="text-xs font-bold">
+                              {candidate?.match_score}%
+                            </span>
+                            {candidate?.is_recommended === "YES" && (
+                              <span className="absolute inset-0 rounded-full opacity-30"></span>
+                            )}
+                          </div>
+                          <span className="font-medium text-xs text-[var(--accent)] flex items-center justify-center">
+                            <Info size={18} />
+                          </span>
+                        </button>
                       </div>
                     </td>
 
                     {/* Actions Column */}
                     <td className="px-4 py-4">
                       <div className="flex justify-end space-x-1.5">
-                        {/* Combined Assessment & Feedback Button */}
-                        <div
-                          className="relative tooltip-container"
-                          onMouseEnter={() =>
-                            setActiveTooltip(`feedback-${candidate.id}`)
-                          }
-                          onMouseLeave={() => setActiveTooltip(null)}
-                        >
-                          <button
-                            onClick={() => handleShowFeedback(candidate)}
-                            className={`p-1.5 flex items-center ${
-                              candidate?.is_screened
-                                ? "bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-black"
-                                : "bg-[var(--surface-lighter)] text-[var(--text-secondary)]"
-                            } 
-                        rounded transition-colors duration-200 font-medium text-xs`}
-                            disabled={!candidate?.is_screened}
-                          >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="14"
-                              height="14"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              className="mr-1"
-                            >
-                              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                            </svg>
-                            <span className="hidden sm:inline">Feedback</span>
-                          </button>
-                          {activeTooltip === `feedback-${candidate.id}` && (
-                            <div className="absolute z-50 top-full left-1/2 transform -translate-x-1/2 mt-1 px-2 py-1 rounded text-xs bg-[var(--bg)] border border-[var(--border)] shadow-md text-[var(--text-primary)] whitespace-nowrap">
-                              {candidate?.is_screened
-                                ? "View Feedback"
-                                : "Pending Screening"}
-                            </div>
-                          )}
-                        </div>
-
                         {/* Action Buttons Group */}
                         <div className="inline-flex rounded-md shadow-sm border border-[var(--border)]">
                           {/* View Resume Button */}
                           <div
                             className="relative tooltip-container"
-                            onMouseEnter={() =>
-                              setActiveTooltip(`resume-${candidate.id}`)
+                            onMouseEnter={(e) =>
+                              handleTooltipHover(e, `resume-${candidate.id}`)
                             }
                             onMouseLeave={() => setActiveTooltip(null)}
                           >
@@ -290,18 +345,13 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
                                 <circle cx="12" cy="12" r="3"></circle>
                               </svg>
                             </button>
-                            {activeTooltip === `resume-${candidate.id}` && (
-                              <div className="absolute z-50 top-full left-1/2 transform -translate-x-1/2 mt-1 px-2 py-1 rounded text-xs bg-[var(--bg)] border border-[var(--border)] shadow-md text-[var(--text-primary)] whitespace-nowrap">
-                                View Resume
-                              </div>
-                            )}
                           </div>
 
                           {/* Parse Resume Button */}
                           <div
                             className="relative tooltip-container"
-                            onMouseEnter={() =>
-                              setActiveTooltip(`parsed-${candidate.id}`)
+                            onMouseEnter={(e) =>
+                              handleTooltipHover(e, `parsed-${candidate.id}`)
                             }
                             onMouseLeave={() => setActiveTooltip(null)}
                           >
@@ -334,20 +384,13 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
                                 <path d="M10 9H8"></path>
                               </svg>
                             </button>
-                            {activeTooltip === `parsed-${candidate.id}` && (
-                              <div className="absolute z-50 top-full left-1/2 transform -translate-x-1/2 mt-1 px-2 py-1 rounded text-xs bg-[var(--bg)] border border-[var(--border)] shadow-md text-[var(--text-primary)] whitespace-nowrap">
-                                {viewParsedResume === candidate.id
-                                  ? "Hide Parsed Resume"
-                                  : "View Parsed Resume"}
-                              </div>
-                            )}
                           </div>
 
                           {/* More Actions Button */}
                           <div
                             className="relative tooltip-container"
-                            onMouseEnter={() =>
-                              setActiveTooltip(`more-${candidate.id}`)
+                            onMouseEnter={(e) =>
+                              handleTooltipHover(e, `more-${candidate.id}`)
                             }
                             onMouseLeave={() => setActiveTooltip(null)}
                           >
@@ -375,11 +418,6 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
                                 <circle cx="12" cy="19" r="1"></circle>
                               </svg>
                             </button>
-                            {activeTooltip === `more-${candidate.id}` && (
-                              <div className="absolute z-50 top-full left-1/2 transform -translate-x-1/2 mt-1 px-2 py-1 rounded text-xs bg-[var(--bg)] border border-[var(--border)] shadow-md text-[var(--text-primary)] whitespace-nowrap">
-                                More Actions
-                              </div>
-                            )}
                           </div>
                           {isOpen === candidate.id && (
                             <motion.div
@@ -479,6 +517,39 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
           </motion.div>
         </div>
       )}
+
+      {/* Unified tooltip that appears for all tooltip types */}
+      {activeTooltip && (
+        <div
+          className="fixed z-50 px-2 py-1 rounded text-xs bg-[var(--bg)] border border-[var(--border)] shadow-md text-[var(--text-primary)] whitespace-nowrap"
+          style={{
+            top:
+              tooltipPosition.placement === "bottom"
+                ? `${tooltipPosition.y}px`
+                : "auto",
+            bottom:
+              tooltipPosition.placement === "top"
+                ? `${window.innerHeight - tooltipPosition.y}px`
+                : "auto",
+            left: `${tooltipPosition.x}px`,
+            transform: "translateX(-50%)",
+          }}
+        >
+          {activeTooltip.startsWith("parsed-") &&
+            (viewParsedResume === activeTooltip.split("-")[1]
+              ? "Hide Parsed Resume"
+              : "View Parsed Resume")}
+          {activeTooltip.startsWith("resume-") && "View Resume"}
+          {activeTooltip.startsWith("feedback-") &&
+            (currentCandidates.find((c) => `feedback-${c.id}` === activeTooltip)
+              ?.is_screened
+              ? "View Feedback"
+              : "Pending Screening")}
+          {activeTooltip.startsWith("more-") && "More Actions"}
+          {activeTooltip.startsWith("copied-") && "Copied!"}
+        </div>
+      )}
+
       {/* Parsed Resume Modal View */}
       <AnimatePresence>
         {viewParsedResume && (
@@ -487,7 +558,7 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-50 flex items-center justify-center  bg-opacity-50 backdrop-blur-sm overflow-y-auto"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm overflow-y-auto"
           >
             <div className="bg-[var(--surface)] rounded-lg shadow-lg p-6 w-full max-w-3xl h-[90vh] relative my-4 mx-auto overflow-y-auto">
               <button
