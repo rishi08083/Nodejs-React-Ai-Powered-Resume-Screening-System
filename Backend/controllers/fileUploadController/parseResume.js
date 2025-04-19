@@ -86,9 +86,9 @@ exports.parseResumes = async (
 
         // Save the parsed data to the database
         const candidate = await db.Candidates.create({
-          name: parsedData.name,
-          email: parsedData.email,
-          phone_number: parsedData.phone,
+          name: parsedData.name ? parsedData.name : "Unknown Name",
+          email: parsedData.email ? parsedData.email : "Unknown Email",
+          phone_number: parsedData.phone ? parsedData.phone : "Unknown Phone",
           resume_url: file.fileUrl,
           status: "parsed",
           job_id: job_id,
