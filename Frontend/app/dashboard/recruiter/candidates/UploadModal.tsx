@@ -311,7 +311,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
               <span className="absolute left-3 text-[var(--text-secondary)]">
                 🔍
               </span>
-              {JobTitle || "Select a Job Position"}
+              {JobTitle || "Select a Job"}
             </div>
             <span className="text-[var(--text-secondary)]">
               {isDropdownOpen ? "▲" : "▼"}
@@ -327,7 +327,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
                   setIsDropdownOpen(false);
                 }}
               >
-                Select a Job Position
+                Select a Job
               </div>
               {jobs?.map((job, index) => (
                 <div
@@ -375,13 +375,13 @@ const UploadModal: React.FC<UploadModalProps> = ({
             className="hidden"
             id="file-input"
           />
-          <button
+            <button
             className="px-6 py-2 bg-[var(--accent)] text-white rounded hover:bg-[var(--accent-hover)]"
             onClick={() => fileInputRef.current?.click()}
-          >
+            >
             <span className="mr-2">📂</span>
-            Select Resumes
-          </button>
+            {files.length === 1 ? "Select Resume" : "Select Resumes"}
+            </button>
           <p className="mt-4 text-sm text-[var(--text-muted)]">
             Supported formats: PDF, DOCX, JPG, JPEG files only
           </p>
@@ -476,7 +476,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
               disabled={isLoading}
             >
               <span className="mr-2">📤</span>
-              Upload Files
+              {files.length === 1 ? "Upload File" : "Upload Files"}
             </button>
             {/* Full-screen Loading Overlay */}
             {isLoading && (
