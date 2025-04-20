@@ -1,10 +1,21 @@
 const express = require("express");
-const auth = require("../middlewares/authMiddleware");
-
-const { getParsedResumeByCandidateId } = require("../controllers/parsedResume");
-
 const router = express.Router();
+const {authMiddleware} = require("../middlewares/authMiddleware");
 
-router.get("/:candidateId", auth.authMiddleware, getParsedResumeByCandidateId);
+const {
+  getParsedResumeByCandidateId,
+  updateParsedResume,
+} = require("../controllers/parsedResume");
+
+router.get(
+  "/:candidateId",
+  authMiddleware,
+  getParsedResumeByCandidateId
+);
+router.put(
+  "/update/:candidateId",
+  authMiddleware,
+  updateParsedResume
+);
 
 module.exports = router;

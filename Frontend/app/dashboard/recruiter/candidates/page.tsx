@@ -33,6 +33,9 @@ export type Feedback = {
 };
 
 export type Candidate = {
+  isRescreening: boolean;
+  screeningError: any;
+  freshlyScreened: any;
   id: string;
   name: string;
   email: string;

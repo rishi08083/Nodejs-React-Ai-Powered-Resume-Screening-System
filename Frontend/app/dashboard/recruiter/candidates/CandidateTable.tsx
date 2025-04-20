@@ -133,6 +133,132 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
     setViewParsedResume(viewParsedResume === candidateId ? null : candidateId);
   };
 
+  // Update the handleReScreenCandidate function to include
+  const handleReScreenCandidate = async (candidateId: string) => {
+    try {
+      // Close the dropdown if open
+      setIsOpen(null);
+
+      // Set the specific candidate to loading state
+      setCandidates((prev) =>
+        prev.map((c) =>
+          c.id === candidateId ? { ...c, isRescreening: true } : c
+        )
+      );
+
+      // Show loading tooltip
+      setActiveTooltip(`rescreening-${candidateId}`);
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/screening/screen_candidate/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+          body: JSON.stringify({
+            candidate_id: candidateId,
+          }),
+        }
+      );
+
+      if (response.ok) {
+        // Get the updated candidate details
+        const updatedCandidateResponse = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/candidates/${candidateId}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + localStorage.getItem("token"),
+            },
+          }
+        );
+
+        if (updatedCandidateResponse.ok) {
+          const result = await updatedCandidateResponse.json();
+          const updatedCandidate = result.data;
+
+          // Flash the success indicator
+          setActiveTooltip(`rescreened-${candidateId}`);
+
+          // Update the candidate in the list with new data and no loading state
+          setCandidates((prev) =>
+            prev.map((c) =>
+              c.id === candidateId
+                ? {
+                    ...updatedCandidate,
+                    isRescreening: false,
+                    freshlyScreened: true,
+                  }
+                : c
+            )
+          );
+
+          // Remove the "freshlyScreened" flag after animation
+          setTimeout(() => {
+            setCandidates((prev) =>
+              prev.map((c) =>
+                c.id === candidateId ? { ...c, freshlyScreened: false } : c
+              )
+            );
+          }, 3000);
+        }
+      } else {
+        // Error handling - reset loading state
+        setCandidates((prev) =>
+          prev.map((c) =>
+            c.id === candidateId
+              ? { ...c, isRescreening: false, screeningError: true }
+              : c
+          )
+        );
+
+        // Show error tooltip
+        setActiveTooltip(`rescreerror-${candidateId}`);
+
+        // Remove error state after a delay
+        setTimeout(() => {
+          setCandidates((prev) =>
+            prev.map((c) =>
+              c.id === candidateId ? { ...c, screeningError: false } : c
+            )
+          );
+        }, 3000);
+      }
+    } catch (error) {
+      console.error("Error rescreening candidate:", error);
+
+      // Reset loading state and show error
+      setCandidates((prev) =>
+        prev.map((c) =>
+          c.id === candidateId
+            ? { ...c, isRescreening: false, screeningError: true }
+            : c
+        )
+      );
+
+      setActiveTooltip(`rescreerror-${candidateId}`);
+
+      // Clear error state after delay
+      setTimeout(() => {
+        setCandidates((prev) =>
+          prev.map((c) =>
+            c.id === candidateId ? { ...c, screeningError: false } : c
+          )
+        );
+      }, 3000);
+    } finally {
+      // Always clear the tooltip after a delay
+      setTimeout(() => {
+        if (activeTooltip?.includes(candidateId)) {
+          setActiveTooltip(null);
+        }
+      }, 2000);
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
@@ -271,6 +397,7 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
                     </td>
 
                     {/* Feedback Button with score */}
+                    {/* Feedback Button with score */}
                     <td className="px-4 py-4">
                       <div
                         className="relative tooltip-container"
@@ -281,33 +408,75 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
                       >
                         <button
                           onClick={() => handleShowFeedback(candidate)}
-                          disabled={!candidate?.is_recommended}
+                          disabled={
+                            candidate?.is_recommended === "NOT SET" ||
+                            candidate?.isRescreening
+                          }
                           className={`flex items-center space-x-2 px-2 py-0.5 rounded-md transition-all duration-300 ${
-                            candidate?.match_score > 70
-                              ? "bg-green-100/20 text-green-1000 border border-green-500/30"
-                              : candidate?.match_score > 40
-                                ? "bg-yellow-100/20 text-yellow-1000 border border-yellow-500/30"
-                                : "bg-red-100/20 text-red-1000 border border-red-500/30"
+                            candidate?.isRescreening
+                              ? "bg-blue-100/20 text-blue-500 border border-blue-500/30 cursor-wait"
+                              : candidate?.screeningError
+                                ? "bg-red-100/30 text-red-500 border border-red-500/40 animate-pulse"
+                                : candidate?.freshlyScreened
+                                  ? "bg-green-100/30 text-green-600 border border-green-500/40 animate-pulse shadow-md"
+                                  : candidate?.is_recommended === "YES"
+                                    ? "bg-green-100/20 text-green-1000 border border-green-500/30"
+                                    : candidate?.is_recommended === "NO"
+                                      ? "bg-red-100/20 text-red-1000 border border-red-500/30"
+                                      : "bg-gray-100/20 text-gray-500 border border-gray-300/30 cursor-not-allowed"
                           } hover:shadow-md`}
                         >
                           <div
                             className={`relative w-8 h-8 rounded-full flex items-center justify-center ${
-                              candidate?.match_score > 70
-                                ? "bg-green-500/20"
-                                : candidate?.match_score > 40
-                                  ? "bg-yellow-500/20"
-                                  : "bg-red-500/20"
+                              candidate?.isRescreening
+                                ? "bg-blue-500/20"
+                                : candidate?.freshlyScreened
+                                  ? "bg-green-500/30"
+                                  : candidate?.is_recommended === "YES"
+                                    ? "bg-green-500/20"
+                                    : candidate?.is_recommended === "NO"
+                                      ? "bg-red-500/20"
+                                      : "bg-gray-500/20"
                             }`}
                           >
-                            <span className="text-xs font-bold">
-                              {candidate?.match_score}%
-                            </span>
-                            {candidate?.is_recommended === "YES" && (
-                              <span className="absolute inset-0 rounded-full opacity-30"></span>
+                            {candidate?.isRescreening ? (
+                              <svg
+                                className="animate-spin h-4 w-4 text-blue-500"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                              >
+                                <circle
+                                  className="opacity-25"
+                                  cx="12"
+                                  cy="12"
+                                  r="10"
+                                  stroke="currentColor"
+                                  strokeWidth="4"
+                                ></circle>
+                                <path
+                                  className="opacity-75"
+                                  fill="currentColor"
+                                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                ></path>
+                              </svg>
+                            ) : (
+                              <span
+                                className={`text-xs font-bold ${candidate?.freshlyScreened ? "animate-bounce" : ""}`}
+                              >
+                                {candidate?.match_score}%
+                              </span>
                             )}
                           </div>
-                          <span className="font-medium text-xs text-[var(--accent)] flex items-center justify-center">
-                            <Info size={18} />
+                          <span className="font-medium text-xs flex items-center justify-center">
+                            {candidate?.isRescreening ? (
+                              "Screening..."
+                            ) : (
+                              <Info
+                                size={18}
+                                className={`text-[var(--accent)] ${candidate?.freshlyScreened ? "animate-pulse" : ""}`}
+                              />
+                            )}
                           </span>
                         </button>
                       </div>
@@ -344,6 +513,104 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
                                 <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"></path>
                                 <circle cx="12" cy="12" r="3"></circle>
                               </svg>
+                            </button>
+                          </div>
+
+                          {/* Re-Screen Button */}
+                          <div
+                            className="relative tooltip-container"
+                            onMouseEnter={(e) =>
+                              handleTooltipHover(e, `rescreen-${candidate.id}`)
+                            }
+                            onMouseLeave={() => setActiveTooltip(null)}
+                          >
+                            <button
+                              onClick={() =>
+                                handleReScreenCandidate(candidate.id)
+                              }
+                              className={`p-1.5 transition-colors duration-200 border-r border-[var(--border)]
+                          ${
+                            candidate?.isRescreening
+                              ? "bg-blue-100/30 text-blue-500 cursor-wait"
+                              : candidate?.screeningError
+                                ? "bg-red-100/20 text-red-500"
+                                : candidate?.freshlyScreened
+                                  ? "bg-green-100/20 text-green-500"
+                                  : "bg-[var(--surface)] hover:bg-[var(--surface-lighter)] text-[var(--text-primary)]"
+                          }`}
+                              disabled={candidate?.isRescreening}
+                            >
+                              {candidate?.isRescreening ? (
+                                <svg
+                                  className="animate-spin"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="14"
+                                  height="14"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                >
+                                  <path d="M21 12a9 9 0 1 1-6.219-8.56"></path>
+                                </svg>
+                              ) : candidate?.screeningError ? (
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="14"
+                                  height="14"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  className="animate-pulse"
+                                >
+                                  <circle cx="12" cy="12" r="10"></circle>
+                                  <line x1="12" y1="8" x2="12" y2="12"></line>
+                                  <line
+                                    x1="12"
+                                    y1="16"
+                                    x2="12.01"
+                                    y2="16"
+                                  ></line>
+                                </svg>
+                              ) : candidate?.freshlyScreened ? (
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="14"
+                                  height="14"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  className="text-green-500"
+                                >
+                                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                </svg>
+                              ) : (
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="14"
+                                  height="14"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                >
+                                  <path d="M21 2v6h-6"></path>
+                                  <path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path>
+                                  <path d="M3 22v-6h6"></path>
+                                  <path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path>
+                                </svg>
+                              )}
                             </button>
                           </div>
 
@@ -547,6 +814,13 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
               : "Pending Screening")}
           {activeTooltip.startsWith("more-") && "More Actions"}
           {activeTooltip.startsWith("copied-") && "Copied!"}
+          {activeTooltip.startsWith("rescreen-") && "Re-Screen Candidate"}
+          {activeTooltip.startsWith("rescreening-") &&
+            "Screening in progress..."}
+          {activeTooltip.startsWith("rescreened-") &&
+            "Successfully re-screened!"}
+          {activeTooltip.startsWith("rescreerror-") &&
+            "Error re-screening candidate"}
         </div>
       )}
 
