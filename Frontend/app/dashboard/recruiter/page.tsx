@@ -26,6 +26,7 @@ import {
   CirclePercent,
   X,
 } from "lucide-react";
+import { withRole } from "../../../components/withRole";
 
 const colorPalette = {
   primary: ["#ffb300", "#ffc233", "#ffd166", "#ffdf99", "#ffedcc"],
@@ -111,7 +112,7 @@ const StatCard = ({
   </div>
 );
 
-export default function AdminDashboard() {
+function RecruiterDashboard() {
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(
     null
   );
@@ -455,3 +456,6 @@ export default function AdminDashboard() {
     </div>
   );
 }
+
+
+export default withRole(RecruiterDashboard,['recruiter']);

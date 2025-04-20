@@ -4,8 +4,9 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "../../../../lib/auth";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { withRole } from "../../../../components/withRole";
 
-export default function Profile() {
+function Profile() {
   const router = useRouter();
   const { user, checkAuth, setUser } = useAuth();
   const [loading, setLoading] = useState(false);
@@ -274,11 +275,11 @@ export default function Profile() {
   const getInitials = (name: string) => {
     return name
       ? name
-          .split(" ")
-          .map((word) => word[0])
-          .join("")
-          .toUpperCase()
-          .substring(0, 2)
+        .split(" ")
+        .map((word) => word[0])
+        .join("")
+        .toUpperCase()
+        .substring(0, 2)
       : "U";
   };
 
@@ -550,3 +551,5 @@ export default function Profile() {
     </div>
   );
 }
+
+export default withRole(Profile, ['recruiter']);
