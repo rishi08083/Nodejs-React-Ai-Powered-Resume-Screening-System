@@ -29,19 +29,6 @@ async function screenCandidate(candidate) {
       console.log(`❌ RCD file key is null for candidate ${candidate_id}`);
       return false;
     }
-    console.log(
-      JSON.stringify(
-        {
-          candidateDetails: {
-            jd: candidateDetails.jd,
-            rcd_file_key: candidateDetails.rcd_file_key,
-            candidate: candidateDetails.candidate,
-          },
-        },
-        null,
-        2
-      )
-    );
     const aiResponse = await axios.post(
       `${process.env.AI_BACKEND_URL}/screen_candidates_2`,
       {
