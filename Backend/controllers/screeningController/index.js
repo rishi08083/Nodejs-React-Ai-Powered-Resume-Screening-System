@@ -163,11 +163,7 @@ async function getFeedbackByCandidateId(candidate_id) {
       feedback: formattedFeedback.missing_skills.feedback,
       candidate_id: candidate.id,
       rating: formattedFeedback.match_score,
-      experience_match: formattedFeedback.missing_skills.experience_match
-        ? true
-        : false || formattedFeedback.missing_skills.experience_match == []
-        ? false
-        : true,
+      experience_match: !!formattedFeedback.missing_skills.experience_match,
       recommendation: formattedFeedback.recommendation,
       feedback_summery: formattedFeedback.feedback,
       jd_mismatch: formattedFeedback.missing_skills.jd_mismatch,

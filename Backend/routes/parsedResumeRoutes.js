@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const authMiddleware = require("../middlewares/authMiddleware");
+const {authMiddleware} = require("../middlewares/authMiddleware");
 
 const {
   getParsedResumeByCandidateId,
@@ -9,12 +9,12 @@ const {
 
 router.get(
   "/:candidateId",
-  authMiddleware.authMiddleware,
+  authMiddleware,
   getParsedResumeByCandidateId
 );
 router.put(
   "/update/:candidateId",
-  authMiddleware.authMiddleware,
+  authMiddleware,
   updateParsedResume
 );
 
