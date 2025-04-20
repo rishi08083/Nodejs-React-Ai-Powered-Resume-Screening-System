@@ -315,7 +315,7 @@ function AdminDashboard() {
                     labelStyle={{ color: "var(--text-primary)" }}
                     formatter={(value) => [`${value} resumes`, "Count"]}
                   />
-                  <AreaChart
+                  <Area
                     type="monotone"
                     dataKey="count"
                     stroke="var(--accent)"
@@ -398,7 +398,7 @@ function AdminDashboard() {
                     labelStyle={{ color: "var(--text-primary)" }}
                     formatter={(value) => [`${value} candidates`, "Count"]}
                   />
-                  <BarChart
+                  <Bar
                     dataKey="count"
                     radius={[0, 4, 4, 0]}
                     fill="var(--accent)"
