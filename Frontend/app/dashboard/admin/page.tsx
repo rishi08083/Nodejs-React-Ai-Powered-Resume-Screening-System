@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { withRole } from "../../../components/withRole";
 import {
   AreaChart,
   Area,
@@ -92,9 +93,8 @@ const StatCard = ({
           </h2>
           {change !== undefined && (
             <span
-              className={`ml-2 text-sm ${
-                changeDirection === "up" ? "text-green-400" : "text-red-400"
-              } flex items-center`}
+              className={`ml-2 text-sm ${changeDirection === "up" ? "text-green-400" : "text-red-400"
+                } flex items-center`}
             >
               {changeDirection === "up" ? (
                 <ChevronUp size={16} />
@@ -111,7 +111,7 @@ const StatCard = ({
   </div>
 );
 
-export default function AdminDashboard() {
+function AdminDashboard() {
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(
     null
   );
@@ -455,3 +455,5 @@ export default function AdminDashboard() {
     </div>
   );
 }
+
+export default withRole(AdminDashboard, ["admin"]);

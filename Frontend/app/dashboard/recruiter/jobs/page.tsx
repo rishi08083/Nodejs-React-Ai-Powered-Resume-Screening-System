@@ -3,6 +3,7 @@ import { useEffect, useState, useRef } from "react";
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Eye, Upload, FileText } from "lucide-react";
+import { withRole } from "../../../../components/withRole";
 
 interface Job {
   id: number;
@@ -304,11 +305,10 @@ const ListJobs = () => {
                     Upload Role Clarity Documents
                   </label>
                   <div
-                    className={`border-2 ${
-                      uploadStatus === "error"
-                        ? "border-red-500"
-                        : "border-dashed border-[var(--accent)] border-opacity-50"
-                    } rounded-lg p-6 text-center hover:border-[var(--accent)] transition-colors duration-200`}
+                    className={`border-2 ${uploadStatus === "error"
+                      ? "border-red-500"
+                      : "border-dashed border-[var(--accent)] border-opacity-50"
+                      } rounded-lg p-6 text-center hover:border-[var(--accent)] transition-colors duration-200`}
                   >
                     <FileText className="mx-auto h-12 w-12 text-[var(--accent)]" />
                     <p className="mt-2 text-sm text-[var(--text-secondary)]">
@@ -365,11 +365,10 @@ const ListJobs = () => {
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className={`px-4 py-2 text-[var(--dark-bg)] font-medium rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg ${
-                      uploadStatus === "uploading"
-                        ? "bg-[var(--accent)] opacity-70 cursor-not-allowed"
-                        : "bg-[var(--accent)] hover:bg-[var(--accent-hover)]"
-                    }`}
+                    className={`px-4 py-2 text-[var(--dark-bg)] font-medium rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg ${uploadStatus === "uploading"
+                      ? "bg-[var(--accent)] opacity-70 cursor-not-allowed"
+                      : "bg-[var(--accent)] hover:bg-[var(--accent-hover)]"
+                      }`}
                     onClick={handleUploadRCD}
                     disabled={uploadStatus === "uploading"}
                   >
@@ -385,4 +384,4 @@ const ListJobs = () => {
   );
 };
 
-export default ListJobs;
+export default withRole(ListJobs, ['recruiter', 'admin']);

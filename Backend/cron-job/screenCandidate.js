@@ -29,7 +29,6 @@ async function screenCandidate(candidate) {
       console.log(`❌ RCD file key is null for candidate ${candidate_id}`);
       return false;
     }
-
     const aiResponse = await axios.post(
       `${process.env.AI_BACKEND_URL}/screen_candidates_2`,
       {
@@ -65,11 +64,11 @@ async function screenCandidate(candidate) {
         rcd_mismatch: aiResponse.data.feedback.rcd_mismatch || [],
         jd_skill_match: aiResponse.data.jd_skill_match || 0,
         rcd_skill_match: aiResponse.data.rcd_skill_match || 0,
-        feedback : aiResponse.data.feedback.feedback || [],
-        experience_match : aiResponse.data.feedback.experience_match || false,
+        feedback: aiResponse.data.feedback.feedback || [],
+        experience_match: aiResponse.data.feedback.experience_match || false,
         experience_info: aiResponse.data.feedback.experience_info || [],
         match_score: aiResponse.data.combined_score || 0,
-        is_recommended :
+        is_recommended:
           aiResponse.data.feedback.recommendation.toUpperCase() === "YES"
             ? "YES"
             : "NO",

@@ -1,18 +1,18 @@
 "use client";
-
 import { useEffect, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import {
-    fetchRecruiterRequests,
-    fetchAcceptedRecruiters,
-    fetchRejectedRecruiters,
-    acceptRecruiterRequest,
-    rejectRecruiterRequest,
-  } from "../../../../api-services/recruiterService";
+  fetchRecruiterRequests,
+  fetchAcceptedRecruiters,
+  fetchRejectedRecruiters,
+  acceptRecruiterRequest,
+  rejectRecruiterRequest,
+} from "../../../../api-services/recruiterService";
+import { withRole } from "../../../../components/withRole";
 
- interface RecruiterRequest {
+interface RecruiterRequest {
   name: string;
   email: string;
 }
@@ -23,8 +23,8 @@ interface ApiResponse {
   };
   ok: boolean;
 }
- 
-export default function RecruiterRequests() {
+
+function RecruiterRequests() {
   const [requests, setRequests] = useState([]); // All recruiter requests
   const [filter, setFilter] = useState("pending"); // Current filter: pending, accepted, rejected
   const [isLoading, setIsLoading] = useState(true);
@@ -51,7 +51,7 @@ export default function RecruiterRequests() {
       setIsLoading(false);
     }
   };
-  
+
   useEffect(() => {
     getRequestsByFilter();
   }, [filter]); // re-run whenever the filter changes
@@ -107,14 +107,14 @@ export default function RecruiterRequests() {
     (req) =>
       req.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       req.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );  
+  );
 
   return (
     <div className="min-h-screen bg-[var(--bg)] py-8 px-0 sm:px-0 lg:px-0 text-[var(--text-primary)] mt-10">
       <div className="mx-auto">
         <div className="bg-[var(--surface)] rounded-xl shadow-lg overflow-hidden border border-[var(--border)]">
           {/* Display Message */}
-          <ToastContainer theme="dark" autoClose={3000}/>
+          <ToastContainer theme="dark" autoClose={3000} />
 
           {/* Filter Buttons and Search Bar */}
           <div className="flex justify-between items-center p-4 border-b border-[var(--border)]">
@@ -122,31 +122,28 @@ export default function RecruiterRequests() {
             <div className="flex space-x-4">
               <button
                 onClick={() => setFilter("pending")}
-                className={`px-4 py-2 rounded-lg transition-colors duration-300 ${
-                  filter === "pending"
-                    ? "bg-[var(--accent)] text-[var(--dark-bg)]"
-                    : "bg-[var(--surface)] text-[var(--text-secondary)] hover:bg-[var(--accent)]/20"
-                }`}
+                className={`px-4 py-2 rounded-lg transition-colors duration-300 ${filter === "pending"
+                  ? "bg-[var(--accent)] text-[var(--dark-bg)]"
+                  : "bg-[var(--surface)] text-[var(--text-secondary)] hover:bg-[var(--accent)]/20"
+                  }`}
               >
                 Requested
               </button>
               <button
                 onClick={() => setFilter("accepted")}
-                className={`px-4 py-2 rounded-lg transition-colors duration-300 ${
-                  filter === "accepted"
-                    ? "bg-green-500 text-white"
-                    : "bg-[var(--surface)] text-[var(--text-secondary)] hover:bg-green-500/20"
-                }`}
+                className={`px-4 py-2 rounded-lg transition-colors duration-300 ${filter === "accepted"
+                  ? "bg-green-500 text-white"
+                  : "bg-[var(--surface)] text-[var(--text-secondary)] hover:bg-green-500/20"
+                  }`}
               >
                 Accepted
               </button>
               <button
                 onClick={() => setFilter("rejected")}
-                className={`px-4 py-2 rounded-lg transition-colors duration-300 ${
-                  filter === "rejected"
-                    ? "bg-red-500 text-white"
-                    : "bg-[var(--surface)] text-[var(--text-secondary)] hover:bg-red-500/20"
-                }`}
+                className={`px-4 py-2 rounded-lg transition-colors duration-300 ${filter === "rejected"
+                  ? "bg-red-500 text-white"
+                  : "bg-[var(--surface)] text-[var(--text-secondary)] hover:bg-red-500/20"
+                  }`}
               >
                 Rejected
               </button>
@@ -278,3 +275,5 @@ export default function RecruiterRequests() {
     </div>
   );
 }
+
+export default withRole(RecruiterRequests, ["admin"]);

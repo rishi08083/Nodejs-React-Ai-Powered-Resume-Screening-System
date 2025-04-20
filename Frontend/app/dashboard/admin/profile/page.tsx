@@ -1,11 +1,13 @@
 "use client";
+
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../../../lib/auth";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { withRole } from "../../../../components/withRole";
 
-export default function Profile() {
+function Profile() {
   const router = useRouter();
   const { user, checkAuth, setUser } = useAuth();
   const [loading, setLoading] = useState(false);
@@ -46,50 +48,50 @@ export default function Profile() {
     formData.name !== originalData.name ||
     formData.email !== originalData.email;
 
-    const validateProfileForm = () => {
-      const { name, email } = formData;
-      let nameError = "";
-      let emailError = "";
-    
-      const trimmedName = name.trim().replace(/\s+/g, " ");
-      const nameRegex = /^[A-Za-z]+( [A-Za-z]+)?$/;
-    
-      if (!trimmedName) {
-        nameError = "Name is required.";
-      } else if (!nameRegex.test(trimmedName)) {
-        nameError = "Name must contain only alphabets and a single space between first and last name.";
-      } else if (trimmedName.length < 2) {
-        nameError = "Name must be at least 2 characters long.";
-      } else if (trimmedName.length > 50) {
-        nameError = "Name must be less than 50 characters long.";
-      }
-    
-      const trimmedEmail = email.trim().toLowerCase();
-      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(\.[a-zA-Z]{2,})?$/;
-    
-      if (!trimmedEmail) {
-        emailError = "Email is required.";
-      } else if (trimmedEmail.length < 8) {
-        emailError = "Email must be at least 8 characters long.";
-      } else if (trimmedEmail.length > 100) {
-        emailError = "Email must be less than 100 characters long.";
-      } else if (/\.{2,}/.test(trimmedEmail)) {
-        emailError = "Email cannot contain consecutive dots.";
-      } else if (!emailRegex.test(trimmedEmail)) {
-        emailError = "Please provide a valid email domain.";
-      }
-    
-      // Additional check for .com.com
-      if (trimmedEmail.includes(".com.com")) {
-        emailError = "Email cannot contain consecutive '.com' in domain.";
-      }
-    
-      setValidationErrors((prev) => ({
-        ...prev,
-        name: nameError,
-        email: emailError,
-      }));
-    };    
+  const validateProfileForm = () => {
+    const { name, email } = formData;
+    let nameError = "";
+    let emailError = "";
+
+    const trimmedName = name.trim().replace(/\s+/g, " ");
+    const nameRegex = /^[A-Za-z]+( [A-Za-z]+)?$/;
+
+    if (!trimmedName) {
+      nameError = "Name is required.";
+    } else if (!nameRegex.test(trimmedName)) {
+      nameError = "Name must contain only alphabets and a single space between first and last name.";
+    } else if (trimmedName.length < 2) {
+      nameError = "Name must be at least 2 characters long.";
+    } else if (trimmedName.length > 50) {
+      nameError = "Name must be less than 50 characters long.";
+    }
+
+    const trimmedEmail = email.trim().toLowerCase();
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(\.[a-zA-Z]{2,})?$/;
+
+    if (!trimmedEmail) {
+      emailError = "Email is required.";
+    } else if (trimmedEmail.length < 8) {
+      emailError = "Email must be at least 8 characters long.";
+    } else if (trimmedEmail.length > 100) {
+      emailError = "Email must be less than 100 characters long.";
+    } else if (/\.{2,}/.test(trimmedEmail)) {
+      emailError = "Email cannot contain consecutive dots.";
+    } else if (!emailRegex.test(trimmedEmail)) {
+      emailError = "Please provide a valid email domain.";
+    }
+
+    // Additional check for .com.com
+    if (trimmedEmail.includes(".com.com")) {
+      emailError = "Email cannot contain consecutive '.com' in domain.";
+    }
+
+    setValidationErrors((prev) => ({
+      ...prev,
+      name: nameError,
+      email: emailError,
+    }));
+  };
 
   const validatePasswordForm = () => {
     const { currentPassword, newPassword, confirmPassword } = formData;
@@ -234,11 +236,11 @@ export default function Profile() {
   const getInitials = (name: string) => {
     return name
       ? name
-          .split(" ")
-          .map((word) => word[0])
-          .join("")
-          .toUpperCase()
-          .substring(0, 2)
+        .split(" ")
+        .map((word) => word[0])
+        .join("")
+        .toUpperCase()
+        .substring(0, 2)
       : "U";
   };
 
@@ -468,3 +470,5 @@ export default function Profile() {
     </div>
   );
 }
+
+export default withRole(Profile, ["admin"]);
