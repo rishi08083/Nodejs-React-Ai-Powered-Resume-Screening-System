@@ -30,6 +30,11 @@ function RecruiterRequests() {
   const [isLoading, setIsLoading] = useState(true);
   const [actionInProgress, setActionInProgress] = useState(null);
   const [searchTerm, setSearchTerm] = useState(""); // Search term for filtering
+  const [rejectionMessage, setRejectionMessage] = useState("");
+  const [selectedRecruiter, setSelectedRecruiter] = useState<string | null>(
+    null
+  );
+  const [messageModal, setmessageModal] = useState<boolean>(false);
 
   const getRequestsByFilter = async (): Promise<void> => {
     setIsLoading(true);
@@ -79,10 +84,10 @@ function RecruiterRequests() {
     }
   };
 
-  const handleReject = async (email) => {
+  const handleRejectSubmit = async (email, message) => {
     setActionInProgress(email);
     try {
-      const response = await rejectRecruiterRequest(email);
+      const response = await rejectRecruiterRequest(email, rejectionMessage);
       if (response.ok) {
         toast.success("Recruiter request rejected successfully!", {
           theme: "light",
@@ -94,6 +99,7 @@ function RecruiterRequests() {
         });
       }
     } catch (error) {
+      console.error(error);
       toast.error("An error occurred while rejecting the request.", {
         theme: "light",
       });
@@ -122,28 +128,31 @@ function RecruiterRequests() {
             <div className="flex space-x-4">
               <button
                 onClick={() => setFilter("pending")}
-                className={`px-4 py-2 rounded-lg transition-colors duration-300 ${filter === "pending"
-                  ? "bg-[var(--accent)] text-[var(--dark-bg)]"
-                  : "bg-[var(--surface)] text-[var(--text-secondary)] hover:bg-[var(--accent)]/20"
-                  }`}
+                className={`px-4 py-2 rounded-lg transition-colors duration-300 ${
+                  filter === "pending"
+                    ? "bg-[var(--accent)] text-[var(--dark-bg)]"
+                    : "bg-[var(--surface)] text-[var(--text-secondary)] hover:bg-[var(--accent)]/20"
+                }`}
               >
                 Requested
               </button>
               <button
                 onClick={() => setFilter("accepted")}
-                className={`px-4 py-2 rounded-lg transition-colors duration-300 ${filter === "accepted"
-                  ? "bg-green-500 text-white"
-                  : "bg-[var(--surface)] text-[var(--text-secondary)] hover:bg-green-500/20"
-                  }`}
+                className={`px-4 py-2 rounded-lg transition-colors duration-300 ${
+                  filter === "accepted"
+                    ? "bg-green-500 text-white"
+                    : "bg-[var(--surface)] text-[var(--text-secondary)] hover:bg-green-500/20"
+                }`}
               >
                 Accepted
               </button>
               <button
                 onClick={() => setFilter("rejected")}
-                className={`px-4 py-2 rounded-lg transition-colors duration-300 ${filter === "rejected"
-                  ? "bg-red-500 text-white"
-                  : "bg-[var(--surface)] text-[var(--text-secondary)] hover:bg-red-500/20"
-                  }`}
+                className={`px-4 py-2 rounded-lg transition-colors duration-300 ${
+                  filter === "rejected"
+                    ? "bg-red-500 text-white"
+                    : "bg-[var(--surface)] text-[var(--text-secondary)] hover:bg-red-500/20"
+                }`}
               >
                 Rejected
               </button>
@@ -167,7 +176,9 @@ function RecruiterRequests() {
               <div className="flex justify-center py-12">
                 <div className="animate-pulse flex flex-col items-center">
                   <div className="w-12 h-12 roun ded-full bg-[var(--accent)]/30"></div>
-                  <div className="mt-4 text-[var(--accent)]">Loading requests...</div>
+                  <div className="mt-4 text-[var(--accent)]">
+                    Loading requests...
+                  </div>
                 </div>
               </div>
             ) : filteredRequests.length > 0 ? (
@@ -208,7 +219,10 @@ function RecruiterRequests() {
                               Accept
                             </button>
                             <button
-                              onClick={() => handleReject(request.email)}
+                              onClick={() => {
+                                setSelectedRecruiter(request.email);
+                                setmessageModal(true);
+                              }}
                               disabled={actionInProgress === request.email}
                               className="px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
@@ -219,7 +233,10 @@ function RecruiterRequests() {
                         {filter === "accepted" && (
                           <div className="flex space-x-2">
                             <button
-                              onClick={() => handleReject(request.email)}
+                              onClick={() => {
+                                setSelectedRecruiter(request.email);
+                                setmessageModal(true);
+                              }}
                               disabled={actionInProgress === request.email}
                               className="px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
@@ -265,11 +282,48 @@ function RecruiterRequests() {
                   No {filter} requests found
                 </h3>
                 <p className="mt-2 text-[var(--text-secondary)]">
-                  There are no {filter} recruiter requests available at the moment.
+                  There are no {filter} recruiter requests available at the
+                  moment.
                 </p>
               </div>
             )}
           </div>
+
+          {messageModal && (
+            <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
+              <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md text-black">
+                <h2 className="text-lg font-semibold mb-4">
+                  Reason for Rejection
+                </h2>
+                <textarea
+                  className="w-full h-24 border rounded-lg p-2 mb-4"
+                  placeholder="Enter rejection reason..."
+                  value={rejectionMessage}
+                  onChange={(e) => setRejectionMessage(e.target.value)}
+                />
+                <div className="flex justify-end space-x-2">
+                  <button
+                    className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                    onClick={() => {
+                      setmessageModal(false);
+                      setRejectionMessage("");
+                      setSelectedRecruiter(null);
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                    onClick={() =>
+                      handleRejectSubmit(selectedRecruiter, rejectionMessage)
+                    }
+                  >
+                    Submit
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
