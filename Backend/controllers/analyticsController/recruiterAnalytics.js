@@ -1,110 +1,146 @@
 const db = require("../../models");
-const { cache } = require("../../middlewares/cacheMiddleWare");
-const { use } = require("../../routes/analyticsRoutes");
+
 exports.recruiterAnalytics = async (req, res) => {
   try {
+    // Step 1: Find candidates of the current user
+    const userCandidates = await db.Candidates.findAll({
+      attributes: ["id", "name", "user_id"], // Add other fields if needed
+      where: {
+        is_deleted: false,
+        user_id: req.user.id,
+      },
+      raw: true,
+    });
+
+    // Step 2: Extract candidate IDs
+    const candidateIds = userCandidates.map((candidate) => candidate.id);
+    console.log("Candidate IDs:", candidateIds); // Debugging line
+
+    if (candidateIds.length === 0) {
+      return res.status(200).json({
+        status: "success",
+        data: {
+          message: "No candidates found for the current user.",
+          top_skills: [],
+          num_of_candidates: 0,
+        },
+      });
+    }
+
+    // Step 3: Fetch analytics data in parallel
     const [
       numOfResumes,
-      numOfCandidates,
       averageScreeningScore,
       candidateStatusCounts,
       dayWiseParseCount,
       candidateCountByJob,
-      candidateCountBySkill,
+      candidateSkills,
     ] = await Promise.all([
+      // Count total resumes parsed
       db.Candidates.count({
-        where: {
-          is_deleted: false,
-          user_id: req.user.id,
-        },
+      where: {
+        is_deleted: false,
+        user_id: req.user.id,
+      },
       }),
-      db.Candidates.count({
-        where: {
-          is_deleted: false,
-          user_id: req.user.id,
-        },
-      }),
+
+      // Calculate average screening score
       db.Candidates.findOne({
-        attributes: [
-          [
-            db.sequelize.fn("AVG", db.sequelize.col("match_score")),
-            "average_screening_score",
-          ],
+      attributes: [
+        [
+        db.sequelize.fn("AVG", db.sequelize.col("match_score")),
+        "average_screening_score",
         ],
-        where: {
-          is_deleted: false,
-          user_id: req.user.id,
-        },
-        raw: true,
+      ],
+      where: {
+        is_deleted: false,
+        user_id: req.user.id,
+      },
+      raw: true,
       }),
+
+      // Count candidates by recommendation status
       db.Candidates.findAll({
-        attributes: [
-          "is_recommended",
-          [db.sequelize.fn("COUNT", db.sequelize.col("user_id")), "count"],
-        ],
-        where: {
-          is_deleted: false,
-          user_id: req.user.id,
-        },
-        group: "is_recommended",
-        raw: true,
+      attributes: [
+        "is_recommended",
+        [db.sequelize.fn("COUNT", db.sequelize.col("user_id")), "count"],
+      ],
+      where: {
+        is_deleted: false,
+        user_id: req.user.id,
+      },
+      group: "is_recommended",
+      raw: true,
       }),
+
+      // Count resumes parsed by date
       db.ParseResume.findAll({
-        attributes: [
-          [db.sequelize.fn("DATE", db.sequelize.col("created_at")), "date"],
-          [db.sequelize.fn("COUNT", db.sequelize.col("user_id")), "count"],
-        ],
-        where: {
-          is_deleted: false,
-          user_id: req.user.id,
-        },
-        group: [db.sequelize.fn("DATE", db.sequelize.col("created_at"))],
-        order: [
-          [db.sequelize.fn("DATE", db.sequelize.col("created_at")), "ASC"],
-        ],
-        raw: true,
+      attributes: [
+        [db.sequelize.fn("DATE", db.sequelize.col("created_at")), "date"],
+        [db.sequelize.fn("COUNT", db.sequelize.col("user_id")), "count"],
+      ],
+      where: {
+        is_deleted: false,
+        user_id: req.user.id,
+      },
+      group: [db.sequelize.fn("DATE", db.sequelize.col("created_at"))],
+      order: [
+        [db.sequelize.fn("DATE", db.sequelize.col("created_at")), "ASC"],
+      ],
+      raw: true,
       }),
+
+      // Count candidates by job
       db.Candidates.findAll({
-        attributes: [
-          "job_id",
-          [db.sequelize.col("jobs.title"), "job_title"],
-          [
-            db.sequelize.fn("COUNT", db.sequelize.col("Candidates.user_id")),
-            "candidate_count",
-          ],
+      attributes: [
+        "job_id",
+        [db.sequelize.col("jobs.title"), "job_title"],
+        [
+        db.sequelize.fn("COUNT", db.sequelize.col("Candidates.user_id")),
+        "candidate_count",
         ],
-        include: [
-          {
-            model: db.Jobs,
-            attributes: [],
-            required: true,
-            as: "jobs",
-          },
-        ],
-        where: {
-          is_deleted: false,
-          user_id: req.user.id,
+      ],
+      include: [
+        {
+        model: db.Jobs,
+        attributes: [],
+        required: true,
+        as: "jobs",
         },
-        group: ["Candidates.job_id", "jobs.title"],
-        raw: true,
+      ],
+      where: {
+        is_deleted: false,
+        user_id: req.user.id,
+      },
+      group: ["Candidates.job_id", "jobs.title"],
+      raw: true,
       }),
+
+      // Find skills for the candidates
       db.Skills.findAll({
-        attributes: [
-          [db.sequelize.literal('unnest("skill_names")'), "skill_name"],
-          [
-            db.sequelize.fn(
-              "COUNT",
-              db.sequelize.fn("DISTINCT", db.sequelize.col("candidate_id"))
-            ),
-            "candidate_count",
-          ],
+      attributes: [
+        [db.sequelize.literal('unnest("skill_names")'), "skill_name"],
+        [
+        db.sequelize.fn(
+          "COUNT",
+          db.sequelize.fn("DISTINCT", db.sequelize.col("candidate_id"))
+        ),
+        "candidate_count",
         ],
-        raw: true,
-        group: ["skill_name"],
-        order: [[db.sequelize.literal("candidate_count"), "DESC"]],
+      ],
+      where: {
+        candidate_id: {
+        [db.Sequelize.Op.in]: candidateIds // Using Op.in for array of candidate IDs
+        }, 
+      },
+      raw: true,
+      group: ["skill_name"],
+      order: [[db.sequelize.literal("candidate_count"), "DESC"]],
+      limit: 5 // Optional: limit to top skills
       }),
     ]);
 
+    // Step 4: Process candidate status counts
     const statusCounts = candidateStatusCounts.reduce(
       (acc, { is_recommended, count }) => {
         acc[is_recommended] = count;
@@ -112,10 +148,17 @@ exports.recruiterAnalytics = async (req, res) => {
       },
       { NO: 0, YES: 0, NOT_SET: 0 }
     );
-    let fullResponse = {
+
+    // Step 5: Prepare the response
+    const topSkills = candidateSkills.map((skill) => ({
+      skill_name: skill.skill_name,
+      candidate_count: skill.candidate_count,
+    }));
+
+    const fullResponse = {
       status: "success",
       data: {
-        num_of_candidates: numOfCandidates,
+        num_of_candidates: userCandidates.length,
         num_recommended_candidates: statusCounts.YES,
         average_screening_score:
           averageScreeningScore?.average_screening_score || 0,
@@ -130,18 +173,9 @@ exports.recruiterAnalytics = async (req, res) => {
           job_title: job.job_title,
           candidate_count: job.candidate_count,
         })),
-        candidate_count_by_skill: candidateCountBySkill.filter((skillMap) => {
-          // console.log(skillMap.skill_name);
-          return skillMap.skill_name.length < 10;
-        }),
+        top_skills: topSkills,
       },
     };
-    // try {
-    //   // cache.set("recruiterAnalytics", fullResponse);
-    // } catch (error) {
-    //   console.log("Cache settings failed ");
-    // }
-    // console.log(fullResponse)
 
     res.status(200).json(fullResponse);
   } catch (error) {

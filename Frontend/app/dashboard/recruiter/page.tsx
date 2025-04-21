@@ -25,14 +25,17 @@ import {
   ChevronUp,
   CirclePercent,
   X,
+  ChartNoAxesCombined,
+  UserX,
+  UserCheck,
 } from "lucide-react";
 import { withRole } from "../../../components/withRole";
 
 const colorPalette = {
   primary: ["#ffb300", "#ffc233", "#ffd166", "#ffdf99", "#ffedcc"],
-  success: "#ffb300",
-  warning: "#ffd166",
-  danger: "#ffc233",
+  success: "#4ade80",
+  warning: "#fbbf24",
+  danger: "#f87171",
   info: "#60a5fa",
   neutral: "#8b949e",
   accent1: "#0ea5e9",
@@ -51,6 +54,10 @@ type StatCardProps = {
 };
 
 type AnalyticsData = {
+  top_skills: {
+    skill_name: string;
+    candidate_count: string;
+  }[];
   num_of_resumes: number;
   num_recommended_candidates: number;
   num_of_candidates: number;
@@ -69,6 +76,7 @@ type AnalyticsData = {
     candidate_count: string;
   }[];
   candidate_count_by_skill: {
+    
     skill_name: string;
     candidate_count: string;
   }[];
@@ -175,12 +183,12 @@ function RecruiterDashboard() {
   // Format data for charts
   const screeningOutcomeData = [
     {
-      name: "Selected",
+      name: "Endorsed",
       value: parseInt(analyticsData.outcome.num_of_candidates_selected),
       color: colorPalette.success,
     },
     {
-      name: "Rejected",
+      name: "Not Endorsed",
       value: parseInt(analyticsData.outcome.num_of_candidates_rejected),
       color: colorPalette.danger,
     },
@@ -202,12 +210,10 @@ function RecruiterDashboard() {
     })
   );
 
-  const topSkillsData = analyticsData.candidate_count_by_skill
-    .slice(0, 10)
-    .map((skill) => ({
-      name: skill.skill_name,
-      count: parseInt(skill.candidate_count),
-    }));
+  const topSkillsData = analyticsData.top_skills.map((skill) => ({
+    name: skill.skill_name,
+    count: parseInt(skill.candidate_count),
+  }));
 
   const scoreDistributionData = [
     { range: "0-20", count: Math.floor(Math.random() * 20) + 5 },
@@ -223,37 +229,37 @@ function RecruiterDashboard() {
     <div className="bg-[var(--bg)] min-h-screen text-[var(--text-primary)]">
       <main className="container mx-auto px-4">
         <h1 className="text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-2">
-          Recruiter Dashboard
+          Dashboard
           <div className="h-1 w-24 bg-[var(--accent)] rounded-full mb-4 mt-2"></div>
         </h1>
 
         {/* KPI Stats Row */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <StatCard
-            title="Total Candidates"
+            title={analyticsData.num_of_candidates === 1 ? `Total Candidate` : `Total Candidates`}
             value={analyticsData.num_of_candidates}
-            icon={<FileText size={24} className="text-[var(--accent)]" />}
+            icon={<Users  size={24} className="text-[var(--accent)]" />}
             //change={12.5}
             changeDirection="up"
           />
           <StatCard
             title="Candidate Endorsed"
             value={analyticsData.num_recommended_candidates}
-            icon={<Users size={24} className="text-[var(--accent)]" />}
+            icon={<UserCheck  size={24} className="text-green-400" />}
             // change={8.3}
             changeDirection="up"
           />
           <StatCard
             title="Candidate Not Endorsed"
             value={analyticsData.outcome.num_of_candidates_rejected}
-            icon={<X size={24} className="text-red-400" />}
+            icon={<UserX  size={24} className="text-red-400" />}
             // change={3.1}
             changeDirection="down"
           />
           <StatCard
             title="Average Screening Score"
             value={`${parseFloat(analyticsData.average_screening_score).toFixed(1)}%`}
-            icon={<CirclePercent size={24} className="text-[var(--accent)]" />}
+            icon={<ChartNoAxesCombined  size={24} className="text-[var(--accent)]" />}
             // change={2.4}
             changeDirection="up"
           />
@@ -261,9 +267,9 @@ function RecruiterDashboard() {
         {/* Row 1: Main Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* Resumes Parsed Over Time */}
-          <div className="bg-[var(--surface)] p-8 rounded-xl shadow-md border border-[var(--border)] transition-all hover:shadow-lg">
+          <div className="bg-[var(--surface)] p-8 rounded-xl shadow-md border border-[var(--border)] transition-all hover:shadow-lg overflow-hidden">
             <h2 className={chartTitle}>Resumes Parsed Over Time</h2>
-            <div className="h-72">
+            <div className="h-72 mt-4">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={resumesParsedData}>
                   <defs>
@@ -280,7 +286,7 @@ function RecruiterDashboard() {
                         stopOpacity={0.8}
                       />
                       <stop
-                        offset="100%"
+                        offset="95%"
                         stopColor="var(--accent)"
                         stopOpacity={0}
                       />
@@ -295,78 +301,194 @@ function RecruiterDashboard() {
                     dataKey="date"
                     stroke="var(--text-secondary)"
                     tick={{ fontSize: 12 }}
+                    axisLine={{ stroke: "var(--border)", strokeWidth: 2 }}
                   />
                   <YAxis
                     stroke="var(--text-secondary)"
                     tick={{ fontSize: 12 }}
+                    domain={[0, 100]}
+                    axisLine={{ stroke: "var(--border)", strokeWidth: 2 }}
                   />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "var(--surface)",
-                      borderColor: "var(--border)",
+                      backgroundColor: "var(--bg)",
+                      borderColor: "var(--accent)",
+                      borderWidth: "2px",
                       borderRadius: "0.5rem",
-                      boxShadow: "0 4px 6px var(--shadow)",
+                      boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                      padding: "10px",
                     }}
-                    labelStyle={{ color: "var(--text-primary)" }}
+                    labelStyle={{
+                      color: "var(--accent)",
+                      fontWeight: "bold",
+                      marginBottom: "5px",
+                    }}
+                    itemStyle={{ color: "var(--text-primary)" }}
                     formatter={(value) => [`${value} resumes`, "Count"]}
+                    cursor={{
+                      stroke: "var(--accent)",
+                      strokeWidth: 1,
+                      strokeDasharray: "5 5",
+                    }}
                   />
                   <Area
                     type="monotone"
                     dataKey="count"
                     stroke="var(--accent)"
+                    strokeWidth={3}
                     fillOpacity={1}
                     fill="url(#colorParsed)"
+                    activeDot={{
+                      stroke: "var(--surface)",
+                      strokeWidth: 2,
+                      r: 6,
+                      fill: "var(--accent)",
+                    }}
                   />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
           </div>
           {/* Candidate Screening Outcome */}
-            <div className="bg-[var(--surface)] p-6 rounded-xl shadow-md border border-[var(--border)] transition-all hover:shadow-lg">
+          <div className="bg-[var(--surface)] p-6 rounded-xl shadow-md border border-[var(--border)] transition-all hover:shadow-lg overflow-hidden">
             <h2 className={chartTitle}>Candidate Screening Outcome</h2>
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                data={screeningOutcomeData}
-                cx="50%"
-                cy="50%"
-                innerRadius={60}
-                outerRadius={100}
-                paddingAngle={5}
-                dataKey="value"
-                >
-                {screeningOutcomeData.map((entry, index) => (
-                  <Cell
-                  key={`cell-${index}`}
-                  fill={index === 0 ? "#FFD700" : "var(--accent)"} 
+                <PieChart>
+                  <Pie
+                    data={screeningOutcomeData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={100}
+                    paddingAngle={5}
+                    dataKey="value"
+                    stroke="var(--surface)"
+                    strokeWidth={2}
+                  >
+                    {screeningOutcomeData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    content={({ active, payload }) => {
+                      if (active && payload && payload.length) {
+                        const data = payload[0].payload;
+                        return (
+                          <div
+                            className="custom-tooltip"
+                            style={{
+                              backgroundColor: "var(--surface)",
+                              border: `2px solid ${data.color}`,
+                              padding: "10px 15px",
+                              borderRadius: "8px",
+                              boxShadow: "0 6px 16px rgba(0,0,0,0.16)",
+                            }}
+                          >
+                            <p
+                              className="label"
+                              style={{
+                                color: data.color,
+                                fontWeight: "bold",
+                                marginBottom: "5px",
+                              }}
+                            >
+                              {data.name}
+                            </p>
+                            <p
+                              className="value"
+                              style={{
+                                color: "var(--text-primary)",
+                                fontSize: "16px",
+                              }}
+                            >
+                              {data.value}
+                            </p>
+                            <p
+                              className="percentage"
+                              style={{
+                                color: "var(--text-secondary)",
+                                fontSize: "12px",
+                                marginTop: "5px",
+                              }}
+                            >
+                              {(
+                                (data.value /
+                                  (analyticsData.num_of_candidates || 1)) *
+                                100
+                              ).toFixed(2)}
+                              %
+                            </p>
+                          </div>
+                        );
+                      }
+                      return null;
+                    }}
                   />
-                ))}
-                </Pie>
-                <Tooltip
-                contentStyle={{
-                  backgroundColor: "var(--accent)",
-                  borderColor: "var(--border)",
-                  borderRadius: "0.5rem",
-                  boxShadow: "0 4px 6px var(--shadow)",
-                }}
-                labelStyle={{ color: "var(--text-primary)" }}
-                />
-                <Legend
-                layout="horizontal"
-                verticalAlign="bottom"
-                align="center"
-                wrapperStyle={{ fontSize: "12px", paddingTop: "10px" }}
-                />
-              </PieChart>
+                  <Legend
+                    layout="horizontal"
+                    verticalAlign="bottom"
+                    align="center"
+                    wrapperStyle={{
+                      fontSize: "12px",
+                      paddingTop: "20px",
+                      fontWeight: "bold",
+                    }}
+                    iconType="circle"
+                    iconSize={10}
+                  />
+                </PieChart>
               </ResponsiveContainer>
             </div>
-            </div>
+          </div>
         </div>
 
         {/* Row 2: Bar Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          {/* Top Skills */}
+          {/* Job-wise Candidate Distribution */}
+          <div className="bg-[var(--surface)] p-6 rounded-xl shadow-md border border-[var(--border)] transition-all hover:shadow-lg">
+            <h2 className={chartTitle}>Job-wise Candidate Distribution</h2>
+            <div className="h-72">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={jobDistributionData}
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={90}
+                    dataKey="value"
+                    label={({ name, percent }) =>
+                      `${(percent * 100).toFixed(0)}%`
+                    }
+                  >
+                    {jobDistributionData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "var(--accent)",
+                      borderColor: "var(--border)",
+                      borderRadius: "0.5rem",
+                      boxShadow: "0 4px 6px var(--shadow)",
+                    }}
+                    labelStyle={{ color: "white" }}
+                    formatter={(value, name, props) => [
+                      `${value}`,
+                      props.payload.name,
+                    ]}
+                  />
+                  <Legend
+                    layout="vertical"
+                    verticalAlign="bottom"
+                    align="center"
+                    wrapperStyle={{ fontSize: "12px", paddingTop: "10px" }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
           <div className="bg-[var(--surface)] p-6 rounded-xl shadow-md border border-[var(--border)] transition-all hover:shadow-lg">
             <h2 className={chartTitle}>Top Skills Among Candidates</h2>
             <div className="h-80">
@@ -397,7 +519,7 @@ function RecruiterDashboard() {
                       boxShadow: "0 4px 6px var(--shadow)",
                     }}
                     labelStyle={{ color: "var(--text-primary)" }}
-                    formatter={(value) => [`${value} candidates`, "Count"]}
+                    formatter={(value) => [`${value}`, "Count"]}
                   />
                   <Bar
                     dataKey="count"
@@ -408,54 +530,10 @@ function RecruiterDashboard() {
               </ResponsiveContainer>
             </div>
           </div>
-          {/* Job-wise Candidate Distribution */}
-          <div className="bg-[var(--surface)] p-6 rounded-xl shadow-md border border-[var(--border)] transition-all hover:shadow-lg">
-            <h2 className={chartTitle}>Job-wise Candidate Distribution</h2>
-            <div className="h-72">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={jobDistributionData}
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={90}
-                    dataKey="value"
-                    label={({ name, percent }) =>
-                      `${(percent * 100).toFixed(0)}%`
-                    }
-                  >
-                    {jobDistributionData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "var(--accent)",
-                      borderColor: "var(--border)",
-                      borderRadius: "0.5rem",
-                      boxShadow: "0 4px 6px var(--shadow)",
-                    }}
-                    labelStyle={{ color: "white" }}
-                    formatter={(value, name, props) => [
-                      `${value} candidates`,
-                      props.payload.name,
-                    ]}
-                  />
-                  <Legend
-                    layout="vertical"
-                    verticalAlign="bottom"
-                    align="center"
-                    wrapperStyle={{ fontSize: "12px", paddingTop: "10px" }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
         </div>
       </main>
     </div>
   );
 }
 
-
-export default withRole(RecruiterDashboard,['recruiter']);
+export default withRole(RecruiterDashboard, ["recruiter"]);

@@ -2,7 +2,7 @@
 import { useEffect, useState, useRef } from "react";
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Eye, Upload, FileText } from "lucide-react";
+import { Eye, Upload, FileText, CloudUpload, ListRestart } from "lucide-react";
 import { withRole } from "../../../../components/withRole";
 
 interface Job {
@@ -161,11 +161,11 @@ const ListJobs = () => {
     <div className="w-full p-6 bg-[var(--bg)] mt-14 min-h-screen text-[var(--text-primary)] transition-all duration-300">
       <div className="mb-8">
         <h1 className="text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-2">
-          Available Job Positions
+          Jobs
         </h1>
         <div className="h-1 w-24 bg-[var(--accent)] rounded-full mb-4"></div>
         <p className="text-[var(--text-secondary)] mt-2">
-          Browse our current openings and upload Role Clarity Documents
+          Browse our current openings
         </p>
       </div>
 
@@ -228,19 +228,25 @@ const ListJobs = () => {
                       </span>
                     </td>
                     <td className="px-4 py-4 text-sm flex space-x-2">
-                      <motion.button
+                        <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         className="px-3 py-2 bg-[var(--accent)] font-medium rounded-lg hover:bg-[var(--accent-hover)] text-[var(--bg)] transition-colors duration-200 shadow-md hover:shadow-lg flex items-center space-x-1"
                         onClick={() => handleViewButtonClick(job)}
-                      >
-                        <Upload className="h-4 w-4" />
+                        title={job.is_rcd_uploaded ? "Update Role Clarity Document" : "Upload Role Clarity Document"}
+                        >
                         {job.is_rcd_uploaded ? (
-                          <span>Update Role Clarity Document</span>
+                          <span title="Update Role Clarity Document">
+                          <ListRestart className="h-4 w-4" />
+                          </span>
                         ) : (
-                          <span>Upload Role Clarity Document</span>
+                          <span title="Upload Role Clarity Document">
+                          <CloudUpload className="h-4 w-4" />
+                          </span>
                         )}
-                      </motion.button>
+                        </motion.button>
+
+                     
 
                       <motion.button
                         whileHover={{ scale: 1.05 }}
@@ -251,7 +257,6 @@ const ListJobs = () => {
                         className="px-3 py-2 bg-[var(--border)] text-[var(--text-primary)] font-medium rounded-lg hover:bg-[var(--blue-highlight)] transition-colors duration-200 shadow-md hover:shadow-lg flex items-center space-x-1"
                       >
                         <Eye className="h-4 w-4" />
-                        <span>View</span>
                       </motion.button>
                     </td>
                   </motion.tr>
@@ -305,10 +310,11 @@ const ListJobs = () => {
                     Upload Role Clarity Documents
                   </label>
                   <div
-                    className={`border-2 ${uploadStatus === "error"
-                      ? "border-red-500"
-                      : "border-dashed border-[var(--accent)] border-opacity-50"
-                      } rounded-lg p-6 text-center hover:border-[var(--accent)] transition-colors duration-200`}
+                    className={`border-2 ${
+                      uploadStatus === "error"
+                        ? "border-red-500"
+                        : "border-dashed border-[var(--accent)] border-opacity-50"
+                    } rounded-lg p-6 text-center hover:border-[var(--accent)] transition-colors duration-200`}
                   >
                     <FileText className="mx-auto h-12 w-12 text-[var(--accent)]" />
                     <p className="mt-2 text-sm text-[var(--text-secondary)]">
@@ -365,10 +371,11 @@ const ListJobs = () => {
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className={`px-4 py-2 text-[var(--dark-bg)] font-medium rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg ${uploadStatus === "uploading"
-                      ? "bg-[var(--accent)] opacity-70 cursor-not-allowed"
-                      : "bg-[var(--accent)] hover:bg-[var(--accent-hover)]"
-                      }`}
+                    className={`px-4 py-2 text-[var(--dark-bg)] font-medium rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg ${
+                      uploadStatus === "uploading"
+                        ? "bg-[var(--accent)] opacity-70 cursor-not-allowed"
+                        : "bg-[var(--accent)] hover:bg-[var(--accent-hover)]"
+                    }`}
                     onClick={handleUploadRCD}
                     disabled={uploadStatus === "uploading"}
                   >
@@ -384,4 +391,4 @@ const ListJobs = () => {
   );
 };
 
-export default withRole(ListJobs, ['recruiter', 'admin']);
+export default withRole(ListJobs, ["recruiter", "admin"]);
