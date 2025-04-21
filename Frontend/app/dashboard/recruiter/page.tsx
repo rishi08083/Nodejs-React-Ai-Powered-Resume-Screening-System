@@ -30,6 +30,7 @@ import {
   UserCheck,
 } from "lucide-react";
 import { withRole } from "../../../components/withRole";
+import { useTheme } from "../../../lib/themeContext";
 
 const colorPalette = {
   primary: ["#ffb300", "#ffc233", "#ffd166", "#ffdf99", "#ffedcc"],
@@ -37,7 +38,11 @@ const colorPalette = {
   warning: "#fbbf24",
   danger: "#f87171",
   info: "#60a5fa",
-  neutral: "#8b949e",
+  neutral: {
+    light: ["#f1f5f9", "#e2e8f0", "#cbd5e1", "#94a3b8", "#64748b"],
+    dark: ["#475569", "#334155", "#1e293b", "#0f172a", "#020617"],
+  },
+  neutral1: ["#94a3b8", "#64748b", "#475569", "#334155", "#1e293b"],
   accent1: "#0ea5e9",
   accent2: "#14b8a6",
   accent3: "#3b82f6",
@@ -76,7 +81,6 @@ type AnalyticsData = {
     candidate_count: string;
   }[];
   candidate_count_by_skill: {
-    
     skill_name: string;
     candidate_count: string;
   }[];
@@ -202,12 +206,21 @@ function RecruiterDashboard() {
     count: parseInt(item.count),
   }));
 
+  const { theme } = useTheme();
   const jobDistributionData = analyticsData.candidate_count_by_job.map(
-    (job, index) => ({
-      name: job.job_title,
-      value: parseInt(job.candidate_count),
-      color: colorPalette.primary[index % colorPalette.primary.length],
-    })
+    (job, index) => {
+      // Use theme value from context instead of accessing DOM
+      const isDarkTheme = theme === "dark";
+      const colorArray = isDarkTheme
+        ? colorPalette.neutral.light
+        : colorPalette.neutral1;
+
+      return {
+        name: job.job_title,
+        value: parseInt(job.candidate_count),
+        color: colorArray[index % colorArray.length],
+      };
+    }
   );
 
   const topSkillsData = analyticsData.top_skills.map((skill) => ({
@@ -236,30 +249,36 @@ function RecruiterDashboard() {
         {/* KPI Stats Row */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <StatCard
-            title={analyticsData.num_of_candidates === 1 ? `Total Candidate` : `Total Candidates`}
+            title={
+              analyticsData.num_of_candidates === 1
+                ? `Total Candidate`
+                : `Total Candidates`
+            }
             value={analyticsData.num_of_candidates}
-            icon={<Users  size={24} className="text-[var(--accent)]" />}
+            icon={<Users size={24} className="text-[var(--accent)]" />}
             //change={12.5}
             changeDirection="up"
           />
           <StatCard
             title="Candidate Endorsed"
             value={analyticsData.num_recommended_candidates}
-            icon={<UserCheck  size={24} className="text-green-400" />}
+            icon={<UserCheck size={24} className="text-green-400" />}
             // change={8.3}
             changeDirection="up"
           />
           <StatCard
             title="Candidate Not Endorsed"
             value={analyticsData.outcome.num_of_candidates_rejected}
-            icon={<UserX  size={24} className="text-red-400" />}
+            icon={<UserX size={24} className="text-red-400" />}
             // change={3.1}
             changeDirection="down"
           />
           <StatCard
             title="Average Screening Score"
             value={`${parseFloat(analyticsData.average_screening_score).toFixed(1)}%`}
-            icon={<ChartNoAxesCombined  size={24} className="text-[var(--accent)]" />}
+            icon={
+              <ChartNoAxesCombined size={24} className="text-[var(--accent)]" />
+            }
             // change={2.4}
             changeDirection="up"
           />
@@ -457,26 +476,51 @@ function RecruiterDashboard() {
                     cy="50%"
                     outerRadius={90}
                     dataKey="value"
-                    label={({ name, percent }) =>
-                      `${(percent * 100).toFixed(0)}%`
-                    }
+                    label={({ name, percent }) => `${(percent * 100).toFixed(0)}%`}
                   >
                     {jobDistributionData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
                   <Tooltip
-                    contentStyle={{
-                      backgroundColor: "var(--accent)",
-                      borderColor: "var(--border)",
-                      borderRadius: "0.5rem",
-                      boxShadow: "0 4px 6px var(--shadow)",
+                    content={({ active, payload }) => {
+                      if (active && payload && payload.length) {
+                        const data = payload[0].payload;
+                        return (
+                          <div className="custom-tooltip"
+                            style={{
+                              backgroundColor: "var(--surface)",
+                              border: `2px solid ${data.color}`,
+                              padding: "10px 15px",
+                              borderRadius: "8px",
+                              boxShadow: "0 6px 16px rgba(0,0,0,0.16)",
+                            }}
+                          >
+                            <p style={{
+                              color: data.color,
+                              fontWeight: "bold",
+                              marginBottom: "5px",
+                            }}>
+                              {data.name}
+                            </p>
+                            <p style={{
+                              color: "var(--text-primary)",
+                              fontSize: "16px",
+                            }}>
+                              {data.value}
+                            </p>
+                            <p style={{
+                              color: "var(--text-secondary)",
+                              fontSize: "12px",
+                              marginTop: "5px",
+                            }}>
+                              {((data.value / jobDistributionData.reduce((sum, item) => sum + item.value, 0)) * 100).toFixed(1)}%
+                            </p>
+                          </div>
+                        );
+                      }
+                      return null;
                     }}
-                    labelStyle={{ color: "white" }}
-                    formatter={(value, name, props) => [
-                      `${value}`,
-                      props.payload.name,
-                    ]}
                   />
                   <Legend
                     layout="vertical"

@@ -120,8 +120,8 @@ const SearchFilter = ({
           disabled={!selectedJob}
         >
           <option value="">All Candidates</option>
-          <option value="YES">Recommended ✓</option>
-          <option value="NO">Not Recommended ✗</option>
+          <option value="YES">Endorsed</option>
+          <option value="NO">Not Endorsed</option>
         </select>
 
         <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">

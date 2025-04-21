@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { PencilRuler, Save, Edit, X, Plus, Trash2 } from "lucide-react";
+import { PencilRuler, Save, Edit, X } from "lucide-react";
 
 type Candidate = {
   name: string;
@@ -24,22 +24,11 @@ type Candidate = {
 
 const SkillBadge: React.FC<{
   skill: string;
-  isEditing: boolean;
-  onRemove: () => void;
-}> = ({ skill, isEditing, onRemove }) => (
+}> = ({ skill }) => (
   <span
-    className={`inline-block bg-[var(--surface)] text-[var(--accent)] rounded-full px-3 py-1 text-sm font-medium mr-2 mb-2 border border-[var(--border)] ${isEditing ? "pr-1" : ""}`}
+    className="inline-block bg-[var(--surface)] text-[var(--accent)] rounded-full px-3 py-1 text-sm font-medium mr-2 mb-2 border border-[var(--border)]"
   >
     {skill}
-    {isEditing && (
-      <button
-        onClick={onRemove}
-        className="ml-2 text-red-400 hover:text-red-600 transition-colors"
-        aria-label="Remove skill"
-      >
-        <X size={14} />
-      </button>
-    )}
   </span>
 );
 
@@ -48,17 +37,11 @@ const AccordionItem: React.FC<{
   icon: React.ReactNode;
   children: React.ReactNode;
   defaultOpen?: boolean;
-  onEdit?: () => void;
-  isEditing?: boolean;
-  canEdit?: boolean;
 }> = ({
   title,
   icon,
   children,
   defaultOpen = false,
-  onEdit,
-  isEditing,
-  canEdit = true,
 }) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
@@ -77,21 +60,6 @@ const AccordionItem: React.FC<{
             </h3>
           </div>
         </button>
-
-        {canEdit && (
-          <button
-            onClick={onEdit}
-            className={`ml-2 p-1.5 rounded-full ${
-              isEditing
-                ? "bg-green-100 text-green-600 hover:bg-green-200"
-                : "bg-[var(--surface-lighter)] text-[var(--accent)] hover:bg-[var(--border)]"
-            } 
-              transition-colors`}
-            aria-label={isEditing ? "Save changes" : "Edit content"}
-          >
-            {isEditing ? <Save size={16} /> : <Edit size={16} />}
-          </button>
-        )}
 
         <div
           className="ml-2 text-[var(--accent)] transition-transform duration-300"
@@ -140,28 +108,8 @@ const ParseCandidate: React.FC<{
   const [saveSuccess, setSaveSuccess] = useState<boolean>(false);
   const [saveError, setSaveError] = useState<string | null>(null);
 
-  // Edit mode states
+  // Only keeping edit mode for basic information
   const [editingBasic, setEditingBasic] = useState<boolean>(false);
-  const [editingSkills, setEditingSkills] = useState<boolean>(false);
-  const [editingExperience, setEditingExperience] = useState<boolean>(false);
-  const [editingEducation, setEditingEducation] = useState<boolean>(false);
-  const [editingLocations, setEditingLocations] = useState<boolean>(false);
-
-  // New item states
-  const [newSkill, setNewSkill] = useState<string>("");
-  const [newLocation, setNewLocation] = useState<string>("");
-  const [newExperience, setNewExperience] = useState({
-    company: "",
-    job_title: "",
-    start_date: "",
-    end_date: "",
-  });
-  const [newEducation, setNewEducation] = useState({
-    College: "",
-    Degree: "",
-    start_date: "",
-    end_date: "",
-  });
 
   const getParseResume = async (candidateId: string) => {
     try {
@@ -222,12 +170,8 @@ const ParseCandidate: React.FC<{
         setSaveSuccess(true);
         setCandidate(editedCandidate);
 
-        // Reset edit states
+        // Reset edit state
         setEditingBasic(false);
-        setEditingSkills(false);
-        setEditingExperience(false);
-        setEditingEducation(false);
-        setEditingLocations(false);
 
         setTimeout(() => {
           setSaveSuccess(false);
@@ -251,150 +195,6 @@ const ParseCandidate: React.FC<{
       getParseResume(candidateId);
     }
   }, [candidateId]);
-
-  // Handlers for editing
-  const handleAddSkill = () => {
-    if (!newSkill.trim() || !editedCandidate) return;
-
-    setEditedCandidate({
-      ...editedCandidate,
-      skills: [...(editedCandidate.skills || []), newSkill.trim()],
-    });
-
-    setNewSkill("");
-  };
-
-  const handleRemoveSkill = (index: number) => {
-    if (!editedCandidate) return;
-
-    const updatedSkills = [...editedCandidate.skills];
-    updatedSkills.splice(index, 1);
-
-    setEditedCandidate({
-      ...editedCandidate,
-      skills: updatedSkills,
-    });
-  };
-
-  const handleAddExperience = () => {
-    if (!editedCandidate) return;
-    if (!newExperience.company.trim() || !newExperience.job_title.trim())
-      return;
-
-    setEditedCandidate({
-      ...editedCandidate,
-      experience: [...(editedCandidate.experience || []), newExperience],
-    });
-
-    setNewExperience({
-      company: "",
-      job_title: "",
-      start_date: "",
-      end_date: "",
-    });
-  };
-
-  const handleRemoveExperience = (index: number) => {
-    if (!editedCandidate || !editedCandidate.experience) return;
-
-    const updatedExperience = [...editedCandidate.experience];
-    updatedExperience.splice(index, 1);
-
-    setEditedCandidate({
-      ...editedCandidate,
-      experience: updatedExperience,
-    });
-  };
-
-  const handleUpdateExperience = (
-    index: number,
-    field: string,
-    value: string
-  ) => {
-    if (!editedCandidate || !editedCandidate.experience) return;
-
-    const updatedExperience = [...editedCandidate.experience];
-    updatedExperience[index] = {
-      ...updatedExperience[index],
-      [field]: value,
-    };
-
-    setEditedCandidate({
-      ...editedCandidate,
-      experience: updatedExperience,
-    });
-  };
-
-  const handleAddEducation = () => {
-    if (!editedCandidate) return;
-    if (!newEducation.College.trim() || !newEducation.Degree.trim()) return;
-
-    setEditedCandidate({
-      ...editedCandidate,
-      education: [...(editedCandidate.education || []), newEducation],
-    });
-
-    setNewEducation({
-      College: "",
-      Degree: "",
-      start_date: "",
-      end_date: "",
-    });
-  };
-
-  const handleRemoveEducation = (index: number) => {
-    if (!editedCandidate || !editedCandidate.education) return;
-
-    const updatedEducation = [...editedCandidate.education];
-    updatedEducation.splice(index, 1);
-
-    setEditedCandidate({
-      ...editedCandidate,
-      education: updatedEducation,
-    });
-  };
-
-  const handleUpdateEducation = (
-    index: number,
-    field: string,
-    value: string
-  ) => {
-    if (!editedCandidate || !editedCandidate.education) return;
-
-    const updatedEducation = [...editedCandidate.education];
-    updatedEducation[index] = {
-      ...updatedEducation[index],
-      [field]: value,
-    };
-
-    setEditedCandidate({
-      ...editedCandidate,
-      education: updatedEducation,
-    });
-  };
-
-  const handleAddLocation = () => {
-    if (!newLocation.trim() || !editedCandidate) return;
-
-    setEditedCandidate({
-      ...editedCandidate,
-      locations: [...(editedCandidate.locations || []), newLocation.trim()],
-    });
-
-    setNewLocation("");
-  };
-
-  const handleRemoveLocation = (index: number) => {
-    if (!editedCandidate || !editedCandidate.locations) return;
-
-    const updatedLocations = [...editedCandidate.locations];
-    updatedLocations.splice(index, 1);
-
-    setEditedCandidate({
-      ...editedCandidate,
-      locations: updatedLocations,
-    });
-  };
 
   if (loading) {
     return (
@@ -428,7 +228,7 @@ const ParseCandidate: React.FC<{
 
   return (
     <div className="max-h-[80vh] overflow-y-auto custom-scrollbar pr-2">
-      {/* Save Status Messages */}
+      {/* Success Message */}
       {saveSuccess && (
         <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-lg flex items-center justify-between">
           <span>Resume data saved successfully!</span>
@@ -438,6 +238,7 @@ const ParseCandidate: React.FC<{
         </div>
       )}
 
+      {/* Error Message */}
       {saveError && (
         <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg flex items-center justify-between">
           <span>{saveError}</span>
@@ -447,7 +248,7 @@ const ParseCandidate: React.FC<{
         </div>
       )}
 
-      {/* Header Section */}
+      {/* Header Section - Keeping edit functionality here */}
       <div className="mb-8 bg-[var(--surface)] rounded-xl shadow-lg overflow-hidden border border-[var(--border)]">
         <div className="md:flex">
           <div className="md:flex-shrink-0 bg-[var(--accent)] p-6 flex items-center justify-center">
@@ -629,43 +430,12 @@ const ParseCandidate: React.FC<{
         </div>
       </div>
 
-      {/* Skills Section */}
+      {/* Skills Section - Read Only */}
       <AccordionItem
         title="Skills"
         defaultOpen={true}
         icon={<PencilRuler />}
-        onEdit={() => {
-          if (editingSkills) {
-            saveResumeData();
-          }
-          setEditingSkills(!editingSkills);
-        }}
-        isEditing={editingSkills}
       >
-        {editingSkills && (
-          <div className="mb-4 flex items-center">
-            <input
-              type="text"
-              value={newSkill}
-              onChange={(e) => setNewSkill(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  handleAddSkill();
-                }
-              }}
-              placeholder="Add new skill"
-              className="flex-1 p-2 border border-[var(--border)] rounded-l-lg bg-[var(--bg)] text-[var(--text-primary)]"
-            />
-            <button
-              onClick={handleAddSkill}
-              className="p-2 bg-[var(--accent)] text-white rounded-r-lg hover:bg-[var(--accent-hover)] transition-colors"
-              disabled={!newSkill.trim()}
-            >
-              <Plus size={18} />
-            </button>
-          </div>
-        )}
-
         <div
           className={`flex flex-wrap ${editedCandidate.skills && editedCandidate.skills.length > 15 ? "max-h-60 overflow-y-auto custom-scrollbar pr-2" : ""}`}
         >
@@ -674,8 +444,6 @@ const ParseCandidate: React.FC<{
               <SkillBadge
                 key={index}
                 skill={skill}
-                isEditing={editingSkills}
-                onRemove={() => handleRemoveSkill(index)}
               />
             ))
           ) : (
@@ -691,7 +459,7 @@ const ParseCandidate: React.FC<{
         )}
       </AccordionItem>
 
-      {/* Experience Section */}
+      {/* Experience Section - Read Only */}
       <AccordionItem
         title="Work Experience"
         defaultOpen={true}
@@ -711,101 +479,7 @@ const ParseCandidate: React.FC<{
             <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
           </svg>
         }
-        onEdit={() => {
-          if (editingExperience) {
-            saveResumeData();
-          }
-          setEditingExperience(!editingExperience);
-        }}
-        isEditing={editingExperience}
       >
-        {editingExperience && (
-          <div className="mb-6 p-4 border border-[var(--border)] rounded-lg bg-[var(--bg)]">
-            <h4 className="font-medium text-[var(--text-primary)] mb-3">
-              Add Experience
-            </h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <div>
-                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">
-                  Job Title
-                </label>
-                <input
-                  type="text"
-                  value={newExperience.job_title}
-                  onChange={(e) =>
-                    setNewExperience({
-                      ...newExperience,
-                      job_title: e.target.value,
-                    })
-                  }
-                  className="w-full p-2 border border-[var(--border)] rounded-lg bg-[var(--surface-lighter)] text-[var(--text-primary)]"
-                  placeholder="Job Title"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">
-                  Company
-                </label>
-                <input
-                  type="text"
-                  value={newExperience.company}
-                  onChange={(e) =>
-                    setNewExperience({
-                      ...newExperience,
-                      company: e.target.value,
-                    })
-                  }
-                  className="w-full p-2 border border-[var(--border)] rounded-lg bg-[var(--surface-lighter)] text-[var(--text-primary)]"
-                  placeholder="Company Name"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">
-                  Start Date
-                </label>
-                <input
-                  type="text"
-                  value={newExperience.start_date}
-                  onChange={(e) =>
-                    setNewExperience({
-                      ...newExperience,
-                      start_date: e.target.value,
-                    })
-                  }
-                  className="w-full p-2 border border-[var(--border)] rounded-lg bg-[var(--surface-lighter)] text-[var(--text-primary)]"
-                  placeholder="e.g., Jan 2020"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">
-                  End Date
-                </label>
-                <input
-                  type="text"
-                  value={newExperience.end_date}
-                  onChange={(e) =>
-                    setNewExperience({
-                      ...newExperience,
-                      end_date: e.target.value,
-                    })
-                  }
-                  className="w-full p-2 border border-[var(--border)] rounded-lg bg-[var(--surface-lighter)] text-[var(--text-primary)]"
-                  placeholder="e.g., Present"
-                />
-              </div>
-            </div>
-            <div className="flex justify-end">
-              <button
-                onClick={handleAddExperience}
-                className="px-4 py-2 bg-[var(--accent)] text-white rounded-lg hover:bg-[var(--accent-hover)] transition-colors"
-                disabled={!newExperience.job_title || !newExperience.company}
-              >
-                Add Experience
-              </button>
-            </div>
-          </div>
-        )}
-
         <div
           className={`space-y-4 ${editedCandidate.experience && editedCandidate.experience.length > 3 ? "max-h-72 overflow-y-auto custom-scrollbar pr-2" : ""}`}
         >
@@ -816,99 +490,15 @@ const ParseCandidate: React.FC<{
                 key={index}
                 className="border-l-4 border-[var(--accent)] pl-4 py-1 relative"
               >
-                {editingExperience ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">
-                    <div>
-                      <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">
-                        Job Title
-                      </label>
-                      <input
-                        type="text"
-                        value={exp.job_title}
-                        onChange={(e) =>
-                          handleUpdateExperience(
-                            index,
-                            "job_title",
-                            e.target.value
-                          )
-                        }
-                        className="w-full p-1 text-sm border border-[var(--border)] rounded-lg bg-[var(--surface-lighter)] text-[var(--text-primary)]"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">
-                        Company
-                      </label>
-                      <input
-                        type="text"
-                        value={exp.company}
-                        onChange={(e) =>
-                          handleUpdateExperience(
-                            index,
-                            "company",
-                            e.target.value
-                          )
-                        }
-                        className="w-full p-1 text-sm border border-[var(--border)] rounded-lg bg-[var(--surface-lighter)] text-[var(--text-primary)]"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">
-                        Start Date
-                      </label>
-                      <input
-                        type="text"
-                        value={exp.start_date}
-                        onChange={(e) =>
-                          handleUpdateExperience(
-                            index,
-                            "start_date",
-                            e.target.value
-                          )
-                        }
-                        className="w-full p-1 text-sm border border-[var(--border)] rounded-lg bg-[var(--surface-lighter)] text-[var(--text-primary)]"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">
-                        End Date
-                      </label>
-                      <input
-                        type="text"
-                        value={exp.end_date}
-                        onChange={(e) =>
-                          handleUpdateExperience(
-                            index,
-                            "end_date",
-                            e.target.value
-                          )
-                        }
-                        className="w-full p-1 text-sm border border-[var(--border)] rounded-lg bg-[var(--surface-lighter)] text-[var(--text-primary)]"
-                      />
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex justify-between items-start flex-wrap gap-2">
-                    <h4 className="font-medium text-[var(--text-primary)]">
-                      {exp.job_title}
-                    </h4>
-                    <span className="bg-[var(--surface-lighter)] text-[var(--text-secondary)] text-xs px-2 py-1 rounded">
-                      {exp.start_date} - {exp.end_date || "Present"}
-                    </span>
-                  </div>
-                )}
-
-                {!editingExperience ? (
-                  <p className="text-[var(--text-secondary)]">{exp.company}</p>
-                ) : (
-                  <button
-                    onClick={() => handleRemoveExperience(index)}
-                    className="mt-2 flex items-center text-xs text-red-500 hover:text-red-700 transition-colors"
-                  >
-                    <Trash2 size={14} className="mr-1" />
-                    Remove
-                  </button>
-                )}
+                <div className="flex justify-between items-start flex-wrap gap-2">
+                  <h4 className="font-medium text-[var(--text-primary)]">
+                    {exp.job_title}
+                  </h4>
+                  <span className="bg-[var(--surface-lighter)] text-[var(--text-secondary)] text-xs px-2 py-1 rounded">
+                    {exp.start_date} - {exp.end_date || "Present"}
+                  </span>
+                </div>
+                <p className="text-[var(--text-secondary)]">{exp.company}</p>
               </div>
             ))
           ) : (
@@ -919,7 +509,7 @@ const ParseCandidate: React.FC<{
         </div>
       </AccordionItem>
 
-      {/* Education Section */}
+      {/* Education Section - Read Only */}
       <AccordionItem
         title="Education"
         icon={
@@ -938,98 +528,7 @@ const ParseCandidate: React.FC<{
             <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
           </svg>
         }
-        onEdit={() => {
-          if (editingEducation) {
-            saveResumeData();
-          }
-          setEditingEducation(!editingEducation);
-        }}
-        isEditing={editingEducation}
       >
-        {editingEducation && (
-          <div className="mb-6 p-4 border border-[var(--border)] rounded-lg bg-[var(--bg)]">
-            <h4 className="font-medium text-[var(--text-primary)] mb-3">
-              Add Education
-            </h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <div>
-                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">
-                  Degree
-                </label>
-                <input
-                  type="text"
-                  value={newEducation.Degree}
-                  onChange={(e) =>
-                    setNewEducation({ ...newEducation, Degree: e.target.value })
-                  }
-                  className="w-full p-2 border border-[var(--border)] rounded-lg bg-[var(--surface-lighter)] text-[var(--text-primary)]"
-                  placeholder="Degree Name"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">
-                  Institution
-                </label>
-                <input
-                  type="text"
-                  value={newEducation.College}
-                  onChange={(e) =>
-                    setNewEducation({
-                      ...newEducation,
-                      College: e.target.value,
-                    })
-                  }
-                  className="w-full p-2 border border-[var(--border)] rounded-lg bg-[var(--surface-lighter)] text-[var(--text-primary)]"
-                  placeholder="College or University"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">
-                  Start Date
-                </label>
-                <input
-                  type="text"
-                  value={newEducation.start_date}
-                  onChange={(e) =>
-                    setNewEducation({
-                      ...newEducation,
-                      start_date: e.target.value,
-                    })
-                  }
-                  className="w-full p-2 border border-[var(--border)] rounded-lg bg-[var(--surface-lighter)] text-[var(--text-primary)]"
-                  placeholder="e.g., 2018"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">
-                  End Date
-                </label>
-                <input
-                  type="text"
-                  value={newEducation.end_date}
-                  onChange={(e) =>
-                    setNewEducation({
-                      ...newEducation,
-                      end_date: e.target.value,
-                    })
-                  }
-                  className="w-full p-2 border border-[var(--border)] rounded-lg bg-[var(--surface-lighter)] text-[var(--text-primary)]"
-                  placeholder="e.g., 2022"
-                />
-              </div>
-            </div>
-            <div className="flex justify-end">
-              <button
-                onClick={handleAddEducation}
-                className="px-4 py-2 bg-[var(--accent)] text-white rounded-lg hover:bg-[var(--accent-hover)] transition-colors"
-                disabled={!newEducation.Degree || !newEducation.College}
-              >
-                Add Education
-              </button>
-            </div>
-          </div>
-        )}
-
         <div
           className={`space-y-4 ${editedCandidate.education && editedCandidate.education.length > 3 ? "max-h-72 overflow-y-auto custom-scrollbar pr-2" : ""}`}
         >
@@ -1039,95 +538,15 @@ const ParseCandidate: React.FC<{
                 key={index}
                 className="border-l-4 border-[var(--accent)] pl-4 py-1"
               >
-                {editingEducation ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">
-                    <div>
-                      <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">
-                        Degree
-                      </label>
-                      <input
-                        type="text"
-                        value={edu.Degree}
-                        onChange={(e) =>
-                          handleUpdateEducation(index, "Degree", e.target.value)
-                        }
-                        className="w-full p-1 text-sm border border-[var(--border)] rounded-lg bg-[var(--surface-lighter)] text-[var(--text-primary)]"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">
-                        Institution
-                      </label>
-                      <input
-                        type="text"
-                        value={edu.College}
-                        onChange={(e) =>
-                          handleUpdateEducation(
-                            index,
-                            "College",
-                            e.target.value
-                          )
-                        }
-                        className="w-full p-1 text-sm border border-[var(--border)] rounded-lg bg-[var(--surface-lighter)] text-[var(--text-primary)]"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">
-                        Start Date
-                      </label>
-                      <input
-                        type="text"
-                        value={edu.start_date}
-                        onChange={(e) =>
-                          handleUpdateEducation(
-                            index,
-                            "start_date",
-                            e.target.value
-                          )
-                        }
-                        className="w-full p-1 text-sm border border-[var(--border)] rounded-lg bg-[var(--surface-lighter)] text-[var(--text-primary)]"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">
-                        End Date
-                      </label>
-                      <input
-                        type="text"
-                        value={edu.end_date}
-                        onChange={(e) =>
-                          handleUpdateEducation(
-                            index,
-                            "end_date",
-                            e.target.value
-                          )
-                        }
-                        className="w-full p-1 text-sm border border-[var(--border)] rounded-lg bg-[var(--surface-lighter)] text-[var(--text-primary)]"
-                      />
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex justify-between items-start flex-wrap gap-2">
-                    <h4 className="font-medium text-[var(--text-primary)]">
-                      {edu.Degree}
-                    </h4>
-                    <span className="bg-[var(--surface-lighter)] text-[var(--text-secondary)] text-xs px-2 py-1 rounded">
-                      {edu.start_date} - {edu.end_date || "Present"}
-                    </span>
-                  </div>
-                )}
-
-                {!editingEducation ? (
-                  <p className="text-[var(--text-secondary)]">{edu.College}</p>
-                ) : (
-                  <button
-                    onClick={() => handleRemoveEducation(index)}
-                    className="mt-2 flex items-center text-xs text-red-500 hover:text-red-700 transition-colors"
-                  >
-                    <Trash2 size={14} className="mr-1" />
-                    Remove
-                  </button>
-                )}
+                <div className="flex justify-between items-start flex-wrap gap-2">
+                  <h4 className="font-medium text-[var(--text-primary)]">
+                    {edu.Degree}
+                  </h4>
+                  <span className="bg-[var(--surface-lighter)] text-[var(--text-secondary)] text-xs px-2 py-1 rounded">
+                    {edu.start_date} - {edu.end_date || "Present"}
+                  </span>
+                </div>
+                <p className="text-[var(--text-secondary)]">{edu.College}</p>
               </div>
             ))
           ) : (
@@ -1136,7 +555,7 @@ const ParseCandidate: React.FC<{
         </div>
       </AccordionItem>
 
-      {/* Locations Section */}
+      {/* Locations Section - Read Only */}
       <AccordionItem
         title="Preferred Locations"
         icon={
@@ -1155,38 +574,7 @@ const ParseCandidate: React.FC<{
             <circle cx="12" cy="10" r="3"></circle>
           </svg>
         }
-        onEdit={() => {
-          if (editingLocations) {
-            saveResumeData();
-          }
-          setEditingLocations(!editingLocations);
-        }}
-        isEditing={editingLocations}
       >
-        {editingLocations && (
-          <div className="mb-4 flex items-center">
-            <input
-              type="text"
-              value={newLocation}
-              onChange={(e) => setNewLocation(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  handleAddLocation();
-                }
-              }}
-              placeholder="Add location preference"
-              className="flex-1 p-2 border border-[var(--border)] rounded-l-lg bg-[var(--bg)] text-[var(--text-primary)]"
-            />
-            <button
-              onClick={handleAddLocation}
-              className="p-2 bg-[var(--accent)] text-white rounded-r-lg hover:bg-[var(--accent-hover)] transition-colors"
-              disabled={!newLocation.trim()}
-            >
-              <Plus size={18} />
-            </button>
-          </div>
-        )}
-
         <div
           className={`flex flex-wrap ${editedCandidate.locations && editedCandidate.locations.length > 8 ? "max-h-40 overflow-y-auto custom-scrollbar pr-2" : ""}`}
         >
@@ -1197,15 +585,6 @@ const ParseCandidate: React.FC<{
                 className="inline-block bg-[var(--surface-lighter)] text-[var(--text-primary)] rounded-full px-3 py-1 text-sm font-medium mr-2 mb-2"
               >
                 {location}
-                {editingLocations && (
-                  <button
-                    onClick={() => handleRemoveLocation(index)}
-                    className="ml-2 text-red-400 hover:text-red-600 transition-colors"
-                    aria-label="Remove location"
-                  >
-                    <X size={14} />
-                  </button>
-                )}
               </span>
             ))
           ) : (
@@ -1216,13 +595,9 @@ const ParseCandidate: React.FC<{
         </div>
       </AccordionItem>
 
-      {/* Actions Footer */}
-      <div className="mt-8 flex justify-end">
-        {(editingBasic ||
-          editingSkills ||
-          editingExperience ||
-          editingEducation ||
-          editingLocations) && (
+      {/* Actions Footer - Only show when basic info is being edited */}
+      {editingBasic && (
+        <div className="mt-8 flex justify-end">
           <button
             onClick={saveResumeData}
             className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center shadow-md"
@@ -1233,10 +608,10 @@ const ParseCandidate: React.FC<{
             ) : (
               <Save size={18} className="mr-2" />
             )}
-            Save All Changes
+            Save Changes
           </button>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

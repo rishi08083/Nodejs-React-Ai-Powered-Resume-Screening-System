@@ -94,6 +94,8 @@ const CandidateList = () => {
 
         if (response.ok) {
           const data = await response.json();
+          
+
           setJobs(data.data);
 
           {

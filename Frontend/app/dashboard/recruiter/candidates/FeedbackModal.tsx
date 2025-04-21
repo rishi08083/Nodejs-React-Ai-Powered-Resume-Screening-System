@@ -27,7 +27,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
 
   if (!selectedFeedback) return null;
 
-  console.log("Selected Feedback:", selectedFeedback);
+  // console.log("Selected Feedback:", selectedFeedback);
 
   // Parse JD match and mismatch skills
   const parseSkills = (skillsString: string) => {
@@ -305,7 +305,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
               />
             </div>
 
-            {jdMatchSkills.length > 0 && (
+            {jdMatchSkills.length > 0 ? (
               <div className="mb-3">
                 <p className="text-sm font-medium text-green-400 mb-2">
                   Matching Skills:
@@ -320,6 +320,12 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
                     </span>
                   ))}
                 </div>
+              </div>
+            ) : (
+              <div className="mb-3">
+                <p className="text-sm font-medium text-red-400 mb-2">
+                  No Matching skills found.
+                </p>
               </div>
             )}
 
@@ -365,7 +371,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
               />
             </div>
 
-            {rcdMatchSkills.length > 0 && (
+            {rcdMatchSkills.length > 0 ? (
               <div className="mb-3">
                 <p className="text-sm font-medium text-green-400 mb-2">
                   Matching Skills:
@@ -381,7 +387,15 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
                   ))}
                 </div>
               </div>
+            ) : (
+              <div className="mb-3">
+                <p className="text-sm font-medium text-red-400 mb-2">
+                  No Matching skills found.
+                </p>
+              </div>
             )}
+
+            {/* Uncomment if you want to show missing skills for RCD */}
 
             {/* {rcdMismatchSkills.length > 0 && (
               <div>
