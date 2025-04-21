@@ -35,6 +35,7 @@ function RecruiterRequests() {
     null
   );
   const [messageModal, setmessageModal] = useState<boolean>(false);
+  const [currentStat, setCurrentStat] = useState<string>("");
 
   const getRequestsByFilter = async (): Promise<void> => {
     setIsLoading(true);
@@ -61,22 +62,24 @@ function RecruiterRequests() {
     getRequestsByFilter();
   }, [filter]); // re-run whenever the filter changes
 
-  const handleAccept = async (email: string) => {
+  const handleAcceptSubmit = async (email: string, message: string) => {
     setActionInProgress(email);
+
     try {
-      const response = await acceptRecruiterRequest(email);
+      const response = await acceptRecruiterRequest(email, rejectionMessage);
       if (response.ok) {
         toast.success("Recruiter request accepted successfully!", {
           theme: "light",
         });
         getRequestsByFilter();
       } else {
-        toast.error("Failed to accept the recruiter request.", {
+        toast.error("Failed to reject the recruiter request.", {
           theme: "light",
         });
       }
     } catch (error) {
-      toast.error("An error occurred while accepting the request.", {
+      console.error(error);
+      toast.error("An error occurred while rejecting the request.", {
         theme: "light",
       });
     } finally {
@@ -219,7 +222,12 @@ function RecruiterRequests() {
                         {filter === "pending" && (
                           <div className="flex space-x-2">
                             <button
-                              onClick={() => handleAccept(request.email)}
+                              onClick={() =>
+                                handleAcceptSubmit(
+                                  request.email,
+                                  rejectionMessage
+                                )
+                              }
                               disabled={actionInProgress === request.email}
                               className="px-3 py-1 bg-[var(--accent)] text-[var(--dark-bg)] rounded-lg hover:bg-[var(--accent)]/90 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
@@ -254,7 +262,11 @@ function RecruiterRequests() {
                         {filter === "rejected" && (
                           <div className="flex space-x-2">
                             <button
-                              onClick={() => handleAccept(request.email)}
+                              onClick={() => {
+                                setCurrentStat("accepted-tab");
+                                setSelectedRecruiter(request.email);
+                                setmessageModal(true);
+                              }}
                               disabled={actionInProgress === request.email}
                               className="px-3 py-1 bg-[var(--accent)] text-[var(--dark-bg)] rounded-lg hover:bg-[var(--accent)]/90 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
@@ -301,11 +313,15 @@ function RecruiterRequests() {
               <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md text-black relative">
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-lg font-semibold">
-                    Reason for Rejection
+                    Reason for{" "}
+                    {currentStat === "accepted-tab" ? "Accept" : "Reject"}
                   </h2>
                   {/* Close Button with Emoji and closeModal function */}
                   <button
-                    onClick={closeModal}
+                    onClick={() => {
+                      closeModal();
+                      setCurrentStat("");
+                    }}
                     className="text-red-500 hover:text-red-700 text-2xl font-bold"
                   >
                     ❌
@@ -320,14 +336,25 @@ function RecruiterRequests() {
                 <div className="flex justify-end space-x-2">
                   <button
                     className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-                    onClick={closeModal}
+                    onClick={() => {
+                      closeModal();
+                      setCurrentStat("");
+                    }}
                   >
                     Cancel
                   </button>
                   <button
                     className="px-4 py-2 bg-[#FFB300] text-white rounded hover:bg-[#E69F00]"
                     onClick={() => {
-                      handleRejectSubmit(selectedRecruiter!, rejectionMessage);
+                      currentStat === "accepted-tab"
+                        ? handleAcceptSubmit(
+                            selectedRecruiter,
+                            rejectionMessage
+                          )
+                        : handleRejectSubmit(
+                            selectedRecruiter!,
+                            rejectionMessage
+                          );
                       closeModal();
                     }}
                   >
