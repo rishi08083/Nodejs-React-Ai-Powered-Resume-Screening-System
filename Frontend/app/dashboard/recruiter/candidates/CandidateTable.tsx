@@ -517,7 +517,7 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
                           </div>
 
                           {/* Re-Screen Button */}
-                          <div
+                          {/* <div
                             className="relative tooltip-container"
                             onMouseEnter={(e) =>
                               handleTooltipHover(e, `rescreen-${candidate.id}`)
@@ -612,7 +612,7 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
                                 </svg>
                               )}
                             </button>
-                          </div>
+                          </div> */}
 
                           {/* Parse Resume Button */}
                           <div

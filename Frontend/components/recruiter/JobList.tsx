@@ -161,7 +161,7 @@ const ListJobs = () => {
     <div className="w-full p-2 bg-[#0e151f] text-[#ffffff]">
       <div className="mb-6">
         <h1 className="text-2xl md:text-3xl font-bold text-[#ffffff]">
-          Available Job Positions
+          Available Jobs
         </h1>
         <p className="text-[#8b949e] mt-2">
           Browse our current openings and upload Role Clarity Documents
