@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+
 import {
   AreaChart,
   Area,
@@ -105,9 +106,8 @@ const StatCard = ({
           </h2>
           {change !== undefined && (
             <span
-              className={`ml-2 text-sm ${
-                changeDirection === "up" ? "text-green-400" : "text-red-400"
-              } flex items-center`}
+              className={`ml-2 text-sm ${changeDirection === "up" ? "text-green-400" : "text-red-400"
+                } flex items-center`}
             >
               {changeDirection === "up" ? (
                 <ChevronUp size={16} />
@@ -125,6 +125,8 @@ const StatCard = ({
 );
 
 function RecruiterDashboard() {
+  const { theme } = useTheme();
+
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(
     null
   );
@@ -206,7 +208,6 @@ function RecruiterDashboard() {
     count: parseInt(item.count),
   }));
 
-  const { theme } = useTheme();
   const jobDistributionData = analyticsData.candidate_count_by_job.map(
     (job, index) => {
       // Use theme value from context instead of accessing DOM
