@@ -41,7 +41,7 @@ const adminLinks = [
   },
   {
     href: "/dashboard/admin/recruiter-requests",
-    label: "Recruiter Requests",
+    label: "Requested Recruiters",
     icon: <Users className="sidebar-icon" />,
   },
 ];
