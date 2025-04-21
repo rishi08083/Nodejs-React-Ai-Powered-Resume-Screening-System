@@ -17,7 +17,7 @@ let isScreeningInProgress = false;
 async function screenCandidate(candidate) {
   try {
     const candidate_id = candidate.id;
-    // console.log(`📝 Starting screening for candidate ${candidate_id}`);
+    // console.log(`Starting screening for candidate ${candidate_id}`);
     const candidateDetails = await getCandidateDetails(candidate_id);
     const token = generateToken();
     // console.log(candidateDetails)
@@ -26,7 +26,7 @@ async function screenCandidate(candidate) {
       candidateDetails.rcd_file_key === undefined ||
       candidateDetails.rcd_file_key === ""
     ) {
-      console.log(`❌ RCD file key is null for candidate ${candidate_id}`);
+      console.log(`RCD file key is null for candidate ${candidate_id}`);
       return false;
     }
     const aiResponse = await axios.post(
@@ -97,10 +97,10 @@ async function screenCandidate(candidate) {
       { where: { id: candidate_id } }
     );
 
-    // console.log(`✅ Candidate ${candidate_id} screened successfully`);
+    // console.log(`Candidate ${candidate_id} screened successfully`);
     return true;
   } catch (err) {
-    console.error(`❌ Error screening ${candidate.id}:`, err.message);
+    console.error(`Error screening ${candidate.id}:`, err.message);
     return false;
   }
 }
@@ -132,7 +132,7 @@ async function processQueue() {
     });
 
     if (!candidate) {
-      // console.log("✅ No candidates to screen at this time.");
+      // console.log("Candidate not to screen at this time.");
       isScreeningInProgress = false;
       return;
     }
@@ -143,7 +143,7 @@ async function processQueue() {
     // Wait 6 seconds before processing the next candidate
     await sleep(6000);
   } catch (error) {
-    console.error("❌ Error in processing queue:", error);
+    console.error("Error in processing queue:", error);
   } finally {
     isScreeningInProgress = false;
   }

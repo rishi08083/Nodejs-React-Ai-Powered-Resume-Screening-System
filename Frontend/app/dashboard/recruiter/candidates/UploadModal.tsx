@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { toast } from "react-toastify";
 import ParseCandidate from "../../../../components/ParseCandidate";
 import { AnimatePresence } from "framer-motion";
+import { MousePointerClick, Search } from "lucide-react";
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 type UploadModalProps = {
@@ -309,7 +310,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
           >
             <div className="flex items-center">
               <span className="absolute left-3 text-[var(--text-secondary)]">
-                🔍
+                <MousePointerClick />
               </span>
               {JobTitle || "Select a Job"}
             </div>
@@ -321,7 +322,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
           {isDropdownOpen && (
             <div className="absolute z-10 w-full mt-1 bg-[var(--surface)] border border-[var(--border)] rounded-lg shadow-lg max-h-60 overflow-y-auto">
               <div
-                className="p-3 hover:bg-[var(--surface-lighter)] cursor-pointer transition-colors duration-200 border-l-4 border-transparent hover:border-[var(--accent)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                className="p-3 hover:bg-[var(--surface-lighter)] cursor-pointer transition-colors duration-200 border-l-4 border-transparent text-[var(--text-secondary)]"
                 onClick={() => {
                   setSelectedJob("");
                   setIsDropdownOpen(false);
@@ -332,15 +333,29 @@ const UploadModal: React.FC<UploadModalProps> = ({
               {jobs?.map((job, index) => (
                 <div
                   key={index}
-                  className="p-3 hover:bg-[var(--surface-lighter)] cursor-pointer transition-colors duration-200 border-l-4 border-transparent hover:border-[var(--accent)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                  className={`p-3 hover:bg-[var(--surface-lighter)] cursor-pointer transition-colors duration-200 border-l-4 border-transparent ${
+                  job.is_rcd_uploaded ? "text-[var(--text-primary)] hover:border-[var(--accent)]" : "text-[var(--text-secondary)] opacity-70"
+                  }`}
                   onClick={() => {
+                  if (job.is_rcd_uploaded && job.is_rcd_uploaded === true) {
                     setSelectedJob(job.id);
                     setJobTitle(job.title);
                     setJobId(job.id);
                     setIsDropdownOpen(false);
+                  } else {
+                    toast.info("Please upload Role Clarity Document first for this job");
+                  }
                   }}
+                  title={!job.is_rcd_uploaded ? "Please upload Role Clarity Document first" : ""}
                 >
+                  <div className="flex justify-between items-center">
                   {job.title}
+                  {!job.is_rcd_uploaded && (
+                    <span className="text-xs text-[var(--text-muted)] ml-2 italic">
+                    Needs RCD
+                    </span>
+                  )}
+                  </div>
                 </div>
               ))}
             </div>
@@ -375,13 +390,13 @@ const UploadModal: React.FC<UploadModalProps> = ({
             className="hidden"
             id="file-input"
           />
-            <button
+          <button
             className="px-6 py-2 bg-[var(--accent)] text-white rounded hover:bg-[var(--accent-hover)]"
             onClick={() => fileInputRef.current?.click()}
-            >
+          >
             <span className="mr-2">📂</span>
             {files.length === 1 ? "Select Resume" : "Select Resumes"}
-            </button>
+          </button>
           <p className="mt-4 text-sm text-[var(--text-muted)]">
             Supported formats: PDF, DOCX, JPG, JPEG files only
           </p>

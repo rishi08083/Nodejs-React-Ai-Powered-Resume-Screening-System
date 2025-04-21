@@ -5,6 +5,8 @@ import { AuthProvider } from "../lib/auth";
 import { ThemeProvider } from "../lib/themeContext";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import TokenExpirationHandler from "../components/shared/TokenExpirationHandler";
+
 
 interface RootLayoutProps {
   children: ReactNode;
@@ -16,7 +18,10 @@ export default function RootLayout({ children }: RootLayoutProps) {
       <body>
         <ThemeProvider>
           <ToastContainer />
-          <AuthProvider>{children}</AuthProvider>
+          <AuthProvider>
+          <TokenExpirationHandler />
+          {children}
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

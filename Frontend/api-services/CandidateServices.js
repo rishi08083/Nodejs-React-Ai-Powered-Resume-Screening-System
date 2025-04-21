@@ -10,6 +10,10 @@ export const fetchJobs = async () => {
     console.log("Response:", response); // Log the response for debugging
 
     if (!response.ok) {
+      // redirect to login page if not authenticated
+      if (response.status === 401) {
+        window.location.href = "/login"; // Redirect to login page
+      }
       throw new Error("Failed to fetch jobs.");
     }
     return await response.json();
@@ -28,7 +32,11 @@ export const fetchCandidates = async (jobId) => {
   try {
     const response = await fetch(`${BASE_URL}candidates/list${jobId}`);
     if (!response.ok) {
-      throw new Error("Failed to fetch candidates.");
+      if (response.status === 401) {
+        window.location.href = "/login"; // Redirect to login page
+      } else {
+        throw new Error("Failed to fetch candidates.");
+      }
     }
     return await response.json();
   } catch (error) {
@@ -45,10 +53,14 @@ export const fetchCandidates = async (jobId) => {
 export const checkCandidateCompatibility = async (candidateId) => {
   try {
     const response = await fetch(
-      `${BASE_URL}/api/checkCompatibility?candidateId=${candidateId}`,
+      `${BASE_URL}/api/checkCompatibility?candidateId=${candidateId}`
     );
     if (!response.ok) {
-      throw new Error("Failed to check compatibility.");
+      if (response.status === 401) {
+        window.location.href = "/login"; // Redirect to login page
+      } else {
+        throw new Error("Failed to check compatibility.");
+      }
     }
     return await response.json();
   } catch (error) {

@@ -227,7 +227,7 @@ function AdminDashboard() {
     <div className="bg-[var(--bg)] min-h-screen text-[var(--text-primary)]">
       <main className="container mx-auto px-4">
         <h1 className="text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-2">
-          Admin Dashboard
+          Dashboard
           <div className="h-1 w-24 bg-[var(--accent)] rounded-full mb-4 mt-2"></div>
         </h1>
 
@@ -270,59 +270,65 @@ function AdminDashboard() {
             <h2 className={chartTitle}>Resumes Parsed Over Time</h2>
             <div className="h-72">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={resumesParsedData}>
-                  <defs>
-                    <linearGradient
-                      id="colorParsed"
-                      x1="0"
-                      y1="0"
-                      x2="0"
-                      y2="1"
-                    >
-                      <stop
-                        offset="5%"
-                        stopColor="var(--accent)"
-                        stopOpacity={0.8}
-                      />
-                      <stop
-                        offset="100%"
-                        stopColor="var(--accent)"
-                        stopOpacity={0}
-                      />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                    stroke="var(--border)"
-                    vertical={false}
-                  />
-                  <XAxis
-                    dataKey="date"
-                    stroke="var(--text-secondary)"
-                    tick={{ fontSize: 12 }}
-                  />
-                  <YAxis
-                    stroke="var(--text-secondary)"
-                    tick={{ fontSize: 12 }}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "var(--surface)",
-                      borderColor: "var(--border)",
-                      borderRadius: "0.5rem",
-                      boxShadow: "0 4px 6px var(--shadow)",
-                    }}
-                    labelStyle={{ color: "var(--text-primary)" }}
-                    formatter={(value) => [`${value} resumes`, "Count"]}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="count"
-                    stroke="var(--accent)"
-                    fillOpacity={1}
-                    fill="url(#colorParsed)"
-                  />
-                </AreaChart>
+          <AreaChart data={resumesParsedData}>
+            <defs>
+              <linearGradient
+                id="colorParsed"
+                x1="0"
+                y1="0"
+                x2="0"
+                y2="1"
+              >
+                <stop
+            offset="5%"
+            stopColor="var(--accent)"
+            stopOpacity={0.8}
+                />
+                <stop
+            offset="100%"
+            stopColor="var(--accent)"
+            stopOpacity={0}
+                />
+              </linearGradient>
+            </defs>
+            <CartesianGrid
+              strokeDasharray="3 3"
+              stroke="var(--border)"
+              vertical={false}
+            />
+            <XAxis
+              dataKey="date"
+              stroke="var(--text-secondary)"
+              tick={{ fontSize: 12 }}
+            />
+            <YAxis
+              stroke="var(--text-secondary)"
+              tick={{ fontSize: 12 }}
+              domain={[0, 100]}
+            />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: "var(--accent)",
+                color: "white",
+                borderColor: "var(--border)",
+                borderWidth: "2px",
+                borderRadius: "0.75rem",
+                boxShadow: "0 6px 12px rgba(0,0,0,0.15)",
+                padding: "10px 14px"
+              }}
+              labelStyle={{ color: "white", fontWeight: "bold" }}
+              formatter={(value) => [`${value} resumes`, "Count"]}
+              wrapperStyle={{ outline: "none" }}
+            />
+            <Area
+              type="monotone"
+              dataKey="count"
+              stroke="var(--accent)"
+              strokeWidth={2}
+              fillOpacity={1}
+              fill="url(#colorParsed)"
+            />
+          </AreaChart>
               </ResponsiveContainer>
             </div>
           </div>
@@ -331,33 +337,46 @@ function AdminDashboard() {
             <h2 className={chartTitle}>Candidate Screening Outcome</h2>
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={screeningOutcomeData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={100}
-                    paddingAngle={5}
-                    dataKey="value"
-                    label={({ name, value, percent }) =>
-                      `${name}: ${value} (${(percent * 100).toFixed(0)}%)`
-                    }
-                  >
-                    {screeningOutcomeData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "var(--accent)",
-                      borderColor: "var(--border)",
-                      borderRadius: "0.5rem",
-                      boxShadow: "0 4px 6px var(--shadow)",
-                    }}
-                    labelStyle={{ color: "var(--text-primary)" }}
-                  />
-                </PieChart>
+          <PieChart>
+            <Pie
+              data={screeningOutcomeData}
+              cx="50%"
+              cy="50%"
+              innerRadius={60}
+              outerRadius={100}
+              paddingAngle={5}
+              dataKey="value"
+              label={({ name, value, percent }) =>
+                `${name}: ${value} (${(percent * 100).toFixed(0)}%)`
+              }
+            >
+              {screeningOutcomeData.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={entry.color} stroke="var(--surface)" strokeWidth={2} />
+              ))}
+            </Pie>
+            <Tooltip
+              content={({ active, payload }) => {
+                if (active && payload && payload.length) {
+            const data = payload[0].payload;
+            return (
+              <div className="custom-tooltip" style={{
+                backgroundColor: data.color,
+                color: "white",
+                padding: "10px 14px",
+                borderRadius: "0.75rem",
+                border: "2px solid var(--surface)",
+                boxShadow: "0 6px 12px rgba(0,0,0,0.15)"
+              }}>
+                <p className="font-bold">{data.name}</p>
+                <p>{`Candidates: ${data.value}`}</p>
+              </div>
+            );
+                }
+                return null;
+              }}
+              wrapperStyle={{ outline: "none" }}
+            />
+          </PieChart>
               </ResponsiveContainer>
             </div>
           </div>

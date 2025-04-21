@@ -412,19 +412,7 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
                             candidate?.is_recommended === "NOT SET" ||
                             candidate?.isRescreening
                           }
-                          className={`flex items-center space-x-2 px-2 py-0.5 rounded-md transition-all duration-300 ${
-                            candidate?.isRescreening
-                              ? "bg-blue-100/20 text-blue-500 border border-blue-500/30 cursor-wait"
-                              : candidate?.screeningError
-                                ? "bg-red-100/30 text-red-500 border border-red-500/40 animate-pulse"
-                                : candidate?.freshlyScreened
-                                  ? "bg-green-100/30 text-green-600 border border-green-500/40 animate-pulse shadow-md"
-                                  : candidate?.is_recommended === "YES"
-                                    ? "bg-green-100/20 text-green-1000 border border-green-500/30"
-                                    : candidate?.is_recommended === "NO"
-                                      ? "bg-red-100/20 text-red-1000 border border-red-500/30"
-                                      : "bg-gray-100/20 text-gray-500 border border-gray-300/30 cursor-not-allowed"
-                          } hover:shadow-md`}
+                          className={`flex items-center space-x-2 px-2 py-0.5 rounded-md transition-all duration-300  hover:shadow-md`}
                         >
                           <div
                             className={`relative w-8 h-8 rounded-full flex items-center justify-center ${
@@ -517,7 +505,7 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
                           </div>
 
                           {/* Re-Screen Button */}
-                          <div
+                          {/* <div
                             className="relative tooltip-container"
                             onMouseEnter={(e) =>
                               handleTooltipHover(e, `rescreen-${candidate.id}`)
@@ -612,7 +600,7 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
                                 </svg>
                               )}
                             </button>
-                          </div>
+                          </div> */}
 
                           {/* Parse Resume Button */}
                           <div

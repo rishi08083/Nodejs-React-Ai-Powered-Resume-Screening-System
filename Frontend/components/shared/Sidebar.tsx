@@ -28,7 +28,7 @@ const recruiterLinks = [
   },
   {
     href: "/dashboard/recruiter/candidates",
-    label: "Candidates",
+    label: "Screened Candidates",
     icon: <Book className="sidebar-icon" />,
   },
 ];

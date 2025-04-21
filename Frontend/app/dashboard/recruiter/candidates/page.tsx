@@ -21,6 +21,12 @@ type Job = {
   title: string;
 };
 
+type experience_info = {
+  "Required Experience": string;
+  "Candidate Experience": string;
+  "Experience Range Check": string;
+};
+
 export type Feedback = {
   rating: number;
   experience_match?: boolean;
@@ -30,7 +36,13 @@ export type Feedback = {
   rcd_mismatch?: string[];
   jd_match?: string[];
   rcd_match?: string[];
-  experience_info: string;
+  experience_info:
+    | {
+        required_experience: string;
+        candidate_experience: string;
+        experience_range_check: string;
+      }
+    | string;
 };
 
 export type Candidate = {
@@ -82,6 +94,8 @@ const CandidateList = () => {
 
         if (response.ok) {
           const data = await response.json();
+          
+
           setJobs(data.data);
 
           {
@@ -173,7 +187,10 @@ const CandidateList = () => {
         const payload = data.data;
 
         // console.log("Feedback data:", payload);
-        setSelectedFeedback(payload || {});
+        setSelectedFeedback({
+          ...payload,
+          experience_info: payload.experience_info,
+        });
         setIsFeedbackModalOpen(true);
       }
     } catch (error: any) {
@@ -287,10 +304,11 @@ const CandidateList = () => {
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             disabled={currentPage === 1}
-            className={`px-4 py-2 rounded-lg shadow-md transition-all duration-300 ${currentPage === 1
-              ? "bg-[var(--surface)] text-[var(--text-secondary)] cursor-not-allowed opacity-50"
-              : "bg-[var(--surface)] text-[var(--text-secondary)] border border-[var(--border)] hover:border-[var(--accent)] hover:text-[var(--accent)]"
-              }`}
+            className={`px-4 py-2 rounded-lg shadow-md transition-all duration-300 ${
+              currentPage === 1
+                ? "bg-[var(--surface)] text-[var(--text-secondary)] cursor-not-allowed opacity-50"
+                : "bg-[var(--surface)] text-[var(--text-secondary)] border border-[var(--border)] hover:border-[var(--accent)] hover:text-[var(--accent)]"
+            }`}
           >
             Previous
           </motion.button>
@@ -306,10 +324,11 @@ const CandidateList = () => {
               onClick={() => paginate(number + 1)}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
-              className={`px-4 py-2 rounded-lg shadow-md transition-all duration-300 ${currentPage === number + 1
-                ? "bg-[var(--accent)] text-[var(--dark-bg)] font-medium scale-110"
-                : "bg-[var(--surface)] text-[var(--text-secondary)] border border-[var(--border)] hover:border-[var(--accent)] hover:text-[var(--accent)]"
-                }`}
+              className={`px-4 py-2 rounded-lg shadow-md transition-all duration-300 ${
+                currentPage === number + 1
+                  ? "bg-[var(--accent)] text-[var(--dark-bg)] font-medium scale-110"
+                  : "bg-[var(--surface)] text-[var(--text-secondary)] border border-[var(--border)] hover:border-[var(--accent)] hover:text-[var(--accent)]"
+              }`}
             >
               {number + 1}
             </motion.button>
@@ -324,11 +343,12 @@ const CandidateList = () => {
               currentPage ===
               Math.ceil(filteredCandidates.length / candidatesPerPage)
             }
-            className={`px-4 py-2 rounded-lg shadow-md transition-all duration-300 ${currentPage ===
+            className={`px-4 py-2 rounded-lg shadow-md transition-all duration-300 ${
+              currentPage ===
               Math.ceil(filteredCandidates.length / candidatesPerPage)
-              ? "bg-[var(--surface)] text-[var(--text-secondary)] cursor-not-allowed opacity-50"
-              : "bg-[var(--surface)] text-[var(--text-secondary)] border border-[var(--border)] hover:border-[var(--accent)] hover:text-[var(--accent)]"
-              }`}
+                ? "bg-[var(--surface)] text-[var(--text-secondary)] cursor-not-allowed opacity-50"
+                : "bg-[var(--surface)] text-[var(--text-secondary)] border border-[var(--border)] hover:border-[var(--accent)] hover:text-[var(--accent)]"
+            }`}
           >
             Next
           </motion.button>
