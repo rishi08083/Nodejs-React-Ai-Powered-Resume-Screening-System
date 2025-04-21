@@ -223,7 +223,7 @@ function RecruiterDashboard() {
     <div className="bg-[var(--bg)] min-h-screen text-[var(--text-primary)]">
       <main className="container mx-auto px-4">
         <h1 className="text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-2">
-          Recruiter Dashboard
+          Dashboard
           <div className="h-1 w-24 bg-[var(--accent)] rounded-full mb-4 mt-2"></div>
         </h1>
 

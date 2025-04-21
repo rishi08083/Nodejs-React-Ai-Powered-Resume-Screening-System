@@ -25,10 +25,10 @@ interface ApiResponse {
 }
 
 function RecruiterRequests() {
-  const [requests, setRequests] = useState([]); // All recruiter requests
+  const [requests, setRequests] = useState<RecruiterRequest[]>([]); // All recruiter requests
   const [filter, setFilter] = useState("pending"); // Current filter: pending, accepted, rejected
   const [isLoading, setIsLoading] = useState(true);
-  const [actionInProgress, setActionInProgress] = useState(null);
+  const [actionInProgress, setActionInProgress] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState(""); // Search term for filtering
   const [rejectionMessage, setRejectionMessage] = useState("");
   const [selectedRecruiter, setSelectedRecruiter] = useState<string | null>(
@@ -61,7 +61,7 @@ function RecruiterRequests() {
     getRequestsByFilter();
   }, [filter]); // re-run whenever the filter changes
 
-  const handleAccept = async (email) => {
+  const handleAccept = async (email: string) => {
     setActionInProgress(email);
     try {
       const response = await acceptRecruiterRequest(email);
@@ -84,7 +84,7 @@ function RecruiterRequests() {
     }
   };
 
-  const handleRejectSubmit = async (email, message) => {
+  const handleRejectSubmit = async (email: string, message: string) => {
     setActionInProgress(email);
     try {
       const response = await rejectRecruiterRequest(email, rejectionMessage);
@@ -106,6 +106,13 @@ function RecruiterRequests() {
     } finally {
       setActionInProgress(null);
     }
+  };
+
+  // Function to close the modal and reset relevant state
+  const closeModal = () => {
+    setmessageModal(false);
+    setRejectionMessage("");
+    setSelectedRecruiter(null);
   };
 
   // Filter requests based on the selected filter and search term
@@ -134,7 +141,7 @@ function RecruiterRequests() {
                     : "bg-[var(--surface)] text-[var(--text-secondary)] hover:bg-[var(--accent)]/20"
                 }`}
               >
-                Requested
+                Requested Recruiters
               </button>
               <button
                 onClick={() => setFilter("accepted")}
@@ -144,7 +151,7 @@ function RecruiterRequests() {
                     : "bg-[var(--surface)] text-[var(--text-secondary)] hover:bg-green-500/20"
                 }`}
               >
-                Accepted
+                Accepted Recruiters
               </button>
               <button
                 onClick={() => setFilter("rejected")}
@@ -154,7 +161,7 @@ function RecruiterRequests() {
                     : "bg-[var(--surface)] text-[var(--text-secondary)] hover:bg-red-500/20"
                 }`}
               >
-                Rejected
+                Rejected Recruiters
               </button>
             </div>
 
@@ -175,7 +182,7 @@ function RecruiterRequests() {
             {isLoading ? (
               <div className="flex justify-center py-12">
                 <div className="animate-pulse flex flex-col items-center">
-                  <div className="w-12 h-12 roun ded-full bg-[var(--accent)]/30"></div>
+                  <div className="w-12 h-12 rounded-full bg-[var(--accent)]/30"></div>
                   <div className="mt-4 text-[var(--accent)]">
                     Loading requests...
                   </div>
@@ -216,7 +223,7 @@ function RecruiterRequests() {
                               disabled={actionInProgress === request.email}
                               className="px-3 py-1 bg-[var(--accent)] text-[var(--dark-bg)] rounded-lg hover:bg-[var(--accent)]/90 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                              Accept
+                              Restore Access
                             </button>
                             <button
                               onClick={() => {
@@ -226,7 +233,7 @@ function RecruiterRequests() {
                               disabled={actionInProgress === request.email}
                               className="px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                              Reject
+                              Suspend Access
                             </button>
                           </div>
                         )}
@@ -240,7 +247,7 @@ function RecruiterRequests() {
                               disabled={actionInProgress === request.email}
                               className="px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                              Reject
+                              Suspend Access
                             </button>
                           </div>
                         )}
@@ -251,7 +258,7 @@ function RecruiterRequests() {
                               disabled={actionInProgress === request.email}
                               className="px-3 py-1 bg-[var(--accent)] text-[var(--dark-bg)] rounded-lg hover:bg-[var(--accent)]/90 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                              Accept
+                              Restore Access
                             </button>
                           </div>
                         )}
@@ -291,10 +298,19 @@ function RecruiterRequests() {
 
           {messageModal && (
             <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
-              <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md text-black">
-                <h2 className="text-lg font-semibold mb-4">
-                  Reason for Rejection
-                </h2>
+              <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md text-black relative">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-lg font-semibold">
+                    Reason for Rejection
+                  </h2>
+                  {/* Close Button with Emoji and closeModal function */}
+                  <button
+                    onClick={closeModal}
+                    className="text-red-500 hover:text-red-700 text-2xl font-bold"
+                  >
+                    ❌
+                  </button>
+                </div>
                 <textarea
                   className="w-full h-24 border rounded-lg p-2 mb-4"
                   placeholder="Enter rejection reason..."
@@ -304,19 +320,16 @@ function RecruiterRequests() {
                 <div className="flex justify-end space-x-2">
                   <button
                     className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-                    onClick={() => {
-                      setmessageModal(false);
-                      setRejectionMessage("");
-                      setSelectedRecruiter(null);
-                    }}
+                    onClick={closeModal}
                   >
                     Cancel
                   </button>
                   <button
-                    className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-                    onClick={() =>
-                      handleRejectSubmit(selectedRecruiter, rejectionMessage)
-                    }
+                    className="px-4 py-2 bg-[#FFB300] text-white rounded hover:bg-[#E69F00]"
+                    onClick={() => {
+                      handleRejectSubmit(selectedRecruiter!, rejectionMessage);
+                      closeModal();
+                    }}
                   >
                     Submit
                   </button>

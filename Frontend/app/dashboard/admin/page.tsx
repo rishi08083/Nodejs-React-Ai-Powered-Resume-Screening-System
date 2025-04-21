@@ -24,7 +24,7 @@ import {
   CheckCircle,
   ChevronDown,
   ChevronUp,
-  UserCheck,
+  CirclePercent,
   X,
 } from "lucide-react";
 
@@ -241,14 +241,14 @@ function AdminDashboard() {
             changeDirection="up"
           />
           <StatCard
-            title="Total Candidates"
+            title="Candidates Endorsed"
             value={analyticsData.num_of_candidates}
             icon={<Users size={24} className="text-[var(--accent)]" />}
             // change={8.3}
             changeDirection="up"
           />
           <StatCard
-            title="Candidates Rejected"
+            title="Candidates not Endorsed"
             value={analyticsData.outcome.num_of_candidates_rejected}
             icon={<X size={24} className="text-red-400" />}
             // change={3.1}
@@ -257,7 +257,7 @@ function AdminDashboard() {
           <StatCard
             title="Average Screening Score"
             value={`${parseFloat(analyticsData.average_screening_score).toFixed(1)}%`}
-            icon={<UserCheck size={24} className="text-[var(--accent)]" />}
+            icon={<CirclePercent size={24} className="text-[var(--accent)]" />}
             // change={2.4}
             changeDirection="up"
           />
