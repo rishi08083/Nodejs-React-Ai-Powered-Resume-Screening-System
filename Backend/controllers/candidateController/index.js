@@ -56,6 +56,7 @@ module.exports.addCandidate = async (req, res) => {
 
 module.exports.listCandidate = async (req, res) => {
   try {
+    
     const { job_id } = req.params;
     const user = req.user;
     if (!job_id) {

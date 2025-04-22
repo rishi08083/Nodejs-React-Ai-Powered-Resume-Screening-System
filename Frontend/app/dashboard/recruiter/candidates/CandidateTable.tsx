@@ -6,26 +6,32 @@ import DeleteModal, {
   AnimationType,
 } from "../../../../components/recruiter/DeleteModal/DeleteModal";
 import { Info } from "lucide-react";
+import { useData } from "../../../../lib/dataContext";
+
 type CandidateTableProps = {
-  currentCandidates: Candidate[];
+  candidates: Candidate[];
   selectedJob: string;
+  setOriginalCandidates: React.Dispatch<React.SetStateAction<Candidate[]>>;
+  onCandidateDeleted?: () => void;
+  onScreeningCompleted?: () => void;
+  isLoading: boolean;
   handleShowFeedback: (candidate: Candidate) => void;
   setCandidates: React.Dispatch<React.SetStateAction<Candidate[]>>;
-  setSuccessMessage: React.Dispatch<React.SetStateAction<string>>;
-  setErrorMessage: React.Dispatch<React.SetStateAction<string>>;
 };
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 const CandidateTable: React.FC<CandidateTableProps> = ({
-  currentCandidates,
-  selectedJob,
+  candidates,
   handleShowFeedback,
   setCandidates,
+  setOriginalCandidates,
+  selectedJob,
+  onCandidateDeleted,
+  onScreeningCompleted,
+  isLoading,
 }) => {
   const [isOpen, setIsOpen] = useState<string | null>(null);
-  const [originalCandidates, setOriginalCandidates] =
-    useState(currentCandidates);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [activeTooltip, setActiveTooltip] = useState<string | null>(null);
   const [viewParsedResume, setViewParsedResume] = useState<string | null>(null);
@@ -34,6 +40,7 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
     y: 0,
     placement: "bottom",
   });
+  const { refreshData } = useData();
 
   // Function to calculate and set tooltip position
   const handleTooltipHover = (e: React.MouseEvent, tooltipId: string) => {
@@ -94,7 +101,7 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
   };
 
   // Function to handle candidate deletion
-  const handleDeleteCandidate = async (candidateId: string) => {
+  const handleDeleteCandidate = async (candidateId) => {
     try {
       const response = await fetch(
         `${BASE_URL}/candidates/delete/${candidateId}`,
@@ -115,9 +122,16 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
           );
           return updatedCandidates;
         });
-        setOriginalCandidates((prevOriginal) =>
-          prevOriginal.filter((candidate) => candidate.id !== candidateId)
-        ); // Update originalCandidates too
+
+        // Notify context about data changes
+        refreshData("candidates");
+        refreshData("analytics");
+
+        // Call parent callback
+        if (onCandidateDeleted) {
+          onCandidateDeleted();
+        }
+
         console.log(`Candidate ${candidateId} deleted successfully`);
       } else {
         const errorData = await response.json();
@@ -133,8 +147,7 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
     setViewParsedResume(viewParsedResume === candidateId ? null : candidateId);
   };
 
-  // Update the handleReScreenCandidate function to include
-  const handleReScreenCandidate = async (candidateId: string) => {
+  const handleReScreenCandidate = async (candidateId) => {
     try {
       // Close the dropdown if open
       setIsOpen(null);
@@ -196,6 +209,15 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
             )
           );
 
+          // Notify data context about changes
+          refreshData("analytics");
+          refreshData("screeningResults");
+
+          // Call parent callback
+          if (onScreeningCompleted) {
+            onScreeningCompleted();
+          }
+
           // Remove the "freshlyScreened" flag after animation
           setTimeout(() => {
             setCandidates((prev) =>
@@ -206,7 +228,7 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
           }, 3000);
         }
       } else {
-        // Error handling - reset loading state
+        // Error handling
         setCandidates((prev) =>
           prev.map((c) =>
             c.id === candidateId
@@ -214,23 +236,10 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
               : c
           )
         );
-
-        // Show error tooltip
         setActiveTooltip(`rescreerror-${candidateId}`);
-
-        // Remove error state after a delay
-        setTimeout(() => {
-          setCandidates((prev) =>
-            prev.map((c) =>
-              c.id === candidateId ? { ...c, screeningError: false } : c
-            )
-          );
-        }, 3000);
       }
     } catch (error) {
-      console.error("Error rescreening candidate:", error);
-
-      // Reset loading state and show error
+      // Error handling
       setCandidates((prev) =>
         prev.map((c) =>
           c.id === candidateId
@@ -238,10 +247,9 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
             : c
         )
       );
-
       setActiveTooltip(`rescreerror-${candidateId}`);
-
-      // Clear error state after delay
+    } finally {
+      // Clear error state after a while
       setTimeout(() => {
         setCandidates((prev) =>
           prev.map((c) =>
@@ -249,13 +257,6 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
           )
         );
       }, 3000);
-    } finally {
-      // Always clear the tooltip after a delay
-      setTimeout(() => {
-        if (activeTooltip?.includes(candidateId)) {
-          setActiveTooltip(null);
-        }
-      }, 2000);
     }
   };
 
@@ -266,7 +267,7 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
       transition={{ duration: 0.6, delay: 0.3 }}
       className="mb-3 bg-[var(--surface)] rounded-xl shadow-lg overflow-hidden border border-[var(--border)]"
     >
-      {currentCandidates.length > 0 ? (
+      {candidates.length > 0 ? (
         <div className="overflow-x-auto h-[600px] flex flex-col">
           {" "}
           {/* Set a fixed height and use flex column */}
@@ -292,7 +293,7 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
               </tr>
             </thead>
             <tbody>
-              {currentCandidates.map((candidate, index) => (
+              {candidates.map((candidate, index) => (
                 <React.Fragment key={candidate.id}>
                   <motion.tr
                     initial={{ opacity: 0, x: -20 }}
@@ -796,7 +797,7 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
               : "View Parsed Resume")}
           {activeTooltip.startsWith("resume-") && "View Resume"}
           {activeTooltip.startsWith("feedback-") &&
-            (currentCandidates.find((c) => `feedback-${c.id}` === activeTooltip)
+            (candidates.find((c) => `feedback-${c.id}` === activeTooltip)
               ?.is_screened
               ? "View Feedback"
               : "Pending Screening")}

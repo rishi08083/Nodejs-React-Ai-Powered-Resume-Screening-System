@@ -13,6 +13,10 @@ import FeedbackModal from "./FeedbackModal";
 import CandidateTable from "./CandidateTable";
 import SearchFilter from "./SearchFilter";
 import { withRole } from "../../../../components/withRole";
+import { toast } from "react-toastify";
+import { useJobs, useCandidates } from "../../../../hooks";
+import { useData } from "../../../../lib/dataContext";
+import { RefreshCw } from "lucide-react";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
@@ -62,111 +66,75 @@ export type Candidate = {
 };
 
 const CandidateList = () => {
-  const [jobs, setJobs] = useState<Job[]>([]);
-  const [selectedJob, setSelectedJob] = useState<string>("");
-
-  const [candidates, setCandidates] = useState<Candidate[]>([]);
-  const [originalCandidates, setOriginalCandidates] = useState<Candidate[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [selectedRecommendation, setSelectedRecommendation] = useState("");
-  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+
   const [selectedFeedback, setSelectedFeedback] = useState<Feedback | null>(
     null
   );
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
   const candidatesPerPage = 10;
 
-  // File upload related states
-  const [errorMessage, setErrorMessage] = useState<string>("");
-  const [successMessage, setSuccessMessage] = useState<string>("");
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [selectedJob, setSelectedJob] = useState("");
+  const [selectedRecommendation, setSelectedRecommendation] = useState("");
+  const { jobs, isLoading: jobsLoading, refreshJobs } = useJobs();
+  const {
+    candidates,
+    originalCandidates,
+    isLoading: candidatesLoading,
+    refreshCandidates,
+    setcandidates,
+  } = useCandidates(selectedJob);
+  const { refreshData } = useData();
 
-  useEffect(() => {
-    const getJobDetails = async () => {
-      try {
-        const response = await fetch(`${BASE_URL}/job/view`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.getItem("token"),
-          },
-        });
+  const handleRefresh = () => {
+    refreshJobs();
+    if (selectedJob) {
+      refreshCandidates();
+    }
+  };
 
-        if (response.ok) {
-          const data = await response.json();
-          
+  // Handle job selection change
+  const handleJobChange = (e) => {
+    // Handle both direct string values and event objects
+    const jobId = typeof e === "object" && e.target ? e.target.value : e;
 
-          setJobs(data.data);
+    if (jobId) {
+      setSelectedJob(jobId);
+      setSelectedRecommendation("");
+      setCurrentPage(1);
+    }
+  };
 
-          {
-            data.data.length > 0 &&
-              selectedJob === "" &&
-              (() => {
-                setSelectedJob(data.data[0].id);
-                return null;
-              })();
-          }
-        } else {
-          const errorData = await response.json();
-          throw new Error(errorData.message);
-        }
-      } catch (error) {
-        console.log(error, "error");
-      }
-    };
-    getJobDetails();
-  }, []);
+  const handleRecommendationChange = (e) => {
+    setSelectedRecommendation(e.target.value);
 
-  useEffect(() => {
-    const getCandidates = async () => {
-      try {
-        if (!selectedJob) {
-          setCandidates([]);
-          return;
-        }
-        const response = await fetch(
-          `${BASE_URL}/candidates/list/${selectedJob}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: "Bearer " + localStorage.getItem("token"),
-            },
-          }
-        );
-        if (response.ok) {
-          const data = await response.json();
-          if (data.data) {
-            setOriginalCandidates(data.data.candidates);
-            setCandidates(() => {
-              if (selectedRecommendation === "") return data.data.candidates;
-              return data.data.candidates.filter(
-                (candidate) =>
-                  candidate.is_recommended ===
-                  selectedRecommendation.toUpperCase()
-              );
-            });
-          } else {
-            setCandidates([]);
-            setOriginalCandidates([]);
-          }
-        } else {
-          const errorData = await response.json();
-          throw new Error(errorData.message);
-        }
-      } catch (error) {
-        console.log(error, "error");
-      }
-    };
+    if (e.target.value === "") {
+      setcandidates(originalCandidates);
+    } else {
+      setcandidates(
+        originalCandidates.filter(
+          (candidate) =>
+            candidate.is_recommended ===
+            (e.target.value === "YES" ? true : false)
+        )
+      );
+    }
+  };
 
-    getCandidates();
+  // When a candidate is deleted, we should refresh the analytics too
+  const handleCandidateDeleted = () => {
+    refreshCandidates();
+    refreshData("analytics");
+  };
 
-    const intervalId = setInterval(() => {
-      getCandidates();
-    }, 6000);
-
-    return () => clearInterval(intervalId);
-  }, [selectedJob, selectedRecommendation]);
+  // When screening is completed, update analytics
+  const handleScreeningCompleted = () => {
+    refreshCandidates();
+    refreshData("analytics");
+    refreshData("screeningResults");
+  };
 
   const fetchCandidateFeedback = async (candidateId: string) => {
     try {
@@ -203,11 +171,32 @@ const CandidateList = () => {
   };
 
   const filteredCandidates = useMemo(() => {
-    return candidates.filter(
-      (candidate) =>
-        candidate.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        candidate.email.toString().includes(searchTerm)
-    );
+    if (!candidates || candidates.length === 0) {
+      return [];
+    }
+
+    return candidates.filter((candidate) => {
+      // Make search case-insensitive
+      const searchTermLower = searchTerm.toLowerCase().trim();
+
+      // If search term is empty, return all candidates
+      if (!searchTermLower) {
+        return true;
+      }
+
+      // Check if name contains search term
+      const nameMatch =
+        candidate.name &&
+        candidate.name.toLowerCase().includes(searchTermLower);
+
+      // Check if email contains search term
+      const emailMatch =
+        candidate.email &&
+        candidate.email.toLowerCase().includes(searchTermLower);
+
+      // Return true if either name or email matches
+      return nameMatch || emailMatch;
+    });
   }, [candidates, searchTerm]);
 
   const indexOfLastCandidate = currentPage * candidatesPerPage;
@@ -249,6 +238,7 @@ const CandidateList = () => {
     setIsFeedbackModalOpen(false);
     setSelectedFeedback(null);
   };
+
   return (
     <div className="w-full p-6 bg-[var(--bg)] mt-14 min-h-screen text-[var(--text-primary)] transition-all duration-300">
       <motion.div
@@ -269,7 +259,7 @@ const CandidateList = () => {
       {/* Search, Filter, and Recommendation Filter */}
       <SearchFilter
         jobs={jobs}
-        setCandidates={setCandidates}
+        setCandidates={setcandidates}
         originalCandidates={originalCandidates}
         selectedJob={selectedJob}
         setSearchTerm={setSearchTerm}
@@ -277,17 +267,19 @@ const CandidateList = () => {
         searchTerm={searchTerm}
         selectedRecommendation={selectedRecommendation}
         setSelectedJob={setSelectedJob}
+        handleJobChange={handleJobChange}
         setSelectedRecommendation={setSelectedRecommendation}
       />
 
-      {/* Candidate Table */}
       <CandidateTable
-        currentCandidates={currentCandidates}
-        selectedJob={selectedJob}
-        setErrorMessage={setErrorMessage}
-        setSuccessMessage={setSuccessMessage}
         handleShowFeedback={handleShowFeedback}
-        setCandidates={setCandidates}
+        candidates={filteredCandidates} 
+        setCandidates={setcandidates}
+        setOriginalCandidates={() => refreshCandidates()}
+        selectedJob={selectedJob}
+        onCandidateDeleted={handleCandidateDeleted}
+        onScreeningCompleted={handleScreeningCompleted}
+        isLoading={candidatesLoading}
       />
 
       {/* Pagination - Only show if we have candidates */}

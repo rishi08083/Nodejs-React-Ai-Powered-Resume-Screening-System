@@ -6,6 +6,8 @@ import { Eye, FileText, CloudUpload, FilePen, Briefcase } from "lucide-react";
 import { withRole } from "../../../../components/withRole";
 import JobModal, { JobDetails } from "../../../../components/shared/JobModal";
 import { toast } from "react-toastify";
+import { useJobs } from "../../../../hooks";
+import { useData } from "../../../../lib/dataContext";
 
 interface Job {
   id: number;
@@ -17,10 +19,16 @@ interface Job {
 }
 
 const ListJobs = () => {
-  const [jobs, setJobs] = useState<Job[]>([]);
+  const { refreshData } = useData();
+  const {
+    jobs,
+    isLoading: jobsLoading,
+    error: jobsError,
+    refreshJobs,
+  } = useJobs();
+
   const [showModal, setShowModal] = useState<boolean>(false);
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [fileName, setFileName] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const [jobError, setJobError] = useState<string | null>(null);
@@ -42,50 +50,54 @@ const ListJobs = () => {
   const [isLoadingJobDetails, setIsLoadingJobDetails] = useState(false);
   const [jobDetailsError, setJobDetailsError] = useState<string | null>(null);
 
- const handleViewJobDetails = async (jobId: number) => {
-  setIsLoadingJobDetails(true);
-  setJobDetailsError(null);
+  const handleRefresh = () => {
+    refreshJobs();
+  };
 
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/job/view/${jobId}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + localStorage.getItem("token"),
-        },
+  const handleViewJobDetails = async (jobId: number) => {
+    setIsLoadingJobDetails(true);
+    setJobDetailsError(null);
+
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/job/view/${jobId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        }
+      );
+
+      // Log the response for debugging
+      console.log("Response status:", response.status);
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Job details:", data);
+        setSelectedJobDetails(data.data);
+        setShowJobDetailsModal(true);
+      } else {
+        // Better error handling
+        let errorData;
+        try {
+          errorData = await response.json();
+        } catch (e) {
+          errorData = { message: "Failed to parse error response" };
+        }
+        console.error("Error fetching job details:", errorData);
+        setJobDetailsError(errorData.message || "Failed to load job details");
       }
-    );
-
-    // Log the response for debugging
-    console.log("Response status:", response.status);
-
-    if (response.ok) {
-      const data = await response.json();
-      console.log("Job details:", data);
-      setSelectedJobDetails(data.data);
-      setShowJobDetailsModal(true);
-    } else {
-      // Better error handling
-      let errorData;
-      try {
-        errorData = await response.json();
-      } catch (e) {
-        errorData = { message: "Failed to parse error response" };
-      }
-      console.error("Error fetching job details:", errorData);
-      setJobDetailsError(errorData.message || "Failed to load job details");
+    } catch (error) {
+      console.error("Network error:", error);
+      setJobDetailsError(
+        "Network error. Please check your connection and try again."
+      );
+    } finally {
+      setIsLoadingJobDetails(false);
     }
-  } catch (error) {
-    console.error("Network error:", error);
-    setJobDetailsError(
-      "Network error. Please check your connection and try again."
-    );
-  } finally {
-    setIsLoadingJobDetails(false);
-  }
-};
+  };
 
   const handleTooltipShow = (
     e: React.MouseEvent<HTMLButtonElement>,
@@ -114,12 +126,12 @@ const ListJobs = () => {
       toast.error("Please select a file to upload");
       return;
     }
-  
+
     const file = inputRef.current.files[0];
     const formData = new FormData();
     formData.append("rcd", file);
     formData.append("jobId", selectedJob?.id.toString() || "");
-  
+
     try {
       setUploadStatus("uploading");
       setUploadProgress(0);
@@ -144,30 +156,12 @@ const ListJobs = () => {
           const data = JSON.parse(xhr.responseText);
           setFileName("");
           // Update the jobs state with both the URL and the is_rcd_uploaded flag
-          setJobs((prevJobs) =>
-            prevJobs.map((job) =>
-              job.id === selectedJob?.id
-                ? { 
-                    ...job, 
-                    rcd_url: data.data.documents[0],
-                    is_rcd_uploaded: true
-                  }
-                : job
-            )
-          );
-          
-          // Also update selectedJob to ensure UI consistency
-          if (selectedJob) {
-            setSelectedJob({
-              ...selectedJob,
-              rcd_url: data.data.documents[0],
-              is_rcd_uploaded: true
-            });
-          }
-          
+          refreshData("jobs");
+          refreshData("rcd");
+
           // Show success toast
           toast.success("Document uploaded successfully!");
-          
+
           // Close modal after a short delay
           setTimeout(() => {
             setShowModal(false);
@@ -175,34 +169,34 @@ const ListJobs = () => {
             setUploadProgress(0);
           }, 1000);
         } else {
-          let errorMessage = "Upload failed";
           try {
             const errorData = JSON.parse(xhr.responseText);
-            errorMessage = errorData.message || errorMessage;
+            setError(errorData.message || "Upload failed");
           } catch (e) {
-            // If parsing fails, use default message
+            setError("Upload failed");
           }
-          toast.error(`${errorMessage}`);
           setUploadStatus("error");
         }
       };
-  
+
       xhr.onerror = () => {
         toast.error("Network error. Please try again.");
         setUploadStatus("error");
       };
-  
+
       xhr.send(formData);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "An unexpected error occurred");
+      toast.error(
+        error instanceof Error ? error.message : "An unexpected error occurred"
+      );
       setUploadStatus("error");
     }
   };
 
-  const getJobDetails = async () => {
+  const handleRcdRedirect = async (id) => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/job/view`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/rcd/get-rcd/${id}`,
         {
           method: "GET",
           headers: {
@@ -214,47 +208,22 @@ const ListJobs = () => {
 
       if (response.ok) {
         const data = await response.json();
-        setJobs(data.data);
-        setIsLoading(false);
+        console.log("RCD data:", data);
+        if (data.data && data.data.documents.length > 0) {
+          window.open(data.data.documents[0], "_blank");
+        } else {
+          toast.error("RCD document not found");
+        }
       } else {
         const errorData = await response.json();
-        throw new Error(errorData.message);
+        throw new Error(errorData.message || "Failed to fetch RCD document");
       }
     } catch (error) {
-      setJobError(
-        error instanceof Error ? error.message : "Failed to fetch jobs"
+      toast.error(
+        error instanceof Error ? error.message : "An unexpected error occurred"
       );
-      setIsLoading(false);
     }
   };
-
-  const handlercdRedirect = async (id) => {
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/rcd/get-rcd/${id}`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: "Bearer " + localStorage.getItem("token"),
-          },
-        }
-      );
-      if (response.ok) {
-        const data = await response.json();
-        window.open(data.data.documents);
-      } else {
-        const errorData = await response.json();
-        throw new Error(errorData.message);
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  useEffect(() => {
-    getJobDetails();
-  }, []);
-
   return (
     <>
       <div className="w-full p-6 bg-[var(--bg)] mt-14 min-h-screen text-[var(--text-primary)] transition-all duration-300">
@@ -268,7 +237,7 @@ const ListJobs = () => {
           </p>
         </div>
 
-        {isLoading ? (
+        {jobsLoading ? (
           <div className="flex justify-center items-center h-64">
             <div className="w-12 h-12 rounded-full border-4 border-[var(--accent)] border-t-transparent animate-spin"></div>
           </div>
@@ -315,25 +284,39 @@ const ListJobs = () => {
                       transition={{ delay: index * 0.1 }}
                       className="border-b border-[var(--border)] hover:bg-[var(--dark-bg)] transition-colors duration-200"
                     >
-                        <td className="px-4 py-4 text-sm font-medium text-[var(--text-primary)]">
+                      <td className="px-4 py-4 text-sm font-medium text-[var(--text-primary)]">
                         <div className="flex items-center">
-                          <span className="cursor-pointer hover:text-[var(--accent)]" onClick={() => handleViewJobDetails(job.id)}>
-                          {job.title}
-                          </span>
-                          <button 
-                          className="ml-2 text-[var(--text-secondary)] hover:text-[var(--accent)]"
-                          onMouseEnter={(e) => handleTooltipShow(e, "View Job Description")}
-                          onMouseLeave={handleTooltipHide}
-                          onClick={() => handleViewJobDetails(job.id)}
+                          <span
+                            className="cursor-pointer hover:text-[var(--accent)]"
+                            onClick={() => handleViewJobDetails(job.id)}
                           >
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <line x1="12" y1="16" x2="12" y2="12"></line>
-                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                          </svg>
+                            {job.title}
+                          </span>
+                          <button
+                            className="ml-2 text-[var(--text-secondary)] hover:text-[var(--accent)]"
+                            onMouseEnter={(e) =>
+                              handleTooltipShow(e, "View Job Description")
+                            }
+                            onMouseLeave={handleTooltipHide}
+                            onClick={() => handleViewJobDetails(job.id)}
+                          >
+                            <svg
+                              width="16"
+                              height="16"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <circle cx="12" cy="12" r="10"></circle>
+                              <line x1="12" y1="16" x2="12" y2="12"></line>
+                              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                            </svg>
                           </button>
                         </div>
-                        </td>
+                      </td>
                       <td className="px-4 py-4 text-sm text-[var(--text-secondary)]">
                         {job.experience_required}
                       </td>
@@ -372,12 +355,11 @@ const ListJobs = () => {
                               handleTooltipShow(e, "View Role Clarity Document")
                             }
                             onMouseLeave={handleTooltipHide}
-                            onClick={() => handlercdRedirect(job.id)}
+                            onClick={() => handleRcdRedirect(job.id)}
                           >
                             <Eye className="h-4 w-4" />
                           </motion.button>
                         )}
-                        
                       </td>
                     </motion.tr>
                   ))}
@@ -386,14 +368,15 @@ const ListJobs = () => {
             </div>
           </motion.div>
         )}
-        <JobModal
-          job={selectedJobDetails}
-          isOpen={showJobDetailsModal}
-          onClose={() => setShowJobDetailsModal(false)}
-          isLoading={isLoadingJobDetails}
-          error={jobDetailsError}
-        />
-        {/* Modal */}
+        {/* Job Details Modal */}
+        {showJobDetailsModal && selectedJobDetails && (
+          <JobModal
+            job={selectedJobDetails}
+            onClose={() => setShowJobDetailsModal(false)}
+          />
+        )}
+
+        {/* RCD Upload Modal */}
         <AnimatePresence>
           {showModal && selectedJob && (
             <motion.div
