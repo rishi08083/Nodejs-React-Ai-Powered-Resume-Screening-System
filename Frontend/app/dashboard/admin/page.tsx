@@ -38,10 +38,9 @@ const colorPalette = {
   danger: "#f87171",
   info: "#60a5fa",
   neutral: {
-    light: ["#f1f5f9", "#e2e8f0", "#cbd5e1", "#94a3b8", "#64748b"],
-    dark: ["#475569", "#334155", "#1e293b", "#0f172a", "#020617"],
+    light: ["#7886C7", "#67AE6E", "#f87171", "#1e40af", "#1e40af"],
+    dark: ["#7886C7", "#67AE6E", "#f87171", "#1e40af", "#FFA725"],
   },
-  neutral1: ["#94a3b8", "#64748b", "#475569", "#334155", "#1e293b"],
   accent1: "#0ea5e9",
   accent2: "#14b8a6",
   accent3: "#3b82f6",
