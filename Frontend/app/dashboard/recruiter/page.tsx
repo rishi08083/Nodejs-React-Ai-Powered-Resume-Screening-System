@@ -106,8 +106,9 @@ const StatCard = ({
           </h2>
           {change !== undefined && (
             <span
-              className={`ml-2 text-sm ${changeDirection === "up" ? "text-green-400" : "text-red-400"
-                } flex items-center`}
+              className={`ml-2 text-sm ${
+                changeDirection === "up" ? "text-green-400" : "text-red-400"
+              } flex items-center`}
             >
               {changeDirection === "up" ? (
                 <ChevronUp size={16} />
@@ -186,48 +187,77 @@ function RecruiterDashboard() {
     );
   }
 
+  // Add your new validation check right here, before data processing starts
+  if (
+    !analyticsData.day_wise_parse_count ||
+    !analyticsData.candidate_count_by_job ||
+    !analyticsData.top_skills
+  ) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="flex flex-col items-center justify-center p-8 text-center">
+          <div className="mb-4">
+            <FileText size={48} className="text-[var(--text-secondary)]" />
+          </div>
+          <h3 className="text-xl font-semibold text-[var(--text-primary)] mb-2">
+            Dashboard Data Unavailable
+          </h3>
+          <p className="text-[var(--text-secondary)] mb-4">
+            Please upload candidate resumes to view analytics and insights.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   // Format data for charts
   const screeningOutcomeData = [
     {
       name: "Endorsed",
-      value: parseInt(analyticsData.outcome.num_of_candidates_selected),
+      value:
+        parseInt(analyticsData.outcome?.num_of_candidates_selected || "0") || 0,
       color: colorPalette.success,
     },
     {
       name: "Not Endorsed",
-      value: parseInt(analyticsData.outcome.num_of_candidates_rejected),
+      value:
+        parseInt(analyticsData.outcome?.num_of_candidates_rejected || "0") || 0,
       color: colorPalette.danger,
     },
   ];
 
-  const resumesParsedData = analyticsData.day_wise_parse_count.map((item) => ({
-    date: new Date(item.date).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-    }),
-    count: parseInt(item.count),
-  }));
+  const resumesParsedData = analyticsData.day_wise_parse_count
+    ? analyticsData.day_wise_parse_count.map((item) => ({
+        date: new Date(item.date).toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+        }),
+        count: parseInt(item.count),
+      }))
+    : [];
 
-  const jobDistributionData = analyticsData.candidate_count_by_job.map(
-    (job, index) => {
-      // Use theme value from context instead of accessing DOM
-      const isDarkTheme = theme === "dark";
-      const colorArray = isDarkTheme
-        ? colorPalette.neutral.light
-        : colorPalette.neutral1;
+  const jobDistributionData = analyticsData.candidate_count_by_job
+    ? analyticsData.candidate_count_by_job.map((job, index) => {
+        const isDarkTheme = theme === "dark";
+        const colorArray = isDarkTheme
+          ? colorPalette.neutral.light
+          : colorPalette.neutral1;
 
-      return {
-        name: job.job_title,
-        value: parseInt(job.candidate_count),
-        color: colorArray[index % colorArray.length],
-      };
-    }
-  );
+        return {
+          name: job.job_title,
+          value: parseInt(job.candidate_count),
+          color: colorArray[index % colorArray.length],
+        };
+      })
+    : [];
 
-  const topSkillsData = analyticsData.top_skills.map((skill) => ({
-    name: skill.skill_name,
-    count: parseInt(skill.candidate_count),
-  }));
+  // For topSkillsData
+  const topSkillsData = analyticsData.top_skills
+    ? analyticsData.top_skills.map((skill) => ({
+        name: skill.skill_name,
+        count: parseInt(skill.candidate_count),
+      }))
+    : [];
 
   const scoreDistributionData = [
     { range: "0-20", count: Math.floor(Math.random() * 20) + 5 },
@@ -262,21 +292,23 @@ function RecruiterDashboard() {
           />
           <StatCard
             title="Candidate Endorsed"
-            value={analyticsData.num_recommended_candidates}
+            value={analyticsData.num_recommended_candidates || 0}
             icon={<UserCheck size={24} className="text-green-400" />}
             // change={8.3}
             changeDirection="up"
           />
+
           <StatCard
             title="Candidate Not Endorsed"
-            value={analyticsData.outcome.num_of_candidates_rejected}
+            value={analyticsData.outcome?.num_of_candidates_rejected || "0"}
             icon={<UserX size={24} className="text-red-400" />}
             // change={3.1}
             changeDirection="down"
           />
+
           <StatCard
             title="Average Screening Score"
-            value={`${parseFloat(analyticsData.average_screening_score).toFixed(1)}%`}
+            value={`${parseFloat(analyticsData.average_screening_score || "0").toFixed(1)}%`}
             icon={
               <ChartNoAxesCombined size={24} className="text-[var(--accent)]" />
             }
@@ -477,7 +509,9 @@ function RecruiterDashboard() {
                     cy="50%"
                     outerRadius={90}
                     dataKey="value"
-                    label={({ name, percent }) => `${(percent * 100).toFixed(0)}%`}
+                    label={({ name, percent }) =>
+                      `${(percent * 100).toFixed(0)}%`
+                    }
                   >
                     {jobDistributionData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
@@ -488,7 +522,8 @@ function RecruiterDashboard() {
                       if (active && payload && payload.length) {
                         const data = payload[0].payload;
                         return (
-                          <div className="custom-tooltip"
+                          <div
+                            className="custom-tooltip"
                             style={{
                               backgroundColor: "var(--surface)",
                               border: `2px solid ${data.color}`,
@@ -497,25 +532,39 @@ function RecruiterDashboard() {
                               boxShadow: "0 6px 16px rgba(0,0,0,0.16)",
                             }}
                           >
-                            <p style={{
-                              color: data.color,
-                              fontWeight: "bold",
-                              marginBottom: "5px",
-                            }}>
+                            <p
+                              style={{
+                                color: data.color,
+                                fontWeight: "bold",
+                                marginBottom: "5px",
+                              }}
+                            >
                               {data.name}
                             </p>
-                            <p style={{
-                              color: "var(--text-primary)",
-                              fontSize: "16px",
-                            }}>
+                            <p
+                              style={{
+                                color: "var(--text-primary)",
+                                fontSize: "16px",
+                              }}
+                            >
                               {data.value}
                             </p>
-                            <p style={{
-                              color: "var(--text-secondary)",
-                              fontSize: "12px",
-                              marginTop: "5px",
-                            }}>
-                              {((data.value / jobDistributionData.reduce((sum, item) => sum + item.value, 0)) * 100).toFixed(1)}%
+                            <p
+                              style={{
+                                color: "var(--text-secondary)",
+                                fontSize: "12px",
+                                marginTop: "5px",
+                              }}
+                            >
+                              {(
+                                (data.value /
+                                  jobDistributionData.reduce(
+                                    (sum, item) => sum + item.value,
+                                    0
+                                  )) *
+                                100
+                              ).toFixed(1)}
+                              %
                             </p>
                           </div>
                         );
