@@ -11,7 +11,6 @@ interface UploadModalProps {
   jobs?: any[];
   closeModal: () => void;
   setIsUploadModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  setIsSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>; // Ensure this is defined
   onUploadSuccess?: () => void;
 }
 
@@ -25,7 +24,6 @@ const UploadModal: React.FC<UploadModalProps> = ({
   closeModal,
   setIsUploadModalOpen,
   onUploadSuccess,
-  setIsSidebarOpen,
 }) => {
   
 
