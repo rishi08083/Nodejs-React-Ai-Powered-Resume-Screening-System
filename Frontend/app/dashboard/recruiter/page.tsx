@@ -235,21 +235,21 @@ function RecruiterDashboard() {
     : [];
 
 
-  const jobDistributionData = analyticsData.candidate_count_by_job.map(
-    (job, index) => {
-      // Use theme value from context instead of accessing DOM
-      const isDarkTheme = theme === "dark";
-      const colorArray = isDarkTheme
-        ? colorPalette.neutral.light
-        : colorPalette.neutral.dark;
+  const jobDistributionData = analyticsData.candidate_count_by_job
+    ? analyticsData.candidate_count_by_job.map(
+        (job: any, index: number) => {
+          // Use theme value from context instead of accessing DOM
+          const isDarkTheme = theme === "dark";
+          const colorArray = isDarkTheme
+            ? colorPalette.neutral.light
+            : colorPalette.neutral.dark;
 
-
-        return {
-          name: job.job_title,
-          value: parseInt(job.candidate_count),
-          color: colorArray[index % colorArray.length],
-        };
-      })
+          return {
+            name: job.job_title,
+            value: parseInt(job.candidate_count),
+            color: colorArray[index % colorArray.length],
+          };
+        })
     : [];
 
   // For topSkillsData
