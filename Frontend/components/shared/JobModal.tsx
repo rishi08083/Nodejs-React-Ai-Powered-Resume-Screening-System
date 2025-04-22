@@ -44,7 +44,6 @@ export interface JobDetails {
 
 type JobModalProps = {
   job: JobDetails | null;
-  isOpen: boolean;
   onClose: () => void;
   isLoading?: boolean;
   error?: string | null;
@@ -52,14 +51,11 @@ type JobModalProps = {
 
 const JobModal: React.FC<JobModalProps> = ({
   job,
-  isOpen,
   onClose,
   isLoading = false,
   error = null,
 }) => {
   const [activeTab, setActiveTab] = useState<'description' | 'responsibilities' | 'qualifications'>('description');
-  
-  if (!isOpen) return null;
 
   // Loading state
   if (isLoading) {

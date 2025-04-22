@@ -11,6 +11,7 @@ type SearchFilterProps = {
   setSearchTerm: (term: string) => void;
   searchTerm: string;
   selectedRecommendation: string;
+  handleJobChange: (jobIdOrEvent: any) => void; // Updated to accept either
   setSelectedJob: (jobId: string) => void;
   setSelectedRecommendation: (recommendation: string) => void;
 };
@@ -24,6 +25,7 @@ const SearchFilter = ({
   searchTerm,
   selectedRecommendation,
   setSelectedJob,
+  handleJobChange,
   setSelectedRecommendation,
 }: SearchFilterProps) => {
   return (
@@ -39,7 +41,11 @@ const SearchFilter = ({
           type="text"
           placeholder="Search by Name or Email"
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(e) => {
+            const value = e.target.value;
+            setSearchTerm(value);
+            // Don't set candidates directly here, let the filteredCandidates memo handle it
+          }}
           className="w-full h-full p-3 pl-10 border rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)] bg-[var(--surface)] border-[var(--border)] text-[var(--text-primary)] transition-all duration-300"
         />
         <svg
@@ -64,16 +70,31 @@ const SearchFilter = ({
           className="w-full h-full p-3 pl-4 border rounded-lg shadow-md appearance-none focus:outline-none focus:ring-2 focus:ring-[var(--accent)] bg-[var(--surface)] border-[var(--border)] text-[var(--text-primary)] transition-all duration-300"
           value={selectedJob}
           onChange={(e) => {
-            setSelectedJob(e.target.value);
-            setCandidates(originalCandidates); // Reset candidates when job changes
+            handleJobChange(e);
+            setCandidates(originalCandidates);
           }}
         >
-          {jobs.map((job, index) => (
-            <option key={job.id} value={job.id}>
-              {job.title}
+          {jobs && jobs.length > 0 ? (
+            jobs.map((job) => (
+              <option key={job.id} value={job.id}>
+                {job.title}
+              </option>
+            ))
+          ) : (
+            <option value="" disabled>
+              No jobs available
             </option>
-          ))}
+          )}
         </select>
+        {(() => {
+          if (!selectedJob && jobs && jobs.length > 0) {
+            setTimeout(() => {
+              setSelectedJob(jobs[0].id);
+              handleJobChange(jobs[0].id);
+            }, 0);
+          }
+          return null;
+        })()}
 
         <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[var(--text-secondary)] bg-[var(--accent)] rounded-r-lg">
           <svg
@@ -109,11 +130,20 @@ const SearchFilter = ({
             if (value === "") {
               setCandidates(originalCandidates);
             } else {
-              const filtered = originalCandidates.filter(
-                (candidate) =>
-                  candidate.feedback?.feedback_text?.recommendation ===
-                  value.toUpperCase()
-              );
+              const filtered = originalCandidates.filter((candidate) => {
+                if (value === "YES") {
+                  return (
+                    candidate.is_recommended === "YES" ||
+                    candidate.is_recommended === true
+                  );
+                } else if (value === "NO") {
+                  return (
+                    candidate.is_recommended === "NO" ||
+                    candidate.is_recommended === false
+                  );
+                }
+                return false;
+              });
               setCandidates(filtered);
             }
           }}

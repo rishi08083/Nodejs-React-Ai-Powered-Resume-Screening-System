@@ -19,19 +19,18 @@ import {
 } from "recharts";
 import {
   Users,
-  Briefcase,
   FileText,
-  CheckCircle,
   ChevronDown,
   ChevronUp,
-  CirclePercent,
-  X,
   ChartNoAxesCombined,
   UserX,
   UserCheck,
+  RefreshCw,
 } from "lucide-react";
+
 import { withRole } from "../../../components/withRole";
 import { useTheme } from "../../../lib/themeContext";
+import { useAnalytics } from "../../../hooks";
 
 const colorPalette = {
   primary: ["#ffb300", "#ffc233", "#ffd166", "#ffdf99", "#ffedcc"],
@@ -40,10 +39,9 @@ const colorPalette = {
   danger: "#f87171",
   info: "#60a5fa",
   neutral: {
-    light: ["#f1f5f9", "#e2e8f0", "#cbd5e1", "#94a3b8", "#64748b"],
-    dark: ["#475569", "#334155", "#1e293b", "#0f172a", "#020617"],
+    light: ["#7886C7", "#67AE6E", "#f87171", "#1e40af", "#1e40af"],
+    dark: ["#7886C7", "#67AE6E", "#f87171", "#1e40af","#FFA725"],
   },
-  neutral1: ["#94a3b8", "#64748b", "#475569", "#334155", "#1e293b"],
   accent1: "#0ea5e9",
   accent2: "#14b8a6",
   accent3: "#3b82f6",
@@ -128,42 +126,42 @@ const StatCard = ({
 function RecruiterDashboard() {
   const { theme } = useTheme();
 
-  const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(
-    null
-  );
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { analyticsData, isLoading, error, refreshAnalytics } = useAnalytics();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/analytics/recruiter-analytics`,
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        );
-        if (!res.ok) {
-          throw new Error("Failed to fetch analytics data");
-        }
-        const data = await res.json();
-        setAnalyticsData(data.data);
-      } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "An unknown error occurred"
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
+  const handleRefresh = () => {
+    refreshAnalytics();
+  };
 
-    fetchData();
-  }, []);
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const res = await fetch(
+  //         `${process.env.NEXT_PUBLIC_API_URL}/api/analytics/recruiter-analytics`,
+  //         {
+  //           method: "GET",
+  //           headers: {
+  //             Authorization: `Bearer ${localStorage.getItem("token")}`,
+  //           },
+  //         }
+  //       );
+  //       if (!res.ok) {
+  //         throw new Error("Failed to fetch analytics data");
+  //       }
+  //       const data = await res.json();
+  //       setAnalyticsData(data.data);
+  //     } catch (err) {
+  //       setError(
+  //         err instanceof Error ? err.message : "An unknown error occurred"
+  //       );
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
 
-  if (loading) {
+  //   fetchData();
+  // }, []);
+
+  if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[var(--accent)]"></div>
@@ -236,19 +234,22 @@ function RecruiterDashboard() {
       }))
     : [];
 
-  const jobDistributionData = analyticsData.candidate_count_by_job
-    ? analyticsData.candidate_count_by_job.map((job, index) => {
-        const isDarkTheme = theme === "dark";
-        const colorArray = isDarkTheme
-          ? colorPalette.neutral.light
-          : colorPalette.neutral1;
 
-        return {
-          name: job.job_title,
-          value: parseInt(job.candidate_count),
-          color: colorArray[index % colorArray.length],
-        };
-      })
+  const jobDistributionData = analyticsData.candidate_count_by_job
+    ? analyticsData.candidate_count_by_job.map(
+        (job: any, index: number) => {
+          // Use theme value from context instead of accessing DOM
+          const isDarkTheme = theme === "dark";
+          const colorArray = isDarkTheme
+            ? colorPalette.neutral.light
+            : colorPalette.neutral.dark;
+
+          return {
+            name: job.job_title,
+            value: parseInt(job.candidate_count),
+            color: colorArray[index % colorArray.length],
+          };
+        })
     : [];
 
   // For topSkillsData
@@ -276,7 +277,6 @@ function RecruiterDashboard() {
           Dashboard
           <div className="h-1 w-24 bg-[var(--accent)] rounded-full mb-4 mt-2"></div>
         </h1>
-
         {/* KPI Stats Row */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <StatCard

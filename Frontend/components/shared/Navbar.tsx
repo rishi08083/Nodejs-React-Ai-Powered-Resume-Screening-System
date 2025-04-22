@@ -3,7 +3,7 @@
 import { Menu, UserRound, LogOut, Settings, Upload } from "lucide-react";
 import ThemeToggle from "../theme/ThemeToggle";
 import { FileUp } from "lucide-react";
-import { useEffect, useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 import { useAuth } from "../../lib/auth";
 import LogOutModal from "./LogOut";
 import { useRouter } from "next/navigation";
@@ -64,8 +64,8 @@ export default function Navbar({
             {isUploadModalOpen && (
               <UploadModal
                 closeModal={() => setIsUploadModalOpen(false)}
-                setIsUploadModalOpen={setIsUploadModalOpen}
-              />
+                setIsUploadModalOpen={setIsUploadModalOpen} 
+                 />
             )}
           </>
         )}
