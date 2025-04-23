@@ -8,6 +8,10 @@ const path = require("path");
 const crypto = require("crypto");
 const db = require("../../models");
 const { parseResumes } = require("./parseResume");
+const { generateFileName } = require("../../utils/fileNameGenerator");
+const {
+  screenCandidate,
+} = require("../../utils/screenUtils");
 require("dotenv").config();
 
 // AWS S3 Configuration
@@ -18,11 +22,6 @@ const s3 = new S3Client({
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
   },
 });
-
-const generateFileName = (originalName) => {
-  const ext = path.extname(originalName);
-  return `${crypto.randomBytes(10).toString("hex")}${ext}`;
-};
 
 // Upload Multiple Resumes API
 exports.uploadResumes = async (req, res) => {
@@ -78,6 +77,15 @@ exports.uploadResumes = async (req, res) => {
       user_id,
       req.files
     );
+
+    // screen candidates based on parsing results
+    const parsedCandidates = successfulUploads.map((candidate) => ({
+      candidate_id: candidate.candidateId,
+    }));
+
+    for (const candidate of parsedCandidates) {
+      await screenCandidate(candidate.candidate_id);
+    }
 
     if (parsingErrors.length > 0 && successfulUploads.length === 0) {
       // Complete failure - all files failed to parse

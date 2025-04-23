@@ -305,7 +305,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
               />
             </div>
 
-            {jdMatchSkills.length > 0 ? (
+            {jdMatchSkills.length > 0 && jdMatchSkills !== "none" ? (
               <div className="mb-3">
                 <p className="text-sm font-medium text-green-400 mb-2">
                   Matching Skills:
@@ -371,7 +371,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
               />
             </div>
 
-            {rcdMatchSkills.length > 0 ? (
+            {rcdMatchSkills.length > 0 && rcdMatchSkills !== "none" ? (
               <div className="mb-3">
                 <p className="text-sm font-medium text-green-400 mb-2">
                   Matching Skills:

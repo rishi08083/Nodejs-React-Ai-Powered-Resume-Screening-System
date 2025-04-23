@@ -7,7 +7,7 @@ const securityMiddleware = require("./middlewares/securityMiddleware");
 securityMiddleware(app);
 app.use(express.json());
 app.use(morgan("dev"));
-require('./cron-job/screenCandidate.js'); 
+// require('./cron-job/screenCandidate.js');
 // require('./cron-job/dailyMailScheduler.js')
 // require('./cron-job/emailCrawler.js');
 
