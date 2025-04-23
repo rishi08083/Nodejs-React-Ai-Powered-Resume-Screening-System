@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { toast } from "react-toastify";
 import ParseCandidate from "../../../../components/ParseCandidate";
 import { AnimatePresence } from "framer-motion";
-import { Dock, MousePointerClick, Search, X } from "lucide-react";
+import { Dock, MousePointerClick, Search, UploadIcon, X } from "lucide-react";
 import { useData } from "../../../../lib/dataContext";
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
@@ -25,8 +25,6 @@ const UploadModal: React.FC<UploadModalProps> = ({
   setIsUploadModalOpen,
   onUploadSuccess,
 }) => {
-  
-
   const { refreshData, setLoading } = useData();
   const fileTypes = ["pdf", "docx", "jpg", "jpeg"];
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -143,7 +141,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
 
   const handleRemoveFile = (index: number) => {
     setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
-    toast.success("File removed successfully");
+    // toast.success("File removed successfully");
   };
 
   const handleOpenFile = (file: UploadedFile) => {
@@ -186,7 +184,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
       progress += 10;
       if (progress >= 90) clearInterval(interval);
       setUploadProgress(progress);
-    }, 500);
+    }, 1000);
 
     const formData = new FormData();
     files.forEach((file) => formData.append("resume-files", file));
@@ -403,9 +401,8 @@ const UploadModal: React.FC<UploadModalProps> = ({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-opacity-70 flex items-center justify-center z-50 backdrop-blur-sm overflow-y-auto"
+      className="fixed inset-0 bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm overflow-y-auto p-4"
       onClick={closeModal}
-      style={{ maxHeight: "100vh" }}
     >
       <motion.div
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
@@ -614,10 +611,6 @@ const UploadModal: React.FC<UploadModalProps> = ({
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
               className="fixed inset-0 z-[1000] flex items-center justify-center bg-opacity-70 backdrop-blur-sm overflow-y-auto"
-              style={{
-                left: "var(--sidebar-width, 250px)", // Match the sidebar width
-                marginLeft: "0",
-              }}
             >
               <div className="bg-[var(--surface)] rounded-lg shadow-lg p-6 w-full max-w-3xl h-[90vh] relative my-4 mx-auto overflow-y-auto">
                 <button
@@ -671,18 +664,17 @@ const UploadModal: React.FC<UploadModalProps> = ({
               onClick={handleUploadResume}
               disabled={isLoading}
             >
-              <span className="mr-2">📤</span>
-              {files.length === 1 ? "Upload File" : "Upload Files"}
+              <span className="mr-2">
+                <UploadIcon />
+              </span>
+              {files.length === 1 ? "Upload Resume" : "Upload Resumes"}
             </button>
 
             {/* Full-screen Loading Overlay */}
             {isLoading && (
               <div
                 className="fixed inset-0 bg-opacity-90 flex items-center justify-center z-[999]"
-                style={{
-                  left: "var(--sidebar-width, 250px)", // Respect the sidebar width
-                  marginLeft: "0",
-                }}
+                onClick={(e) => e.stopPropagation()}
               >
                 <div className="bg-[var(--surface)] p-8 rounded-xl shadow-2xl max-w-md w-full transform transition-all duration-300 scale-105 border border-[var(--border)]">
                   <div className="flex flex-col items-center">

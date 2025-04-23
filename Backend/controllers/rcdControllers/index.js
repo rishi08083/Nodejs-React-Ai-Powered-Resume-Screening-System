@@ -7,6 +7,7 @@ const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 const path = require("path");
 const crypto = require("crypto");
 const db = require("../../models/index.js");
+const { generateFileName } = require("../../utils/fileNameGenerator");
 
 require("dotenv").config();
 
@@ -19,10 +20,7 @@ const s3 = new S3Client({
   },
 });
 
-const generateFileName = (originalName) => {
-  const ext = path.extname(originalName);
-  return `${crypto.randomBytes(10).toString("hex")}${ext}`;
-};
+
 
 // Upload Role Clarity Documents API
 exports.uploadRCD = async (req, res) => {
