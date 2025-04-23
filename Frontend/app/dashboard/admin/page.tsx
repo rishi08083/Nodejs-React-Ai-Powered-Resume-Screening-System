@@ -294,75 +294,127 @@ function AdminDashboard() {
           </h1>
         </div>
 
-        {/* Additional section for more information */}
-        <div className="bg-[var(--surface)] p-4 rounded-xl shadow-md border border-[var(--border)] transition-all hover:shadow-lg mb-6">
-          <h2 className={chartTitle}>System Overview</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex flex-col items-center p-3 bg-[var(--surface-lighter)] rounded-lg">
-              <div className="mb-1 p-2 bg-[var(--blue-highlight)] rounded-full">
-                <UserCheck size={20} className="text-green-400" />
-              </div>
-              <h3 className="text-base font-medium text-[var(--text-primary)]">
-                Selected
-              </h3>
-              <p className="text-xl font-bold text-[var(--text-primary)]">
-                {analyticsData.outcome.num_of_candidates_selected || "0"}
-              </p>
-            </div>
-
-            <div className="flex flex-col items-center p-3 bg-[var(--surface-lighter)] rounded-lg">
-              <div className="mb-1 p-2 bg-[var(--blue-highlight)] rounded-full">
-                <UserX size={20} className="text-red-400" />
-              </div>
-              <h3 className="text-base font-medium text-[var(--text-primary)]">
-                Rejected
-              </h3>
-              <p className="text-xl font-bold text-[var(--text-primary)]">
-                {analyticsData.outcome.num_of_candidates_rejected || "0"}
-              </p>
-            </div>
+        {/* System Overview Stats */}
+        <div className="bg-[var(--surface)] p-6 rounded-xl shadow-md border border-[var(--border)] transition-all hover:shadow-lg mb-8">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className={chartTitle}>System Overview</h2>
           </div>
 
-          <div className="mt-4 p-3 bg-[var(--surface-lighter)] rounded-lg">
-            <h3 className="text-base font-medium text-[var(--text-primary)] mb-2">
-              Performance Summary
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-              <div>
-                <p className="text-sm text-[var(--text-secondary)]">
-                  <span className="font-medium">
-                    Total Jobs with Candidates:
-                  </span>{" "}
-                  {jobDistributionData.length}
-                </p>
-                <p className="text-sm text-[var(--text-secondary)]">
-                  <span className="font-medium">Most Common Skill:</span>{" "}
-                  {topSkillsData[0]?.name || "N/A"}
-                </p>
+            {/* Key Performance Metrics */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="relative group">
+              <StatCard
+              title="Processing Rate"
+              value={`${((analyticsData.num_of_resumes / 
+            (analyticsData.num_of_candidates || 1)) * 100).toFixed(1)}%`}
+              icon={<RefreshCw size={24} className="text-emerald-500" />}
+              changeDirection="up"
+              />
+              <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 absolute z-10 bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 text-sm bg-[var(--surface)] text-[var(--text-primary)] rounded-lg shadow-lg border border-[var(--border)] w-64">
+              <p className="font-semibold mb-1">How it's calculated:</p>
+              <p className="text-[var(--text-secondary)]">
+                (Total Processed Resumes / Total Candidates) × 100
+              </p>
+              <p className="mt-1 text-xs text-[var(--text-secondary)]">
+                Indicates the system's efficiency in processing submitted resumes
+              </p>
               </div>
-              <div>
-                <p className="text-sm text-[var(--text-secondary)]">
-                  <span className="font-medium">Average Match Score:</span>{" "}
-                  {parseFloat(
-                    analyticsData.average_screening_score || "0"
-                  ).toFixed(1)}
-                  %
-                </p>
-                <p className="text-sm text-[var(--text-secondary)]">
-                  <span className="font-medium">Selection Rate:</span>{" "}
-                  {(
-                    (parseInt(
-                      analyticsData.outcome.num_of_candidates_selected || "0"
-                    ) /
-                      (analyticsData.num_of_candidates || 1)) *
-                    100
-                  ).toFixed(1)}
-                  %
-                </p>
+            </div>
+
+            <div className="relative group">
+              <StatCard
+              title="Endorsement Rate"
+              value={`${((parseInt(analyticsData.outcome.num_of_candidates_selected || "0") / 
+            (analyticsData.num_of_candidates || 1)) * 100).toFixed(1)}%`}
+              icon={<UserCheck size={24} className="text-blue-500" />}
+              changeDirection="up"
+              />
+              <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 absolute z-10 bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 text-sm bg-[var(--surface)] text-[var(--text-primary)] rounded-lg shadow-lg border border-[var(--border)] w-64">
+              <p className="font-semibold mb-1">How it's calculated:</p>
+              <p className="text-[var(--text-secondary)]">
+                (Selected Candidates / Total Candidates) × 100
+              </p>
+              <p className="mt-1 text-xs text-[var(--text-secondary)]">
+                Represents the percentage of candidates who met the selection criteria
+              </p>
+              </div>
+            </div>
+
+            <div className="relative group">
+              <StatCard
+              title="Average Score"
+              value={`${parseFloat(analyticsData.average_screening_score || "0").toFixed(1)}%`}
+              icon={<CirclePercent size={24} className="text-amber-500" />}
+              changeDirection="down"
+              />
+              <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 absolute z-10 bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 text-sm bg-[var(--surface)] text-[var(--text-primary)] rounded-lg shadow-lg border border-[var(--border)] w-64">
+              <p className="font-semibold mb-1">How it's calculated:</p>
+              <p className="text-[var(--text-secondary)]">
+                Mean of all candidate screening scores
+              </p>
+              <p className="mt-1 text-xs text-[var(--text-secondary)]">
+                Based on skills match, experience, and qualification alignment
+              </p>
+              </div>
+            </div>
+
+            <div className="relative group">
+              <StatCard
+              title="Rejection Rate"
+              value={`${((parseInt(analyticsData.outcome.num_of_candidates_rejected || "0") / 
+            (analyticsData.num_of_candidates || 1)) * 100).toFixed(1)}%`}
+              icon={<UserX size={24} className="text-rose-500" />}
+              changeDirection="down"
+              />
+              <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 absolute z-10 bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 text-sm bg-[var(--surface)] text-[var(--text-primary)] rounded-lg shadow-lg border border-[var(--border)] w-64">
+              <p className="font-semibold mb-1">How it's calculated:</p>
+              <p className="text-[var(--text-secondary)]">
+                (Rejected Candidates / Total Candidates) × 100
+              </p>
+              <p className="mt-1 text-xs text-[var(--text-secondary)]">
+                Percentage of candidates who didn't meet minimum requirements
+              </p>
+              </div>
+            </div>
+            </div>
+
+          {/* System Health Metrics */}
+          <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="p-4 rounded-xl border border-[var(--border)] flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+          <Users className="h-8 w-8 text-[var(--accent)]" />
+          <div>
+            <h3 className="text-sm font-medium text-[var(--text-secondary)]">Total Candidates</h3>
+            <p className="text-xl font-bold text-[var(--text-primary)]">{analyticsData.num_of_candidates}</p>
+          </div>
+              </div>
+            </div>
+
+            <div className="p-4 rounded-xl border border-[var(--border)] flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+          <FileText className="h-8 w-8 text-[var(--accent)]" />
+          <div>
+            <h3 className="text-sm font-medium text-[var(--text-secondary)]">Parsed Resumes</h3>
+            <p className="text-xl font-bold text-[var(--text-primary)]">{analyticsData.num_of_resumes}</p>
+          </div>
+              </div>
+            </div>
+
+            <div className="p-4 rounded-xl border border-[var(--border)] flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+          <ChartNoAxesCombined className="h-8 w-8 text-[var(--accent)]" />
+          <div>
+            <h3 className="text-sm font-medium text-[var(--text-secondary)]">Active Jobs</h3>
+            <p className="text-xl font-bold text-[var(--text-primary)]">
+              {analyticsData.candidate_count_by_job.length}
+            </p>
+          </div>
               </div>
             </div>
           </div>
         </div>
+      
+
 
         {/* Row 1: Main Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
@@ -373,77 +425,77 @@ function AdminDashboard() {
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={resumesParsedData}>
                   <defs>
-                    <linearGradient
-                      id="colorParsed"
-                      x1="0"
-                      y1="0"
-                      x2="0"
-                      y2="1"
-                    >
-                      <stop
-                        offset="5%"
-                        stopColor="var(--accent)"
-                        stopOpacity={0.8}
-                      />
-                      <stop
-                        offset="95%"
-                        stopColor="var(--accent)"
-                        stopOpacity={0}
-                      />
-                    </linearGradient>
+                  <linearGradient
+                    id="colorParsed"
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
+                    <stop
+                    offset="5%"
+                    stopColor="var(--accent)"
+                    stopOpacity={0.8}
+                    />
+                    <stop
+                    offset="95%"
+                    stopColor="var(--accent)"
+                    stopOpacity={0}
+                    />
+                  </linearGradient>
                   </defs>
                   <CartesianGrid
-                    strokeDasharray="3 3"
-                    stroke="var(--border)"
-                    vertical={false}
+                  strokeDasharray="3 3"
+                  stroke="var(--border)"
+                  vertical={false}
                   />
                   <XAxis
-                    dataKey="date"
-                    stroke="var(--text-secondary)"
-                    tick={{ fontSize: 12 }}
-                    axisLine={{ stroke: "var(--border)", strokeWidth: 2 }}
+                  dataKey="date"
+                  stroke="var(--text-secondary)"
+                  tick={{ fontSize: 12 }}
+                  axisLine={{ stroke: "var(--border)", strokeWidth: 2 }}
                   />
                   <YAxis
-                    stroke="var(--text-secondary)"
-                    tick={{ fontSize: 12 }}
-                    domain={[0, "auto"]}
-                    axisLine={{ stroke: "var(--border)", strokeWidth: 2 }}
+                  stroke="var(--text-secondary)"
+                  tick={{ fontSize: 12 }}
+                  domain={[0, (dataMax: number) => dataMax > 100 ? dataMax : 100]}
+                  axisLine={{ stroke: "var(--border)", strokeWidth: 2 }}
                   />
                   <Tooltip
-                    contentStyle={{
-                      backgroundColor: "var(--bg)",
-                      borderColor: "var(--accent)",
-                      borderWidth: "2px",
-                      borderRadius: "0.5rem",
-                      boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-                      padding: "10px",
-                    }}
-                    labelStyle={{
-                      color: "var(--accent)",
-                      fontWeight: "bold",
-                      marginBottom: "5px",
-                    }}
-                    itemStyle={{ color: "var(--text-primary)" }}
-                    formatter={(value) => [`${value} resumes`, "Count"]}
-                    cursor={{
-                      stroke: "var(--accent)",
-                      strokeWidth: 1,
-                      strokeDasharray: "5 5",
-                    }}
+                  contentStyle={{
+                    backgroundColor: "var(--bg)",
+                    borderColor: "var(--accent)",
+                    borderWidth: "2px",
+                    borderRadius: "0.5rem",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                    padding: "10px",
+                  }}
+                  labelStyle={{
+                    color: "var(--accent)",
+                    fontWeight: "bold",
+                    marginBottom: "5px",
+                  }}
+                  itemStyle={{ color: "var(--text-primary)" }}
+                  formatter={(value) => [`${value} resumes`, "Count"]}
+                  cursor={{
+                    stroke: "var(--accent)",
+                    strokeWidth: 1,
+                    strokeDasharray: "5 5",
+                  }}
                   />
                   <Area
-                    type="monotone"
-                    dataKey="count"
-                    stroke="var(--accent)"
-                    strokeWidth={3}
-                    fillOpacity={1}
-                    fill="url(#colorParsed)"
-                    activeDot={{
-                      stroke: "var(--surface)",
-                      strokeWidth: 2,
-                      r: 6,
-                      fill: "var(--accent)",
-                    }}
+                  type="monotone"
+                  dataKey="count"
+                  stroke="var(--accent)"
+                  strokeWidth={3}
+                  fillOpacity={1}
+                  fill="url(#colorParsed)"
+                  activeDot={{
+                    stroke: "var(--surface)",
+                    strokeWidth: 2,
+                    r: 6,
+                    fill: "var(--accent)",
+                  }}
                   />
                 </AreaChart>
               </ResponsiveContainer>
