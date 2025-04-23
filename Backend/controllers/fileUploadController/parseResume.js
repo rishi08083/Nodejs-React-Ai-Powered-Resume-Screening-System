@@ -60,10 +60,10 @@ exports.parseResumes = async (
 
         // Validate required fields in AI response
         const parsedData = aiResponse.data.data;
-        if (!parsedData.name || !parsedData.email || !parsedData.phone) {
+        if ( !parsedData.email && !parsedData.phone) {
           errors.push({
             file: fileName,
-            error: "Incomplete parsed data from AI backend",
+            error: "Incomplete resume data: Missing email and phone number",
           });
           continue;
         }
