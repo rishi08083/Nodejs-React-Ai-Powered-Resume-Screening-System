@@ -2,7 +2,9 @@
 
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
-import { toast } from "react-toastify";
+import toastService from "../../utils/toastService";
+import { useToastInit } from "../../hooks/useToastInit";
+
 import { useRouter } from "next/navigation";
 
 interface GoogleDecodedToken {
@@ -23,12 +25,13 @@ export default function GoogleSignIn({
   onSuccess,
   onError,
 }: Props) {
+  useToastInit();
   const router = useRouter();
 
   const handleGoogleSuccess = async (credentialResponse: any) => {
     try {
       if (!credentialResponse?.credential) {
-        toast.error("Google login failed: No credentials returned.");
+        toastService.error("Google login failed: No credentials returned.");
         return;
       }
 
@@ -50,10 +53,10 @@ export default function GoogleSignIn({
         if (!registerRes.ok) {
           const message = registerData.message?.toLowerCase();
           if (message?.includes("already registered")) {
-            toast.error("Email already registered. Try logging in.");
+            toastService.error("Email already registered. Try logging in.");
             setTimeout(() => router.push("/login"), 2000);
           } else {
-            toast.error(registerData.message || "Registration failed.");
+            toastService.error(registerData.message || "Registration failed.");
           }
           onError?.(registerData.message);
           return;
@@ -74,7 +77,7 @@ export default function GoogleSignIn({
 
         if (loginRes.ok && loginData?.data?.token) {
           localStorage.setItem("token", loginData.data.token);
-          toast.success("Logged in successfully.");
+          toastService.success("Logged in successfully.");
           onSuccess?.(loginData);
           router.push("/dashboard");
         } else {
@@ -83,7 +86,7 @@ export default function GoogleSignIn({
       }
     } catch (error: any) {
       console.error("⚠️ Google login error:", error);
-      toast.error("Something went wrong during Google authentication.");
+      toastService.error("Something went wrong during Google authentication.");
       onError?.(error.message || "Google login error");
     }
   };
@@ -98,7 +101,7 @@ export default function GoogleSignIn({
         width="335"
         onSuccess={handleGoogleSuccess}
         onError={() => {
-          toast.error("Google login failed");
+          toastService.error("Google login failed");
           onError?.("Google login failed");
         }}
         />

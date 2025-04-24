@@ -5,9 +5,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Eye, FileText, CloudUpload, FilePen, Briefcase } from "lucide-react";
 import { withRole } from "../../../../components/withRole";
 import JobModal, { JobDetails } from "../../../../components/shared/JobModal";
-import { toast } from "react-toastify";
 import { useJobs } from "../../../../hooks";
 import { useData } from "../../../../lib/dataContext";
+import toastService from "../../../../utils/toastService";
+import { useToastInit } from "../../../../hooks/useToastInit";
 
 interface Job {
   id: number;
@@ -19,6 +20,7 @@ interface Job {
 }
 
 const ListJobs = () => {
+  useToastInit();
   const { refreshData } = useData();
   const {
     jobs,
@@ -123,7 +125,7 @@ const ListJobs = () => {
 
   const handleUploadRCD = async () => {
     if (!inputRef.current?.files?.length) {
-      toast.error("Please select a file to upload");
+      toastService.error("Please select a file to upload");
       return;
     }
 
@@ -160,7 +162,7 @@ const ListJobs = () => {
           refreshData("rcd");
 
           // Show success toast
-          toast.success("Document uploaded successfully!");
+          toastService.success("Document uploaded successfully!");
 
           // Close modal after a short delay
           setTimeout(() => {
@@ -180,13 +182,13 @@ const ListJobs = () => {
       };
 
       xhr.onerror = () => {
-        toast.error("Network error. Please try again.");
+        toastService.error("Network error. Please try again.");
         setUploadStatus("error");
       };
 
       xhr.send(formData);
     } catch (error) {
-      toast.error(
+      toastService.error(
         error instanceof Error ? error.message : "An unexpected error occurred"
       );
       setUploadStatus("error");
@@ -212,14 +214,14 @@ const ListJobs = () => {
         if (data.data && data.data.documents.length > 0) {
           window.open(data.data.documents[0], "_blank");
         } else {
-          toast.error("RCD document not found");
+          toastService.error("RCD document not found");
         }
       } else {
         const errorData = await response.json();
         throw new Error(errorData.message || "Failed to fetch RCD document");
       }
     } catch (error) {
-      toast.error(
+      toastService.error(
         error instanceof Error ? error.message : "An unexpected error occurred"
       );
     }

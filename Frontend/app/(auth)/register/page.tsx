@@ -4,7 +4,9 @@ import { useState, ChangeEvent, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { fetchRecruiterRegister } from "../../../api-services/recruiterService";
-import { ToastContainer, toast } from "react-toastify";
+import toastService from "../../../utils/toastService";
+import { useToastInit } from "../../../hooks/useToastInit";
+
 import GoogleSignIn from "../../../components/auth/GoogleAuth";
 import ThemeToggle from "../../../components/theme/ThemeToggle";
 import Image from "next/image";
@@ -45,7 +47,7 @@ export default function RecruiterRegister() {
 
     if (formData.password !== formData.confirmPassword) {
       setMessage(["Passwords do not match!"]);
-      toast.error("Passwords do not match!");
+      toastService.error("Passwords do not match!");
       setIsError(true);
       setIsOpen(true);
       setTimeout(() => {
@@ -59,7 +61,7 @@ export default function RecruiterRegister() {
 
       if (response?.status === "success") {
         setMessage([response.message || "Recruiter Request successful!"]);
-        toast.success(response.message || "Recruiter Request successful!");
+        toastService.success(response.message || "Recruiter Request successful!");
         setIsError(false);
         setIsOpen(true);
         setTimeout(() => {
@@ -71,7 +73,7 @@ export default function RecruiterRegister() {
         setMessage(
           errorMessages || [response?.message || "An error occurred."]
         );
-        toast.error(errorMessages || response?.message || "An error occurred");
+        toastService.error(errorMessages || response?.message || "An error occurred");
         setIsError(true);
         setIsOpen(true);
         setTimeout(() => {
@@ -81,7 +83,7 @@ export default function RecruiterRegister() {
     } catch (error) {
       console.error("Error:", error);
       setMessage(["An unexpected error occurred. Please try again."]);
-      toast.error("An unexpected error occurred. Please try again.");
+      toastService.error("An unexpected error occurred. Please try again.");
       setIsError(true);
       setIsOpen(true);
       setTimeout(() => {
@@ -93,7 +95,7 @@ export default function RecruiterRegister() {
   const handleErrors = (errors: { msg: string }[] | undefined): string[] => {
     if (Array.isArray(errors) && errors.length > 0) {
       return errors.map((error) => {
-        toast.error(error.msg);
+        toastService.error(error.msg);
         return error.msg;
       });
     }
@@ -106,7 +108,6 @@ export default function RecruiterRegister() {
 
   return (
     <div className="flex min-h-screen bg-[var(--surface)] font-sans relative">
-      <ToastContainer theme="dark" />
 
       {/* Theme Toggle in top right corner */}
       <div className="absolute top-4 right-4 z-10">
@@ -305,7 +306,7 @@ export default function RecruiterRegister() {
               <GoogleSignIn
                 mode="register"
                 onSuccess={() => {
-                  toast.success(
+                  toastService.success(
                     "Recruiter request sent successfully. Awaiting admin approval."
                   );
                   localStorage.setItem("recruiterEmail", formData.email);

@@ -1,7 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import toastService from "../../../../utils/toastService";
+import { useToastInit } from "../../../../hooks/useToastInit";
+
 
 import {
   fetchRecruiterRequests,
@@ -25,6 +26,7 @@ interface ApiResponse {
 }
 
 function RecruiterRequests() {
+  useToastInit();
   const [requests, setRequests] = useState<RecruiterRequest[]>([]); // All recruiter requests
   const [filter, setFilter] = useState("pending"); // Current filter: pending, accepted, rejected
   const [isLoading, setIsLoading] = useState(true);
@@ -52,7 +54,7 @@ function RecruiterRequests() {
 
       setRequests(data.data.users);
     } catch (error) {
-      toast.error(`Failed to fetch ${filter} recruiter requests.`);
+      toastService.error(`Failed to fetch ${filter} recruiter requests.`);
     } finally {
       setIsLoading(false);
     }
@@ -68,18 +70,18 @@ function RecruiterRequests() {
     try {
       const response = await acceptRecruiterRequest(email, rejectionMessage);
       if (response.ok) {
-        toast.success("Recruiter request accepted successfully!", {
+        toastService.success("Recruiter request accepted successfully!", {
           theme: "light",
         });
         getRequestsByFilter();
       } else {
-        toast.error("Failed to reject the recruiter request.", {
+        toastService.error("Failed to reject the recruiter request.", {
           theme: "light",
         });
       }
     } catch (error) {
       console.error(error);
-      toast.error("An error occurred while rejecting the request.", {
+      toastService.error("An error occurred while rejecting the request.", {
         theme: "light",
       });
     } finally {
@@ -92,18 +94,18 @@ function RecruiterRequests() {
     try {
       const response = await rejectRecruiterRequest(email, rejectionMessage);
       if (response.ok) {
-        toast.success("Recruiter request rejected successfully!", {
+        toastService.success("Recruiter request rejected successfully!", {
           theme: "light",
         });
         getRequestsByFilter();
       } else {
-        toast.error("Failed to reject the recruiter request.", {
+        toastService.error("Failed to reject the recruiter request.", {
           theme: "light",
         });
       }
     } catch (error) {
       console.error(error);
-      toast.error("An error occurred while rejecting the request.", {
+      toastService.error("An error occurred while rejecting the request.", {
         theme: "light",
       });
     } finally {
@@ -129,9 +131,7 @@ function RecruiterRequests() {
     <div className="min-h-screen bg-[var(--bg)] py-8 px-0 sm:px-0 lg:px-0 text-[var(--text-primary)] mt-10">
       <div className="mx-auto">
         <div className="bg-[var(--surface)] rounded-xl shadow-lg overflow-hidden border border-[var(--border)]">
-          {/* Display Message */}
-          <ToastContainer theme="dark" autoClose={3000} />
-
+          
           {/* Filter Buttons and Search Bar */}
           <div className="flex justify-between items-center p-4 border-b border-[var(--border)]">
             {/* Filter Buttons */}

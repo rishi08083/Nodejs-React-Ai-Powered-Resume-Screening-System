@@ -723,3 +723,50 @@ form {
 .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background-color: rgba(255, 255, 255, 0.3);
 }
+
+/* Toast notification enhancements */
+.Toastify__toast-container {
+  z-index: 9999 !important; /* Ensure toasts are above everything */
+}
+
+.Toastify__toast {
+  background-color: var(--surface);
+  color: var(--text-primary);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  margin-bottom: 1rem;
+}
+
+.Toastify__toast--success {
+  border-left: 4px solid #4caf50;
+}
+
+.Toastify__toast--error {
+  border-left: 4px solid #f44336;
+}
+
+.Toastify__toast--info {
+  border-left: 4px solid #2196f3;
+}
+
+.Toastify__toast--warning {
+  border-left: 4px solid #ff9800;
+}
+
+/* Animation adjustments to make toasts more noticeable */
+.Toastify__toast-enter {
+  transform: translateX(100%);
+}
+
+.Toastify__toast-enter-active {
+  transform: translateX(0);
+  transition: transform 300ms ease-in-out;
+}
+
+.Toastify__toast-exit {
+  transform: translateX(0);
+}
+
+.Toastify__toast-exit-active {
+  transform: translateX(100%);
+  transition: transform 300ms ease-in-out;
+}

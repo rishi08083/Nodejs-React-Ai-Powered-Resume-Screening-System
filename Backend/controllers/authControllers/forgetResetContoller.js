@@ -19,7 +19,7 @@ const forgetPassword = async (req, res) => {
     const user = await db.Users.findOne({ where: { email } });
 
     if (!user) {
-      return res.status(404).json({
+      return res.status(400).json({
         status: "error",
         message: "User not found",
         error: { details: "No user exists with the provided email address" },

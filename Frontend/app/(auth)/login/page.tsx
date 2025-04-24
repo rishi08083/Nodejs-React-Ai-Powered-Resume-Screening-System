@@ -5,11 +5,13 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "../../../lib/auth";
-import { toast, ToastContainer } from "react-toastify";
+import toastService from "../../../utils/toastService";
+import { useToastInit } from "../../../hooks/useToastInit";
 import GoogleSignIn from "../../../components/auth/GoogleAuth";
 import ThemeToggle from "../../../components/theme/ThemeToggle";
 
 function LoginContent() {
+  useToastInit();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isFocused, setIsFocused] = useState({ email: false, password: false });
@@ -25,7 +27,7 @@ function LoginContent() {
       await login({ email, password });
       router.push(redirectPath);
     } catch (err: any) {
-      toast.error(err.message || "Login failed");
+      toastService.error(err.message || "Login failed");
       setIsOpen(true);
       setTimeout(() => {
         setIsOpen(false);
@@ -39,7 +41,6 @@ function LoginContent() {
 
   return (
     <div className="flex min-h-screen bg-[var(--surface)] font-sans relative">
-      <ToastContainer theme="dark" />
 
       <div className="absolute top-4 right-4 z-10">
         <ThemeToggle />
@@ -138,7 +139,7 @@ function LoginContent() {
                     await checkAuth();
                     router.push("/dashboard");
                   }}
-                  onError={(err) => toast.error(err || "Google login failed")}
+                  onError={(err) => toastService.error(err || "Google login failed")}
                 />
               </div>
             </form>

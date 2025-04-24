@@ -3,12 +3,12 @@
 import { Menu, UserRound, LogOut, Settings, Upload } from "lucide-react";
 import ThemeToggle from "../theme/ThemeToggle";
 import { FileUp } from "lucide-react";
-import { SetStateAction, useEffect, useState } from "react";
+import { useState } from "react";
 import { useAuth } from "../../lib/auth";
 import LogOutModal from "./LogOut";
 import { useRouter } from "next/navigation";
 import UploadModal from "../../app/dashboard/recruiter/candidates/UploadModal";
-import "react-toastify/dist/ReactToastify.css"; // Make sure you import the toast styles
+
 
 export default function Navbar({
   user,

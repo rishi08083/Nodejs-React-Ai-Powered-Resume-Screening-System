@@ -1,3 +1,4 @@
+// Frontend/app/layout.tsx
 import React from "react";
 import "./globals.css";
 import { ReactNode } from "react";
@@ -17,7 +18,19 @@ export default function RootLayout({ children }: RootLayoutProps) {
     <html lang="en" suppressHydrationWarning={true}>
       <body>
           <ThemeProvider>
-            <ToastContainer />
+            <ToastContainer 
+              position="top-right"
+              autoClose={3000}
+              hideProgressBar={false}
+              newestOnTop
+              closeOnClick
+              rtl={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+              theme="colored"
+              style={{ zIndex: 9999 }}
+            />
             <DataProvider>
               <AuthProvider>
                 <TokenExpirationHandler />

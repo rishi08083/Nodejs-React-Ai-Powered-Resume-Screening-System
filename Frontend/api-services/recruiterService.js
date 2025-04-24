@@ -1,6 +1,4 @@
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL; // Get the backend base URL from the environment variable
-
-console.log(BASE_URL);
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL; // Get the backend base URL from the environment variable
 
 /**
  * Fetches all recruiter requests.
@@ -8,7 +6,7 @@ console.log(BASE_URL);
  */
 export const fetchRecruiterRequests = async () => {
   try {
-    const response = await fetch(`${BASE_URL}/auth/view-recruiter-req`, {
+    const response = await fetch(`${BASE_URL}/api/auth/view-recruiter-req`, {
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer " + localStorage.getItem("token"),
@@ -33,13 +31,16 @@ export const fetchRecruiterRequests = async () => {
  */
 export const fetchAcceptedRecruiters = async () => {
   try {
-    const response = await fetch(`${BASE_URL}/auth/view-accepted-recruiters`, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + localStorage.getItem("token"),
-      },
-      method: "GET",
-    });
+    const response = await fetch(
+      `${BASE_URL}/api/auth/view-accepted-recruiters`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+        method: "GET",
+      }
+    );
 
     if (!response.ok) {
       throw new Error("Failed to fetch accepted recruiters.");
@@ -58,13 +59,16 @@ export const fetchAcceptedRecruiters = async () => {
  */
 export const fetchRejectedRecruiters = async () => {
   try {
-    const response = await fetch(`${BASE_URL}/auth/view-rejected-recruiters`, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + localStorage.getItem("token"),
-      },
-      method: "GET",
-    });
+    const response = await fetch(
+      `${BASE_URL}/api/auth/view-rejected-recruiters`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+        method: "GET",
+      }
+    );
 
     if (!response.ok) {
       throw new Error("Failed to fetch rejected recruiters.");
@@ -84,7 +88,7 @@ export const fetchRejectedRecruiters = async () => {
  */
 export const acceptRecruiterRequest = async (email, message) => {
   try {
-    const response = await fetch(`${BASE_URL}/auth/approve-recruiter-req`, {
+    const response = await fetch(`${BASE_URL}/api/auth/approve-recruiter-req`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -107,7 +111,7 @@ export const acceptRecruiterRequest = async (email, message) => {
  */
 export const rejectRecruiterRequest = async (email, message) => {
   try {
-    const response = await fetch(`${BASE_URL}/auth/reject-recruiter-req`, {
+    const response = await fetch(`${BASE_URL}/api/auth/reject-recruiter-req`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -128,7 +132,7 @@ export const rejectRecruiterRequest = async (email, message) => {
  */
 export const fetchRecruiterRegister = async (formData) => {
   try {
-    const response = await fetch(`${BASE_URL}/auth/register`, {
+    const response = await fetch(`${BASE_URL}/api/auth/register`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
