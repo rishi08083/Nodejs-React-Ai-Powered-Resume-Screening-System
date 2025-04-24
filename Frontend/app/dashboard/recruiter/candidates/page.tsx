@@ -4,21 +4,20 @@ import React, {
   useEffect,
   useMemo,
   useRef,
-  ChangeEvent,
 } from "react";
 import { motion } from "framer-motion";
 import axios from "axios";
-import "react-toastify/dist/ReactToastify.css";
+
 import FeedbackModal from "./FeedbackModal";
 import CandidateTable from "./CandidateTable";
 import SearchFilter from "./SearchFilter";
 import { withRole } from "../../../../components/withRole";
-import { toast } from "react-toastify";
+
 import { useJobs, useCandidates } from "../../../../hooks";
 import { useData } from "../../../../lib/dataContext";
-import { RefreshCw } from "lucide-react";
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 type Job = {
   id: string;
@@ -139,7 +138,7 @@ const CandidateList = () => {
   const fetchCandidateFeedback = async (candidateId: string) => {
     try {
       const response = await axios.get(
-        `${BASE_URL}/screening/get_feedback/${candidateId}`,
+        `${BASE_URL}/api/screening/get_feedback/${candidateId}`,
         {
           headers: {
             "Content-Type": "application/json",

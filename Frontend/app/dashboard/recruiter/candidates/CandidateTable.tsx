@@ -19,7 +19,7 @@ type CandidateTableProps = {
   setCandidates: React.Dispatch<React.SetStateAction<Candidate[]>>;
 };
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const CandidateTable: React.FC<CandidateTableProps> = ({
   candidates,
@@ -78,7 +78,7 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
     try {
       e.preventDefault();
       const response = await fetch(
-        `${BASE_URL}/upload/get-resume/${candidateId}`,
+        `${BASE_URL}/api/upload/get-resume/${candidateId}`,
         {
           method: "GET",
           headers: {
@@ -104,7 +104,7 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
   const handleDeleteCandidate = async (candidateId) => {
     try {
       const response = await fetch(
-        `${BASE_URL}/candidates/delete/${candidateId}`,
+        `${BASE_URL}/api/candidates/delete/${candidateId}`,
         {
           method: "DELETE",
           headers: {

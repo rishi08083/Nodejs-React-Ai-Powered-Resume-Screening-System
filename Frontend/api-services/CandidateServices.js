@@ -1,4 +1,4 @@
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL; // Use the base URL from environment variables
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL; // Use the base URL from environment variables
 
 /**
  * Fetches the list of jobs.
@@ -6,7 +6,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL; // Use the base URL from envi
  */
 export const fetchJobs = async () => {
   try {
-    const response = await fetch(`${BASE_URL}/job/view`);
+    const response = await fetch(`${BASE_URL}/api/job/view`);
     console.log("Response:", response); // Log the response for debugging
 
     if (!response.ok) {
@@ -30,7 +30,7 @@ export const fetchJobs = async () => {
  */
 export const fetchCandidates = async (jobId) => {
   try {
-    const response = await fetch(`${BASE_URL}candidates/list${jobId}`);
+    const response = await fetch(`${BASE_URL}/api/candidates/list/${jobId}`);
     if (!response.ok) {
       if (response.status === 401) {
         window.location.href = "/login"; // Redirect to login page

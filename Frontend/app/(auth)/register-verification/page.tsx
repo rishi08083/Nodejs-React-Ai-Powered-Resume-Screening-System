@@ -3,7 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import { toast, ToastContainer } from "react-toastify";
+import toastService from "../../../utils/toastService";
+import { useToastInit } from "../../../hooks/useToastInit";
+
 
 export default function RegisterVerification() {
   const [otp, setOtp] = useState(["", "", "", ""]);
@@ -39,13 +41,13 @@ export default function RegisterVerification() {
 
     const finalOtp = otp.join("");
     if (finalOtp.length !== 4) {
-      toast.error("Please enter a valid 4-digit OTP.");
+      toastService.error("Please enter a valid 4-digit OTP.");
       return;
     }
 
     const email = localStorage.getItem("recruiterEmail");
     if (!email) {
-      toast.error("Email not found. Please register again.");
+      toastService.error("Email not found. Please register again.");
       router.push("/register");
       return;
     }
@@ -58,16 +60,16 @@ export default function RegisterVerification() {
       );
 
       if (response.data.status === "success") {
-        toast.success("OTP Verified Successfully!");
+        toastService.success("OTP Verified Successfully!");
         localStorage.removeItem("recruiterEmail");
         setTimeout(() => {
           router.push("/login");
         }, 2000);
       } else {
-        toast.error(response.data.message || "Invalid OTP.");
+        toastService.error(response.data.message || "Invalid OTP.");
       }
     } catch (error: any) {
-      toast.error(error?.response?.data?.message || "Verification failed.");
+      toastService.error(error?.response?.data?.message || "Verification failed.");
     } finally {
       setIsSubmitting(false);
     }
@@ -80,7 +82,6 @@ export default function RegisterVerification() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[var(--surface)]">
-      <ToastContainer theme="dark" />
       <form
         onSubmit={handleSubmit}
         className="bg-[var(--bg)] p-8 rounded-xl shadow-lg w-full max-w-md text-center border border-[var(--border)]"

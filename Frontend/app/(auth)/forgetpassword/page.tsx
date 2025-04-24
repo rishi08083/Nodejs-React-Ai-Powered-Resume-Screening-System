@@ -1,11 +1,12 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { toast } from "react-toastify";
-import { ToastContainer } from "react-toastify";
+import toastService from "../../../utils/toastService";
+import { useToastInit } from "../../../hooks/useToastInit";
 import ThemeToggle from "../../../components/theme/ThemeToggle";
 
 const ForgetPassword = () => {
+  useToastInit();
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState(["", "", "", ""]);
   const [newPassword, setNewPassword] = useState("");
@@ -64,13 +65,13 @@ const ForgetPassword = () => {
       const data = await response.json();
 
       if (response.ok) {
-        toast.success(data.message || "OTP has been sent to your email");
+        toastService.success(data.message || "OTP has been sent to your email");
         setCurrentStep("otp");
       } else {
-        toast.error(data.message || "Something went wrong");
+        toastService.error(data.message || "Something went wrong");
       }
     } catch (error) {
-      toast.error("Failed to connect to server");
+      toastService.error("Failed to connect to server");
     }
   };
 
@@ -93,17 +94,17 @@ const ForgetPassword = () => {
       const data = await response.json();
 
       if (response.ok) {
-        toast.success("OTP verified successfully");
+        toastService.success("OTP verified successfully");
         setCurrentStep("password");
       } else {
-        toast.error(data.message || "Invalid OTP");
+        toastService.error(data.message || "Invalid OTP");
         inputRefs.forEach((iref, index) => {
           inputRefs[index].current.value = "";
         });
         setOtp(["", "", "", ""]);
       }
     } catch (error) {
-      toast.error("Failed to connect to server");
+      toastService.error("Failed to connect to server");
     }
   };
 
@@ -111,14 +112,14 @@ const ForgetPassword = () => {
     e.preventDefault();
 
     if (newPassword !== confirmPassword) {
-      toast.error("Passwords do not match");
+      toastService.error("Passwords do not match");
       return;
     }
     const allValidationsPassed = Object.values(passwordValidation).every(
       (value) => value
     );
     if (!allValidationsPassed) {
-      toast.error("Password does not meet all requirements");
+      toastService.error("Password does not meet all requirements");
       return;
     }
 
@@ -141,13 +142,13 @@ const ForgetPassword = () => {
       const data = await response.json();
 
       if (response.ok) {
-        toast.success(data.message || "Password reset successfully");
+        toastService.success(data.message || "Password reset successfully");
         router.push("/login");
       } else {
-        toast.error(data.message || "Something went wrong");
+        toastService.error(data.message || "Something went wrong");
       }
     } catch (error) {
-      toast.error("Failed to connect to server");
+      toastService.error("Failed to connect to server");
     }
   };
 
@@ -197,6 +198,7 @@ const ForgetPassword = () => {
         return "";
     }
   };
+  useToastInit();
 
   return (
     <div className="min-h-screen flex justify-center items-center p-4 bg-[var(--bg)]">
@@ -204,7 +206,6 @@ const ForgetPassword = () => {
         <div className="absolute top-4 right-4">
           <ThemeToggle />
         </div>
-        <ToastContainer />
         <div className="mb-6 text-center">
           <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-2">
             {getStepTitle()}

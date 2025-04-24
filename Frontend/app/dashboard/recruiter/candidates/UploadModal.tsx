@@ -1,11 +1,13 @@
 import React, { ChangeEvent, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { toast } from "react-toastify";
 import ParseCandidate from "../../../../components/ParseCandidate";
 import { AnimatePresence } from "framer-motion";
 import { Dock, MousePointerClick, Search, UploadIcon, X } from "lucide-react";
 import { useData } from "../../../../lib/dataContext";
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+import toastService from "../../../../utils/toastService";
+import { useToastInit } from "../../../../hooks/useToastInit";
+
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 interface UploadModalProps {
   jobs?: any[];
@@ -25,6 +27,8 @@ const UploadModal: React.FC<UploadModalProps> = ({
   setIsUploadModalOpen,
   onUploadSuccess,
 }) => {
+  useToastInit();
+
   const { refreshData, setLoading } = useData();
   const fileTypes = ["pdf", "docx", "jpg", "jpeg"];
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -60,16 +64,13 @@ const UploadModal: React.FC<UploadModalProps> = ({
       // Show loading state
       setLoading("jobs", true);
 
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/job/view`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.getItem("token"),
-          },
-        }
-      );
+      const response = await fetch(`${BASE_URL}/api/job/view`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      });
       if (response.ok) {
         const data = await response.json();
         setJobs(data.data);
@@ -83,7 +84,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
       }
     } catch (error) {
       console.error(error);
-      toast.error("Failed to load jobs. Please try again.");
+      toastService.error("Failed to load jobs. Please try again.");
     } finally {
       setLoading("jobs", false);
     }
@@ -91,7 +92,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
 
   useEffect(() => {
     if (errorMessage) {
-      toast.error(`⚠️ ${errorMessage}`);
+      toastService.error(`⚠️ ${errorMessage}`);
     }
   }, [errorMessage]);
 
@@ -125,7 +126,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
     });
 
     if (invalidFiles.length > 0) {
-      toast.error(
+      toastService.error(
         `Invalid file types: ${invalidFiles.join(", ")}. Please upload PDF, DOCX, or JPG, JPEG files.`
       );
     }
@@ -158,20 +159,19 @@ const UploadModal: React.FC<UploadModalProps> = ({
     if (candidateId) {
       setViewParsedResume(candidateId);
     } else {
-      toast.error("Candidate ID not found for this file.");
+      toastService.error("Candidate ID not found for this file.");
     }
   };
 
   const handleUploadResume = async () => {
     if (!selectedJob) {
-      const message = "Please select a job before uploading resumes.";
-      toast.error(message);
+      toastService.error("Please select a job before uploading resumes.");
       return;
     }
 
     if (files.length === 0) {
       const message = "No resumes selected for upload.";
-      toast.error(message);
+      toastService.error(message);
       return;
     }
 
@@ -193,7 +193,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
     const token = localStorage.getItem("token");
 
     try {
-      const response = await fetch(`${BASE_URL}/upload/upload-resume`, {
+      const response = await fetch(`${BASE_URL}/api/upload/upload-resume`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: formData,
@@ -235,8 +235,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
         }
 
         setFiles([]);
-        const successMsg = "Files uploaded successfully.";
-        toast.success(successMsg);
+        toastService.success("Files uploaded successfully.");
 
         // Reset file input after successful upload
         if (fileInputRef.current) {
@@ -279,11 +278,11 @@ const UploadModal: React.FC<UploadModalProps> = ({
         const fullErrorMsg =
           `${errorData.message}\n\n${errorMsgList.join("\n")}` ||
           "Failed to upload the files.";
-        toast.error(fullErrorMsg);
+        toastService.error(fullErrorMsg);
       }
     } catch (error) {
       console.error(error);
-      toast.error(`${error}`);
+      toastService.error(`${error}`);
     } finally {
       setIsLoading(false);
       clearInterval(interval);
@@ -305,94 +304,6 @@ const UploadModal: React.FC<UploadModalProps> = ({
         return "🖼️";
       default:
         return "📎";
-    }
-  };
-
-  const handleUpload = async () => {
-    if (files.length === 0) {
-      setError("Please select at least one file");
-      return;
-    }
-
-    if (!selectedJob) {
-      setError("Please select a job");
-      return;
-    }
-
-    const formData = new FormData();
-    files.forEach((file) => {
-      formData.append("resumes", file);
-    });
-    formData.append("jobId", selectedJob);
-
-    try {
-      setLoading("candidates", true);
-      setIsUploading(true);
-      setProgress(0);
-
-      const xhr = new XMLHttpRequest();
-
-      xhr.open(
-        "POST",
-        `${process.env.NEXT_PUBLIC_API_URL}/api/candidates/upload`,
-        true
-      );
-
-      xhr.setRequestHeader(
-        "Authorization",
-        `Bearer ${localStorage.getItem("token")}`
-      );
-
-      xhr.upload.onprogress = (event) => {
-        if (event.lengthComputable) {
-          const percentComplete = (event.loaded / event.total) * 100;
-          setProgress(percentComplete);
-        }
-      };
-
-      xhr.onload = () => {
-        if (xhr.status === 200) {
-          setFiles([]);
-          setSelectedJob("");
-          setIsOpen(false);
-          setSuccess("Resume uploaded successfully");
-
-          // Notify data context about changes
-          refreshData("candidates");
-          refreshData("analytics");
-
-          // Notify parent about success
-          onUploadSuccess();
-
-          // Close modal after delay
-          setTimeout(() => {
-            closeModal();
-          }, 2000);
-        } else {
-          let errorMsg = "Upload failed";
-          try {
-            const response = JSON.parse(xhr.responseText);
-            errorMsg = response.message || errorMsg;
-          } catch (e) {
-            // Use default error message
-          }
-          setError(errorMsg);
-        }
-        setIsUploading(false);
-        setLoading("candidates", false);
-      };
-
-      xhr.onerror = () => {
-        setError("Network error occurred. Please try again.");
-        setIsUploading(false);
-        setLoading("candidates", false);
-      };
-
-      xhr.send(formData);
-    } catch (err) {
-      setError("An unexpected error occurred. Please try again.");
-      setIsUploading(false);
-      setLoading("candidates", false);
     }
   };
 
@@ -467,7 +378,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
                       setJobId(job.id);
                       setIsDropdownOpen(false);
                     } else {
-                      toast.info(
+                      toastService.info(
                         "Please upload Role Clarity Document first for this job"
                       );
                     }

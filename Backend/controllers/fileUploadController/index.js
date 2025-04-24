@@ -9,9 +9,7 @@ const crypto = require("crypto");
 const db = require("../../models");
 const { parseResumes } = require("./parseResume");
 const { generateFileName } = require("../../utils/fileNameGenerator");
-const {
-  screenCandidate,
-} = require("../../utils/screenUtils");
+const { screenCandidate } = require("../../utils/screenUtils");
 require("dotenv").config();
 
 // AWS S3 Configuration
@@ -111,7 +109,7 @@ exports.uploadResumes = async (req, res) => {
     // All files successfully parsed
     res.status(200).json({
       status: "success",
-      message: "Files uploaded and parsed successfully",
+      message: "Files uploaded and parsed and screened successfully",
       data: {
         candidates: successfulUploads,
         files: uploadedFiles,

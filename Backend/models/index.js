@@ -18,7 +18,6 @@ let sequelize;
 
 try {
   if (config) {
-    // Using DATABASE_URL from environment variable (for Render, Heroku, etc.)
     sequelize = new Sequelize(config);
   }
 

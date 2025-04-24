@@ -1,15 +1,18 @@
 "use client";
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '../../lib/auth';
-import { toast } from 'react-toastify';
-import { motion, AnimatePresence } from 'framer-motion';
-import { LogIn } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "../../lib/auth";
+import toastService from "../../utils/toastService";
+import { useToastInit } from "../../hooks/useToastInit";
+
+import { motion, AnimatePresence } from "framer-motion";
+import { LogIn } from "lucide-react";
 
 // Global state to track if session expired dialog is already shown
 let isSessionExpiredDialogShown = false;
 
 const TokenExpirationHandler: React.FC = () => {
+  useToastInit();
   const { logout } = useAuth();
   const [showDialog, setShowDialog] = useState(false);
   const router = useRouter();
@@ -18,34 +21,39 @@ const TokenExpirationHandler: React.FC = () => {
   const handleTokenExpired = () => {
     // Prevent multiple dialogs
     if (isSessionExpiredDialogShown) return;
-    
+
     isSessionExpiredDialogShown = true;
     logout();
     setShowDialog(true);
-    toast.error("Your session has expired. Please log in again to continue.", {
-      toastId: 'session-expired' // Prevents duplicate toasts
-    });
+    toastService.error(
+      "Your session has expired. Please log in again to continue.",
+      {
+        toastId: "session-expired",
+      }
+    );
   };
 
   // Register a global fetch interceptor
   useEffect(() => {
     const originalFetch = window.fetch;
-    
-    window.fetch = async function(input, init) {
+
+    window.fetch = async function (input, init) {
       const response = await originalFetch(input, init);
-      
+
       // Check if the response status is 401 Unauthorized
       if (response.status === 401) {
         // Clone the response so we can both read it and return it
         const clonedResponse = response.clone();
-        
+
         try {
           const data = await clonedResponse.json();
           // Check if the error message indicates token expiration
-          if (data?.message?.toLowerCase().includes('expired') || 
-              data?.message?.toLowerCase().includes('invalid token') ||
-              data?.message?.toLowerCase().includes('jwt') ||
-              data?.message?.toLowerCase().includes('unauthorized')) {
+          if (
+            data?.message?.toLowerCase().includes("expired") ||
+            data?.message?.toLowerCase().includes("invalid token") ||
+            data?.message?.toLowerCase().includes("jwt") ||
+            data?.message?.toLowerCase().includes("unauthorized")
+          ) {
             handleTokenExpired();
           }
         } catch (error) {
@@ -55,7 +63,7 @@ const TokenExpirationHandler: React.FC = () => {
           }
         }
       }
-      
+
       return response;
     };
 
@@ -68,7 +76,7 @@ const TokenExpirationHandler: React.FC = () => {
   const handleLogin = () => {
     isSessionExpiredDialogShown = false;
     setShowDialog(false);
-    router.push('/login');
+    router.push("/login");
   };
 
   const handleClose = () => {

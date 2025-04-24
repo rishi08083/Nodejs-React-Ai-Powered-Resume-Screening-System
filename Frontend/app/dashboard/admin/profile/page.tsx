@@ -3,11 +3,13 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../../../lib/auth";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import toastService from "../../../../utils/toastService";
+import { useToastInit } from "../../../../hooks/useToastInit";
+
 import { withRole } from "../../../../components/withRole";
 
 function Profile() {
+  useToastInit();
   const router = useRouter();
   const { user, checkAuth, setUser } = useAuth();
   const [loading, setLoading] = useState(false);
@@ -59,7 +61,8 @@ function Profile() {
     if (!trimmedName) {
       nameError = "Name is required.";
     } else if (!nameRegex.test(trimmedName)) {
-      nameError = "Name must contain only alphabets and a single space between first and last name.";
+      nameError =
+        "Name must contain only alphabets and a single space between first and last name.";
     } else if (trimmedName.length < 2) {
       nameError = "Name must be at least 2 characters long.";
     } else if (trimmedName.length > 50) {
@@ -67,7 +70,8 @@ function Profile() {
     }
 
     const trimmedEmail = email.trim().toLowerCase();
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(\.[a-zA-Z]{2,})?$/;
+    const emailRegex =
+      /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(\.[a-zA-Z]{2,})?$/;
 
     if (!trimmedEmail) {
       emailError = "Email is required.";
@@ -169,16 +173,16 @@ function Profile() {
 
       const data = await response.json();
       if (response.ok) {
-        toast.success("Profile updated successfully!");
+        toastService.success("Profile updated successfully!");
         setUser(data.data.user);
         setOriginalData({ name: formData.name, email: formData.email });
         setEditMode(false);
       } else {
-        toast.error(data.error?.details || "Failed to update profile");
+        toastService.error(data.error?.details || "Failed to update profile");
       }
     } catch (error) {
       console.error("Update profile error:", error);
-      toast.error("An error occurred. Please try again.");
+      toastService.error("An error occurred. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -191,7 +195,7 @@ function Profile() {
 
   const handleConfirmLogout = async () => {
     if (formData.newPassword !== formData.confirmPassword) {
-      toast.error("Passwords do not match");
+      toastService.error("Passwords do not match");
       setIsLogoutModalOpen(false);
       return;
     }
@@ -215,18 +219,20 @@ function Profile() {
 
       const data = await response.json();
       if (response.ok) {
-        toast.success("Password changed successfully. Please log in again.");
+        toastService.success(
+          "Password changed successfully. Please log in again."
+        );
         setUser(null);
         localStorage.removeItem("token");
         setTimeout(() => {
           router.push("/login");
         }, 1500);
       } else {
-        toast.error(data.error?.details || "Failed to change password");
+        toastService.error(data.error?.details || "Failed to change password");
       }
     } catch (error) {
       console.error("Change password error:", error);
-      toast.error("An error occurred. Please try again.");
+      toastService.error("An error occurred. Please try again.");
     } finally {
       setLoading(false);
       setIsLogoutModalOpen(false);
@@ -236,11 +242,11 @@ function Profile() {
   const getInitials = (name: string) => {
     return name
       ? name
-        .split(" ")
-        .map((word) => word[0])
-        .join("")
-        .toUpperCase()
-        .substring(0, 2)
+          .split(" ")
+          .map((word) => word[0])
+          .join("")
+          .toUpperCase()
+          .substring(0, 2)
       : "U";
   };
 
@@ -248,8 +254,6 @@ function Profile() {
 
   return (
     <div className="profile-container">
-      <ToastContainer position="top-right" autoClose={3000} />
-
       <div className="profile-header">
         <div className="profile-avatar">
           <span className="avatar-initials">{getInitials(formData.name)}</span>
