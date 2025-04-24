@@ -30,7 +30,7 @@ export const fetchJobs = async () => {
  */
 export const fetchCandidates = async (jobId) => {
   try {
-    const response = await fetch(`${BASE_URL}/api/candidates/list${jobId}`);
+    const response = await fetch(`${BASE_URL}/api/candidates/list/${jobId}`);
     if (!response.ok) {
       if (response.status === 401) {
         window.location.href = "/login"; // Redirect to login page
