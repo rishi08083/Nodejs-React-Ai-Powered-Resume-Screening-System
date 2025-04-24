@@ -28,7 +28,7 @@ const recruiterLinks = [
   },
   {
     href: "/dashboard/recruiter/candidates",
-    label: "Candidates",
+    label: "Screened Candidates",
     icon: <Book className="sidebar-icon" />,
   },
 ];
@@ -41,7 +41,7 @@ const adminLinks = [
   },
   {
     href: "/dashboard/admin/recruiter-requests",
-    label: "Recruiter Requests",
+    label: "Requested Recruiters",
     icon: <Users className="sidebar-icon" />,
   },
 ];

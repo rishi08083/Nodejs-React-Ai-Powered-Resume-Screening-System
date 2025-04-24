@@ -3,28 +3,33 @@ import { motion } from "framer-motion";
 import { toast } from "react-toastify";
 import ParseCandidate from "../../../../components/ParseCandidate";
 import { AnimatePresence } from "framer-motion";
+import { Dock, MousePointerClick, Search, UploadIcon, X } from "lucide-react";
+import { useData } from "../../../../lib/dataContext";
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
-type UploadModalProps = {
+interface UploadModalProps {
+  jobs?: any[];
   closeModal: () => void;
   setIsUploadModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
-};
+  onUploadSuccess?: () => void;
+}
 
 type UploadedFile = {
   name: string;
   path: string; // URL or path to the file
   candidateId: string;
 };
-
 const UploadModal: React.FC<UploadModalProps> = ({
+  jobs = [],
   closeModal,
   setIsUploadModalOpen,
+  onUploadSuccess,
 }) => {
+  const { refreshData, setLoading } = useData();
   const fileTypes = ["pdf", "docx", "jpg", "jpeg"];
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [files, setFiles] = useState<File[]>([]);
   const [selectedJob, setSelectedJob] = useState<string | null>(null);
-  const [jobs, setJobs] = useState<any[] | null>(null);
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [successfullyUploadedFiles, setSuccessfullyUploadedFiles] = useState<
     UploadedFile[]
@@ -35,7 +40,15 @@ const UploadModal: React.FC<UploadModalProps> = ({
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
+  // Add missing state variables
+  const [isUploading, setIsUploading] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [isOpen, setIsOpen] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [jobsList, setJobs] = useState<any[]>(jobs || []);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
@@ -44,6 +57,9 @@ const UploadModal: React.FC<UploadModalProps> = ({
 
   const getJobDetails = async () => {
     try {
+      // Show loading state
+      setLoading("jobs", true);
+
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/job/view`,
         {
@@ -56,21 +72,24 @@ const UploadModal: React.FC<UploadModalProps> = ({
       );
       if (response.ok) {
         const data = await response.json();
-        // console.log(data);
         setJobs(data.data);
-        // console.log(data.data);
         setIsLoading(false);
+
+        // Refresh jobs data in context
+        refreshData("jobs");
       } else {
         const errorData = await response.json();
         throw new Error(errorData.message);
       }
     } catch (error) {
       console.error(error);
+      toast.error("Failed to load jobs. Please try again.");
+    } finally {
+      setLoading("jobs", false);
     }
   };
 
   useEffect(() => {
-    // console.log(errorMessage);
     if (errorMessage) {
       toast.error(`⚠️ ${errorMessage}`);
     }
@@ -80,7 +99,13 @@ const UploadModal: React.FC<UploadModalProps> = ({
     const fetchJobDetails = async () => {
       await getJobDetails();
     };
-    fetchJobDetails();
+
+    // Only fetch if jobs array is empty
+    if (!jobs || jobs.length === 0) {
+      fetchJobDetails();
+    } else {
+      setJobs(jobs);
+    }
   }, []);
 
   const getFileExtension = (filename: string): string =>
@@ -116,7 +141,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
 
   const handleRemoveFile = (index: number) => {
     setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
-    toast.success("File removed successfully");
+    // toast.success("File removed successfully");
   };
 
   const handleOpenFile = (file: UploadedFile) => {
@@ -131,7 +156,6 @@ const UploadModal: React.FC<UploadModalProps> = ({
     }
 
     if (candidateId) {
-      // console.log("📎 Opening parsed resume for candidate ID:", candidateId);
       setViewParsedResume(candidateId);
     } else {
       toast.error("Candidate ID not found for this file.");
@@ -151,17 +175,19 @@ const UploadModal: React.FC<UploadModalProps> = ({
       return;
     }
 
+    // Set loading state in DataContext
+    setLoading("candidates", true);
     setIsLoading(true);
+
     let progress = 0;
     const interval = setInterval(() => {
       progress += 10;
       if (progress >= 90) clearInterval(interval);
       setUploadProgress(progress);
-    }, 500);
+    }, 1000);
 
     const formData = new FormData();
     files.forEach((file) => formData.append("resume-files", file));
-    // formData.append("job_id", selectedJob);
     formData.append("job_id", jobId);
 
     const token = localStorage.getItem("token");
@@ -173,15 +199,11 @@ const UploadModal: React.FC<UploadModalProps> = ({
         body: formData,
       });
       setUploadProgress(100);
-      setUploadProgress(0);
 
       if (response.ok) {
         // Add successfully uploaded files to the list
         const responseData = await response.json();
 
-        // Add the newly uploaded files to our state
-        // This assumes your API returns information about the uploaded files
-        // Adjust according to your actual API response structure
         if (
           responseData.data &&
           Array.isArray(responseData.data.files) &&
@@ -199,7 +221,6 @@ const UploadModal: React.FC<UploadModalProps> = ({
           );
 
           setSuccessfullyUploadedFiles((prev) => [...prev, ...uploadedFiles]);
-          // console.log("✅ Uploaded with candidate IDs:", uploadedFiles);
         } else {
           // If API doesn't return file details, at least track the names
           const newUploadedFiles = files.map((file) => ({
@@ -220,6 +241,16 @@ const UploadModal: React.FC<UploadModalProps> = ({
         // Reset file input after successful upload
         if (fileInputRef.current) {
           fileInputRef.current.value = "";
+        }
+
+        // Refresh data in DataContext
+        refreshData("candidates");
+        refreshData("analytics");
+        refreshData("parseResume");
+
+        // Call onUploadSuccess callback if provided
+        if (onUploadSuccess) {
+          onUploadSuccess();
         }
       } else {
         const errorData = await response.json();
@@ -256,6 +287,9 @@ const UploadModal: React.FC<UploadModalProps> = ({
     } finally {
       setIsLoading(false);
       clearInterval(interval);
+      setUploadProgress(0);
+      // Update loading state in DataContext
+      setLoading("candidates", false);
     }
   };
 
@@ -274,14 +308,101 @@ const UploadModal: React.FC<UploadModalProps> = ({
     }
   };
 
+  const handleUpload = async () => {
+    if (files.length === 0) {
+      setError("Please select at least one file");
+      return;
+    }
+
+    if (!selectedJob) {
+      setError("Please select a job");
+      return;
+    }
+
+    const formData = new FormData();
+    files.forEach((file) => {
+      formData.append("resumes", file);
+    });
+    formData.append("jobId", selectedJob);
+
+    try {
+      setLoading("candidates", true);
+      setIsUploading(true);
+      setProgress(0);
+
+      const xhr = new XMLHttpRequest();
+
+      xhr.open(
+        "POST",
+        `${process.env.NEXT_PUBLIC_API_URL}/api/candidates/upload`,
+        true
+      );
+
+      xhr.setRequestHeader(
+        "Authorization",
+        `Bearer ${localStorage.getItem("token")}`
+      );
+
+      xhr.upload.onprogress = (event) => {
+        if (event.lengthComputable) {
+          const percentComplete = (event.loaded / event.total) * 100;
+          setProgress(percentComplete);
+        }
+      };
+
+      xhr.onload = () => {
+        if (xhr.status === 200) {
+          setFiles([]);
+          setSelectedJob("");
+          setIsOpen(false);
+          setSuccess("Resume uploaded successfully");
+
+          // Notify data context about changes
+          refreshData("candidates");
+          refreshData("analytics");
+
+          // Notify parent about success
+          onUploadSuccess();
+
+          // Close modal after delay
+          setTimeout(() => {
+            closeModal();
+          }, 2000);
+        } else {
+          let errorMsg = "Upload failed";
+          try {
+            const response = JSON.parse(xhr.responseText);
+            errorMsg = response.message || errorMsg;
+          } catch (e) {
+            // Use default error message
+          }
+          setError(errorMsg);
+        }
+        setIsUploading(false);
+        setLoading("candidates", false);
+      };
+
+      xhr.onerror = () => {
+        setError("Network error occurred. Please try again.");
+        setIsUploading(false);
+        setLoading("candidates", false);
+      };
+
+      xhr.send(formData);
+    } catch (err) {
+      setError("An unexpected error occurred. Please try again.");
+      setIsUploading(false);
+      setLoading("candidates", false);
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-opacity-70 flex items-center justify-center z-50 backdrop-blur-sm overflow-y-auto"
+      className="fixed inset-0 bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm overflow-y-auto p-4"
       onClick={closeModal}
-      style={{ maxHeight: "100vh" }}
     >
       <motion.div
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
@@ -294,7 +415,9 @@ const UploadModal: React.FC<UploadModalProps> = ({
           <h2 className="text-2xl font-bold text-[var(--text-primary)]">
             Upload Resumes
           </h2>
-          <button onClick={closeModal}>❌</button>
+          <button onClick={closeModal}>
+            <X />
+          </button>
         </div>
 
         {/* Job Dropdown */}
@@ -309,7 +432,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
           >
             <div className="flex items-center">
               <span className="absolute left-3 text-[var(--text-secondary)]">
-                🔍
+                <MousePointerClick />
               </span>
               {JobTitle || "Select a Job"}
             </div>
@@ -321,7 +444,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
           {isDropdownOpen && (
             <div className="absolute z-10 w-full mt-1 bg-[var(--surface)] border border-[var(--border)] rounded-lg shadow-lg max-h-60 overflow-y-auto">
               <div
-                className="p-3 hover:bg-[var(--surface-lighter)] cursor-pointer transition-colors duration-200 border-l-4 border-transparent hover:border-[var(--accent)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                className="p-3 hover:bg-[var(--surface-lighter)] cursor-pointer transition-colors duration-200 border-l-4 border-transparent text-[var(--text-secondary)]"
                 onClick={() => {
                   setSelectedJob("");
                   setIsDropdownOpen(false);
@@ -329,24 +452,47 @@ const UploadModal: React.FC<UploadModalProps> = ({
               >
                 Select a Job
               </div>
-              {jobs?.map((job, index) => (
+              {jobsList?.map((job, index) => (
                 <div
                   key={index}
-                  className="p-3 hover:bg-[var(--surface-lighter)] cursor-pointer transition-colors duration-200 border-l-4 border-transparent hover:border-[var(--accent)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                  className={`p-3 hover:bg-[var(--surface-lighter)] cursor-pointer transition-colors duration-200 border-l-4 border-transparent ${
+                    job.is_rcd_uploaded
+                      ? "text-[var(--text-primary)] hover:border-[var(--accent)]"
+                      : "text-[var(--text-secondary)] opacity-70"
+                  }`}
                   onClick={() => {
-                    setSelectedJob(job.id);
-                    setJobTitle(job.title);
-                    setJobId(job.id);
-                    setIsDropdownOpen(false);
+                    if (job.is_rcd_uploaded && job.is_rcd_uploaded === true) {
+                      setSelectedJob(job.id);
+                      setJobTitle(job.title);
+                      setJobId(job.id);
+                      setIsDropdownOpen(false);
+                    } else {
+                      toast.info(
+                        "Please upload Role Clarity Document first for this job"
+                      );
+                    }
                   }}
+                  title={
+                    !job.is_rcd_uploaded
+                      ? "Please upload Role Clarity Document first"
+                      : ""
+                  }
                 >
-                  {job.title}
+                  <div className="flex justify-between items-center">
+                    {job.title}
+                    {!job.is_rcd_uploaded && (
+                      <span className="text-xs text-[var(--text-muted)] ml-2 italic">
+                        Needs RCD
+                      </span>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
           )}
         </div>
 
+        {/* Rest of your component remains unchanged */}
         {/* Drop Zone */}
         <div
           className={`border-2 border-dashed rounded-lg p-8 text-center transition-all duration-300 ${
@@ -375,13 +521,13 @@ const UploadModal: React.FC<UploadModalProps> = ({
             className="hidden"
             id="file-input"
           />
-            <button
+          <button
             className="px-6 py-2 bg-[var(--accent)] text-white rounded hover:bg-[var(--accent-hover)]"
             onClick={() => fileInputRef.current?.click()}
-            >
+          >
             <span className="mr-2">📂</span>
             {files.length === 1 ? "Select Resume" : "Select Resumes"}
-            </button>
+          </button>
           <p className="mt-4 text-sm text-[var(--text-muted)]">
             Supported formats: PDF, DOCX, JPG, JPEG files only
           </p>
@@ -389,33 +535,74 @@ const UploadModal: React.FC<UploadModalProps> = ({
 
         {/* Uploaded files grid display */}
         {successfullyUploadedFiles.length > 0 && (
-          <div className="mt-6 border border-[var(--border)] rounded-lg p-4 bg-[var(--surface-secondary)]">
-            <h3 className="text-lg font-semibold mb-3 text-[var(--text-primary)]">
-              Uploaded Files
-            </h3>
-            <div className="max-h-48 overflow-y-auto pr-2">
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                {successfullyUploadedFiles.map((file, index) => (
-                  <div
-                    key={index}
-                    onClick={() => handleOpenFile(file)}
-                    className="flex items-center bg-[var(--surface)] p-2 rounded-md border border-[var(--border)] cursor-pointer hover:bg-[var(--blue-highlight)] transition-all duration-200"
-                  >
-                    <span className="text-xl mr-2">
-                      {getFileIcon(file.name)}
-                    </span>
-                    <span
-                      className="truncate text-sm text-[var(--text-primary)]"
-                      title={file.name}
-                    >
-                      {file.name}
-                    </span>
-                  </div>
-                ))}
+          <div className="mt-6 border border-[var(--border)] rounded-lg">
+            <div className="bg-[var(--surface)] border-b border-[var(--border)] px-4 py-3 flex items-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 mr-2 text-[var(--accent)]"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" />
+              </svg>
+              <h3 className="text-base font-medium text-[var(--text-primary)]">
+                Processed Files ({successfullyUploadedFiles.length})
+              </h3>
+            </div>
+
+            <div className="p-3 bg-[var(--surface-secondary)]">
+              <div className="max-h-56 overflow-y-auto pr-1">
+                <table className="min-w-full">
+                  <thead>
+                    <tr className="text-xs text-[var(--text-secondary)] uppercase tracking-wider">
+                      <th className="px-3 py-2 text-left">Name</th>
+                      <th className="px-3 py-2 text-left">Type</th>
+                      <th className="px-3 py-2 text-left">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[var(--border)]">
+                    {successfullyUploadedFiles.map((file, index) => (
+                      <tr
+                        key={index}
+                        className="bg-[var(--surface)] hover:bg-[var(--blue-highlight)] transition-colors duration-200 cursor-pointer"
+                        onClick={() => handleOpenFile(file)}
+                      >
+                        <td className="px-3 py-2 whitespace-nowrap">
+                          <div className="flex items-center">
+                            <span className="text-xl mr-2">
+                              {getFileIcon(file.name)}
+                            </span>
+                            <span
+                              className="text-sm font-medium truncate max-w-[150px]"
+                              title={file.name}
+                            >
+                              {file.name}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-3 py-2 whitespace-nowrap text-sm text-[var(--text-secondary)]">
+                          {file.name.split(".").pop()?.toUpperCase()}
+                        </td>
+                        <td className="px-3 py-2 whitespace-nowrap text-sm">
+                          <button
+                            className="text-[var(--accent)] hover:text-[var(--accent-hover)] transition-colors"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleOpenFile(file);
+                            }}
+                          >
+                            View Parsed Resume
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
         )}
+
         <AnimatePresence>
           {viewParsedResume && (
             <motion.div
@@ -423,7 +610,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
-              className="fixed inset-0 z-50 flex items-center justify-center bg-opacity-50 backdrop-blur-sm overflow-y-auto"
+              className="fixed inset-0 z-[1000] flex items-center justify-center bg-opacity-70 backdrop-blur-sm overflow-y-auto"
             >
               <div className="bg-[var(--surface)] rounded-lg shadow-lg p-6 w-full max-w-3xl h-[90vh] relative my-4 mx-auto overflow-y-auto">
                 <button
@@ -464,7 +651,9 @@ const UploadModal: React.FC<UploadModalProps> = ({
                   <span>
                     {getFileIcon(file.name)} {file.name}
                   </span>
-                  <button onClick={() => handleRemoveFile(idx)}>❌</button>
+                  <button onClick={() => handleRemoveFile(idx)}>
+                    <X />
+                  </button>
                 </li>
               ))}
             </ul>
@@ -475,20 +664,26 @@ const UploadModal: React.FC<UploadModalProps> = ({
               onClick={handleUploadResume}
               disabled={isLoading}
             >
-              <span className="mr-2">📤</span>
-              {files.length === 1 ? "Upload File" : "Upload Files"}
+              <span className="mr-2">
+                <UploadIcon />
+              </span>
+              {files.length === 1 ? "Upload Resume" : "Upload Resumes"}
             </button>
+
             {/* Full-screen Loading Overlay */}
             {isLoading && (
-              <div className="fixed inset-0  bg-opacity-90 flex items-center justify-center z-50">
+              <div
+                className="fixed inset-0 bg-opacity-90 flex items-center justify-center z-[999]"
+                onClick={(e) => e.stopPropagation()}
+              >
                 <div className="bg-[var(--surface)] p-8 rounded-xl shadow-2xl max-w-md w-full transform transition-all duration-300 scale-105 border border-[var(--border)]">
                   <div className="flex flex-col items-center">
                     <div className="text-6xl mb-6 animate-bounce">⏳</div>
                     <h3 className="text-2xl font-bold text-[var(--accent)] mb-4">
-                      Uploading Files
+                      Uploading Resumes
                     </h3>
                     <p className="text-[var(--text-secondary)] mb-6 text-center">
-                      Please wait while we process your files...
+                      Please wait while we parse your resumes...
                     </p>
 
                     <div className="w-full bg-[var(--border)] rounded-full h-4 mb-3">

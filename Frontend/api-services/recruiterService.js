@@ -82,14 +82,14 @@ export const fetchRejectedRecruiters = async () => {
  * @param {string} email - The email of the recruiter to accept.
  * @returns {Promise<Response>} - The API response.
  */
-export const acceptRecruiterRequest = async (email) => {
+export const acceptRecruiterRequest = async (email, message) => {
   try {
     const response = await fetch(`${BASE_URL}/auth/approve-recruiter-req`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ email }),
+      body: JSON.stringify({ email, message }),
     });
 
     return response;
@@ -102,16 +102,17 @@ export const acceptRecruiterRequest = async (email) => {
 /**
  * Rejects a recruiter request.
  * @param {string} email - The email of the recruiter to reject.
+ * @param {string} message
  * @returns {Promise<Response>} - The API response.
  */
-export const rejectRecruiterRequest = async (email) => {
+export const rejectRecruiterRequest = async (email, message) => {
   try {
     const response = await fetch(`${BASE_URL}/auth/reject-recruiter-req`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ email }),
+      body: JSON.stringify({ email, message }),
     });
 
     return response;

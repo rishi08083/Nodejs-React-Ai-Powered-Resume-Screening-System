@@ -52,6 +52,10 @@ body {
   --border: #e0e0e0;
   --shadow: rgba(0, 0, 0, 0.1);
   --blue-highlight: #1f6feb33;
+  --sidebar-width: 250px;
+}
+.sidebar-collapsed {
+  --sidebar-width: 80px; /* Width when sidebar is collapsed */
 }
 
 .dark {

@@ -11,7 +11,7 @@ exports.adminAnalytics = async (req, res) => {
       candidateCountByJob,
       candidateCountBySkill,
     ] = await Promise.all([
-      db.UnparsedResume.count({
+      db.ParseResume.count({
         where: {
           is_deleted: false,
         },
@@ -44,7 +44,7 @@ exports.adminAnalytics = async (req, res) => {
         group: "is_recommended",
         raw: true,
       }),
-      db.UnparsedResume.findAll({
+      db.ParseResume.findAll({
         attributes: [
           [db.sequelize.fn("DATE", db.sequelize.col("created_at")), "date"],
           [db.sequelize.fn("COUNT", db.sequelize.col("user_id")), "count"],

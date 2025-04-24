@@ -94,6 +94,7 @@ exports.getAllJobs = async (req, res) => {
         "openings",
         "is_rcd_uploaded",
       ],
+      order: [["createdAt", "DESC"]],
     });
     res.status(200).json({
       status: "success",
@@ -112,23 +113,53 @@ exports.getAllJobs = async (req, res) => {
 // Get jobs by ID
 exports.getJobById = async (req, res) => {
   try {
-    const jobs = await db.Jobs.findByPk(req.params.id);
-
-    if (!jobs)
+    const jobId = req.params.id;
+    console.log("Fetching job with ID:", jobId);
+    
+    // Remove is_deleted from where clause if not all jobs have this field
+    const job = await db.Jobs.findOne({
+      where: {
+        id: jobId
+      }
+    });
+    
+    if (!job) {
+      console.log("Job not found with ID:", jobId);
       return res.status(404).json({
         status: "error",
-        message: "Failed to retrieve job by ID",
+        message: "Job not found",
       });
-    res.status(200).json({
+    }
+
+    // Format skills for display if needed
+    let formattedJob = job.toJSON();
+    
+    // If skills_required is a string but should be an array
+    if (typeof formattedJob.skills_required === 'string' && formattedJob.skills_required) {
+      try {
+        // First try to parse as JSON
+        formattedJob.skills_required = JSON.parse(formattedJob.skills_required);
+      } catch (e) {
+        // If that fails, split by comma
+        formattedJob.skills_required = formattedJob.skills_required
+          .split(',')
+          .map(skill => skill.trim());
+      }
+    }
+
+    console.log("Successfully retrieved job:", formattedJob.title);
+    
+    return res.status(200).json({
       status: "success",
-      message: "Job retrieved by ID successfully",
-      data: jobs,
+      message: "Job details retrieved successfully",
+      data: formattedJob
     });
   } catch (error) {
-    res.status(500).json({
+    console.error("Error in getJobById:", error);
+    return res.status(500).json({
       status: "error",
-      message: "Failed to retrieve job by ID",
-      error: { details: error.message },
+      message: "Internal server error",
+      error: error.message
     });
   }
 };
