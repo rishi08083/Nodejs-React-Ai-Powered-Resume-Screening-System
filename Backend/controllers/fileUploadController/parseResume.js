@@ -1,6 +1,7 @@
 const { generateToken } = require("../../utils/tokenGeneration");
 const path = require("path");
 const axios = require("axios");
+const { screenCandidate } = require("../../utils/screenUtils");
 const db = require("../../models");
 
 exports.parseResumes = async (
@@ -60,7 +61,7 @@ exports.parseResumes = async (
 
         // Validate required fields in AI response
         const parsedData = aiResponse.data.data;
-        if ( !parsedData.email && !parsedData.phone) {
+        if (!parsedData.email && !parsedData.phone) {
           errors.push({
             file: fileName,
             error: "Incomplete resume data: Missing email and phone number",
@@ -86,9 +87,11 @@ exports.parseResumes = async (
 
         // Save the parsed data to the database
         const candidate = await db.Candidates.create({
-          name: parsedData.name ? parsedData.name : "Unknown Name",
-          email: parsedData.email ? parsedData.email : "Unknown Email",
-          phone_number: parsedData.phone ? parsedData.phone : "Unknown Phone",
+          name: parsedData.name ? parsedData.name : "Name Not Provided",
+          email: parsedData.email ? parsedData.email : "Email Not Provided",
+          phone_number: parsedData.phone
+            ? parsedData.phone
+            : "Phone Not Provided",
           resume_url: file.fileUrl,
           status: "parsed",
           job_id: job_id,
@@ -124,7 +127,6 @@ exports.parseResumes = async (
 
         if (parsedData.education && Array.isArray(parsedData.education)) {
           for (let edu of parsedData.education) {
-            
             const startDate = edu.start_date ? new Date(edu.start_date) : null;
             const endDate = edu.end_date ? new Date(edu.end_date) : null;
             const isValidDate = (date) => date instanceof Date && !isNaN(date);
@@ -137,6 +139,8 @@ exports.parseResumes = async (
             });
           }
         }
+        
+        await screenCandidate(candidate.id);
 
         // Add the successful upload to our tracking array
         successfulUploads.push({

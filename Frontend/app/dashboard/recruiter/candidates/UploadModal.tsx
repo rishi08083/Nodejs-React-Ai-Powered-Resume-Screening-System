@@ -112,18 +112,45 @@ const UploadModal: React.FC<UploadModalProps> = ({
   const getFileExtension = (filename: string): string =>
     filename.split(".").pop()?.toLowerCase() || "";
 
+  // Add a file limit constant at the top of your component
+  const FILE_UPLOAD_LIMIT = 15;
+
+  // Update your handleFile function to check against the limit
   const handleFile = (selectedFiles: FileList) => {
     const validFiles: File[] = [];
     const invalidFiles: string[] = [];
 
-    Array.from(selectedFiles).forEach((file) => {
-      const extension = getFileExtension(file.name);
-      if (fileTypes.includes(extension)) {
-        validFiles.push(file);
-      } else {
-        invalidFiles.push(file.name);
-      }
-    });
+    // Check if adding these files would exceed the limit
+    if (files.length + selectedFiles.length > FILE_UPLOAD_LIMIT) {
+      toastService.error(
+        `Only ${FILE_UPLOAD_LIMIT} resumes are allowed at one time.`
+      );
+      // Optionally, you can still add files up to the limit
+      const remainingSlots = FILE_UPLOAD_LIMIT - files.length;
+      if (remainingSlots <= 0) return;
+
+      // Only process files up to the remaining slots
+      const filesToProcess = Array.from(selectedFiles).slice(0, remainingSlots);
+
+      filesToProcess.forEach((file) => {
+        const extension = getFileExtension(file.name);
+        if (fileTypes.includes(extension)) {
+          validFiles.push(file);
+        } else {
+          invalidFiles.push(file.name);
+        }
+      });
+    } else {
+      // Original logic when under the limit
+      Array.from(selectedFiles).forEach((file) => {
+        const extension = getFileExtension(file.name);
+        if (fileTypes.includes(extension)) {
+          validFiles.push(file);
+        } else {
+          invalidFiles.push(file.name);
+        }
+      });
+    }
 
     if (invalidFiles.length > 0) {
       toastService.error(
@@ -405,11 +432,14 @@ const UploadModal: React.FC<UploadModalProps> = ({
 
         {/* Rest of your component remains unchanged */}
         {/* Drop Zone */}
+        {/* Drop Zone */}
         <div
           className={`border-2 border-dashed rounded-lg p-8 text-center transition-all duration-300 ${
             isDragging
               ? "border-[var(--accent)] bg-[var(--blue-highlight)] scale-105"
-              : "border-[var(--border)] hover:border-[var(--accent)] hover:bg-[var(--blue-highlight)]"
+              : files.length > FILE_UPLOAD_LIMIT
+                ? "border-orange-500 bg-orange-50 dark:bg-orange-950/20" // Visual cue when limit reached
+                : "border-[var(--border)] hover:border-[var(--accent)] hover:bg-[var(--blue-highlight)]"
           }`}
           onDrop={(e) => {
             e.preventDefault();
@@ -420,9 +450,21 @@ const UploadModal: React.FC<UploadModalProps> = ({
           onDragEnter={() => setIsDragging(true)}
           onDragLeave={() => setIsDragging(false)}
         >
-          <span className="text-4xl mb-3">📁</span>
-          <p className="mb-2">Drag & drop resumes here</p>
-          <p className="mb-3 text-[var(--text-muted)]">or</p>
+          <span className="text-4xl mb-3">
+            {files.length > FILE_UPLOAD_LIMIT ? "⚠️" : "📁"}
+          </span>
+
+          {files.length > FILE_UPLOAD_LIMIT ? (
+            <p className="mb-2 text-orange-600 dark:text-orange-400 font-medium">
+              File limit reached (15 maximum)
+            </p>
+          ) : (
+            <>
+              <p className="mb-2">Drag & drop resumes here</p>
+              <p className="mb-3 text-[var(--text-muted)]">or</p>
+            </>
+          )}
+
           <input
             type="file"
             multiple
@@ -431,16 +473,29 @@ const UploadModal: React.FC<UploadModalProps> = ({
             onChange={handleFileSelect}
             className="hidden"
             id="file-input"
+            disabled={files.length >= FILE_UPLOAD_LIMIT}
           />
+
           <button
-            className="px-6 py-2 bg-[var(--accent)] text-white rounded hover:bg-[var(--accent-hover)]"
-            onClick={() => fileInputRef.current?.click()}
+            className={`px-6 py-2 rounded ${
+              files.length >= FILE_UPLOAD_LIMIT
+                ? "bg-gray-400 cursor-not-allowed text-white"
+                : "bg-[var(--accent)] text-white hover:bg-[var(--accent-hover)]"
+            }`}
+            onClick={() =>
+              files.length < FILE_UPLOAD_LIMIT && fileInputRef.current?.click()
+            }
+            disabled={files.length >= FILE_UPLOAD_LIMIT}
           >
             <span className="mr-2">📂</span>
             {files.length === 1 ? "Select Resume" : "Select Resumes"}
           </button>
+
           <p className="mt-4 text-sm text-[var(--text-muted)]">
             Supported formats: PDF, DOCX, JPG, JPEG files only
+            <span className="ml-1 font-medium">
+              (Max {FILE_UPLOAD_LIMIT} files)
+            </span>
           </p>
         </div>
 
@@ -552,7 +607,18 @@ const UploadModal: React.FC<UploadModalProps> = ({
         {/* Files to be uploaded */}
         {files.length > 0 && (
           <div className="mt-6">
-            <h3 className="text-lg font-semibold mb-3">Selected Files</h3>
+            <h3 className="text-lg font-semibold mb-3 flex justify-between">
+              <span>Selected Files</span>
+              <span
+                className={`text-sm font-normal ${
+                  files.length > FILE_UPLOAD_LIMIT
+                    ? "text-orange-500"
+                    : "text-[var(--text-secondary)]"
+                }`}
+              >
+                {files.length} of {FILE_UPLOAD_LIMIT} maximum
+              </span>
+            </h3>
             <ul className="space-y-2">
               {files.map((file, idx) => (
                 <li
@@ -573,7 +639,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
               type="button"
               className="mt-5 w-full px-6 py-3 bg-[var(--accent)] text-[var(--dark-bg)] rounded-lg hover:bg-[var(--accent-hover)] transform hover:-translate-y-1 transition-all duration-300 flex items-center justify-center disabled:opacity-70 disabled:transform-none"
               onClick={handleUploadResume}
-              disabled={isLoading}
+              disabled={isLoading || files.length === 0}
             >
               <span className="mr-2">
                 <UploadIcon />

@@ -9,7 +9,6 @@ const crypto = require("crypto");
 const db = require("../../models");
 const { parseResumes } = require("./parseResume");
 const { generateFileName } = require("../../utils/fileNameGenerator");
-const { screenCandidate } = require("../../utils/screenUtils");
 require("dotenv").config();
 
 // AWS S3 Configuration
@@ -76,15 +75,7 @@ exports.uploadResumes = async (req, res) => {
       req.files
     );
 
-    // screen candidates based on parsing results
-    const parsedCandidates = successfulUploads.map((candidate) => ({
-      candidate_id: candidate.candidateId,
-    }));
-
-    for (const candidate of parsedCandidates) {
-      await screenCandidate(candidate.candidate_id);
-    }
-
+   
     if (parsingErrors.length > 0 && successfulUploads.length === 0) {
       // Complete failure - all files failed to parse
       console.error("All parsing failed:", parsingErrors);
