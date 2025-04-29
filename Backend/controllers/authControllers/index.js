@@ -8,7 +8,7 @@ const { Op, where } = require("sequelize");
 const adminRegister = async (req, res) => {
   try {
     const { name, email, password, apikey } = req.body;
-    if (apikey === "Niket") {
+    if (apikey === process.env.API_KEY) {
       const hashedPassword = await bcrypt.hash(password, 10);
       const is_exist = await db.Users.findOne({
         where: {

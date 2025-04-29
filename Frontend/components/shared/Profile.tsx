@@ -1,11 +1,9 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "../../../../lib/auth";
-import toastService from "../../../../utils/toastService";
-import { useToastInit } from "../../../../hooks/useToastInit";
-
-import { withRole } from "../../../../components/withRole";
+import { useAuth } from "../../lib/auth";
+import toastService from "../../utils/toastService";
+import { useToastInit } from "../../hooks/useToastInit";
 
 function Profile() {
   useToastInit();
@@ -256,7 +254,9 @@ function Profile() {
 
       const data = await response.json();
       if (response.ok) {
-        toastService.success("Password changed successfully. Please log in again.");
+        toastService.success(
+          "Password changed successfully. Please log in again."
+        );
         setUser(null);
         localStorage.removeItem("token");
         setTimeout(() => {
@@ -277,11 +277,11 @@ function Profile() {
   const getInitials = (name: string) => {
     return name
       ? name
-        .split(" ")
-        .map((word) => word[0])
-        .join("")
-        .toUpperCase()
-        .substring(0, 2)
+          .split(" ")
+          .map((word) => word[0])
+          .join("")
+          .toUpperCase()
+          .substring(0, 2)
       : "U";
   };
 
@@ -427,7 +427,7 @@ function Profile() {
           )}
           {!changePasswordMode && (
             <div className="security-info">
-              <p className="text-sm text-[var(--text-secondary)] font-medium">
+              <p className="text-sm text-[var(--text-secondary)]">
                 <strong>Note: </strong> Updating your account password will
                 enhance security, and you will be logged out automatically after
                 the update.
@@ -552,4 +552,4 @@ function Profile() {
   );
 }
 
-export default withRole(Profile, ['recruiter']);
+export default Profile;

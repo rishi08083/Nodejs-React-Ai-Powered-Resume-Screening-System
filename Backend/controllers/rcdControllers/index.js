@@ -20,8 +20,6 @@ const s3 = new S3Client({
   },
 });
 
-
-
 // Upload Role Clarity Documents API
 exports.uploadRCD = async (req, res) => {
   try {

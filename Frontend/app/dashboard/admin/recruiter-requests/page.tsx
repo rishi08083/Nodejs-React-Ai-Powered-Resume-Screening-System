@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import toastService from "../../../../utils/toastService";
 import { useToastInit } from "../../../../hooks/useToastInit";
 
-
 import {
   fetchRecruiterRequests,
   fetchAcceptedRecruiters,
@@ -131,13 +130,15 @@ function RecruiterRequests() {
     <div className="min-h-screen bg-[var(--bg)] py-8 px-0 sm:px-0 lg:px-0 text-[var(--text-primary)] mt-10">
       <div className="mx-auto">
         <div className="bg-[var(--surface)] rounded-xl shadow-lg overflow-hidden border border-[var(--border)]">
-          
           {/* Filter Buttons and Search Bar */}
           <div className="flex justify-between items-center p-4 border-b border-[var(--border)]">
             {/* Filter Buttons */}
             <div className="flex space-x-4">
               <button
-                onClick={() => setFilter("pending")}
+                onClick={() => {
+                  setFilter("pending");
+                  setCurrentStat("requested-recruiters");
+                }}
                 className={`px-4 py-2 rounded-lg transition-colors duration-300 ${
                   filter === "pending"
                     ? "bg-[var(--accent)] text-[var(--dark-bg)]"
@@ -231,7 +232,7 @@ function RecruiterRequests() {
                               disabled={actionInProgress === request.email}
                               className="px-3 py-1 bg-[var(--accent)] text-[var(--dark-bg)] rounded-lg hover:bg-[var(--accent)]/90 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                              Restore Access
+                              Grant Access
                             </button>
                             <button
                               onClick={() => {
@@ -241,7 +242,7 @@ function RecruiterRequests() {
                               disabled={actionInProgress === request.email}
                               className="px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                              Suspend Access
+                              Reject Access
                             </button>
                           </div>
                         )}
@@ -309,33 +310,73 @@ function RecruiterRequests() {
           </div>
 
           {messageModal && (
-            <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
-              <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md text-black relative">
-                <div className="flex justify-between items-center mb-4">
+            <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center backdrop-blur-sm animate-fadeIn">
+              <div className="bg-[var(--surface)] rounded-lg shadow-xl p-6 w-full max-w-md text-[var(--text-primary)] relative border border-[var(--border)] animate-scaleIn">
+                <div className="flex justify-between items-center mb-5">
                   <h2 className="text-lg font-semibold">
                     Reason for{" "}
-                    {currentStat === "accepted-tab" ? "Accept" : "Reject"}
+                    <span
+                      className={
+                        currentStat === "accepted-tab"
+                          ? "text-green-500"
+                          : "text-red-500"
+                      }
+                    >
+                      {currentStat === "accepted-tab"
+                        ? "Restoring"
+                        : "Rejecting"}{" "}
+                      Access
+                    </span>
                   </h2>
-                  {/* Close Button with Emoji and closeModal function */}
+                  {/* Styled Close Button */}
                   <button
                     onClick={() => {
                       closeModal();
                       setCurrentStat("");
                     }}
-                    className="text-red-500 hover:text-red-700 text-2xl font-bold"
+                    className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-[var(--surface-lighter)] text-[var(--text-secondary)] transition-colors"
+                    aria-label="Close modal"
                   >
-                    ❌
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <line x1="18" y1="6" x2="6" y2="18"></line>
+                      <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
                   </button>
                 </div>
-                <textarea
-                  className="w-full h-24 border rounded-lg p-2 mb-4"
-                  placeholder="Enter rejection reason..."
-                  value={rejectionMessage}
-                  onChange={(e) => setRejectionMessage(e.target.value)}
-                />
-                <div className="flex justify-end space-x-2">
+
+                {/* Form Field with Required Indicator */}
+                <div className="mb-5">
+                  <label className="block text-sm font-medium mb-1 text-[var(--text-secondary)]">
+                    Message <span className="text-red-500">*</span>
+                  </label>
+                  <textarea
+                    className="w-full h-28 border rounded-lg p-3 bg-[var(--bg)] text-[var(--text-primary)] border-[var(--border)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] placeholder:text-[var(--text-secondary)]/60 transition-all"
+                    placeholder={`Please provide a reason for ${currentStat === "accepted-tab" ? "restoring" : "rejecting"} access...`}
+                    value={rejectionMessage}
+                    onChange={(e) => setRejectionMessage(e.target.value)}
+                    required
+                  />
+                  {rejectionMessage.trim() === "" && (
+                    <p className="mt-1 text-sm text-red-500">
+                      This field is required
+                    </p>
+                  )}
+                </div>
+
+                {/* Action Buttons with Consistent Styling */}
+                <div className="flex justify-end space-x-3">
                   <button
-                    className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                    className="px-4 py-2 bg-[var(--surface-lighter)] text-[var(--text-primary)] rounded-lg hover:bg-[var(--border)] transition-colors"
                     onClick={() => {
                       closeModal();
                       setCurrentStat("");
@@ -344,8 +385,14 @@ function RecruiterRequests() {
                     Cancel
                   </button>
                   <button
-                    className="px-4 py-2 bg-[#FFB300] text-white rounded hover:bg-[#E69F00]"
+                    className={`px-4 py-2 rounded-lg transition-colors ${
+                      rejectionMessage.trim() === ""
+                        ? "bg-[var(--accent)]/50 cursor-not-allowed text-[var(--dark-bg)]/70"
+                        : "bg-[var(--accent)] text-[var(--dark-bg)] hover:bg-[var(--accent)]/90"
+                    }`}
                     onClick={() => {
+                      if (rejectionMessage.trim() === "") return;
+
                       currentStat === "accepted-tab"
                         ? handleAcceptSubmit(
                             selectedRecruiter,
@@ -357,6 +404,7 @@ function RecruiterRequests() {
                           );
                       closeModal();
                     }}
+                    disabled={rejectionMessage.trim() === ""}
                   >
                     Submit
                   </button>
