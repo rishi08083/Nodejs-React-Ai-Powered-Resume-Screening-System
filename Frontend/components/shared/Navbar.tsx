@@ -108,16 +108,16 @@ export default function Navbar({
 
         {/* User profile dropdown */}
         <div className="relative" ref={dropdownRef}>
-          <motion.button
+            <motion.button
             whileTap={{ scale: 0.9 }}
             className="flex items-center gap-2 p-1.5 rounded-full hover:bg-[var(--surface-lighter)] transition-colors"
             onClick={() => setModalVisible(!modalVisible)}
             aria-label="User menu"
-          >
-            <div className="h-8 w-8 rounded-full border-2 border-[var(--accent)] flex items-center justify-center text-[var(--accent)] overflow-hidden">
+            >
+            <div className="h-8 w-8 rounded-full border-2 border-[var(--text-primary)] flex items-center justify-center text-[var(--text-primary)] overflow-hidden">
               <UserRound className="w-5 h-5" />
             </div>
-          </motion.button>
+            </motion.button>
 
           <AnimatePresence>
             {modalVisible && (
