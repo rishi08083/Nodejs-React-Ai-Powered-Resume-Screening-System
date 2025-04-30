@@ -39,9 +39,8 @@ exports.uploadResumes = async (req, res) => {
       });
     }
 
-    const uploadedFiles = [];
-
-    for (const file of req.files) {
+    // Upload all files to S3 in parallel
+    const uploadPromises = req.files.map(async (file) => {
       const fileName = generateFileName(file.originalname);
       const params = {
         Bucket: process.env.AWS_BUCKET_NAME,
@@ -53,9 +52,13 @@ exports.uploadResumes = async (req, res) => {
       await s3.send(new PutObjectCommand(params));
 
       const fileUrl = `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
-      uploadedFiles.push({ fileName, fileUrl, mimeType: file.mimetype });
-    }
+      return { fileName, fileUrl, mimeType: file.mimetype, originalName: file.originalname };
+    });
 
+    // Wait for all uploads to complete
+    const uploadedFiles = await Promise.all(uploadPromises);
+
+    // Create unparsed resume records in bulk (one DB operation)
     const unparsedResumes = uploadedFiles.map((file) => ({
       user_id: req.user.id,
       resume_url: file.fileUrl,
@@ -64,18 +67,51 @@ exports.uploadResumes = async (req, res) => {
     }));
 
     await db.UnparsedResume.bulkCreate(unparsedResumes);
+    
     const job_id = req.body.job_id;
     const user_id = req.user.id;
 
-    // Wait for AI parsing and get results
-    const { errors: parsingErrors, successfulUploads } = await parseResumes(
-      uploadedFiles,
-      job_id,
-      user_id,
-      req.files
-    );
+    // Process files in smaller batches for optimal performance
+    const BATCH_SIZE = 10; // Adjust based on your server capacity
+    const results = { errors: [], successfulUploads: [] };
+    
+    // Create batches of files
+    const batches = [];
+    for (let i = 0; i < uploadedFiles.length; i += BATCH_SIZE) {
+      batches.push(uploadedFiles.slice(i, i + BATCH_SIZE));
+    }
+    
+    // Process each batch in parallel
+    const batchPromises = batches.map(async (batch) => {
+      // Create a version of req.files that matches the batch
+      const batchOriginalFiles = batch.map(file => {
+        return { originalname: file.originalName };
+      });
+      
+      // Process this batch
+      const batchResult = await parseResumes(
+        batch,
+        job_id, 
+        user_id,
+        batchOriginalFiles
+      );
+      
+      // Return batch results
+      return batchResult;
+    });
+    
+    // Collect all batch results
+    const batchResults = await Promise.all(batchPromises);
+    
+    // Combine results from all batches
+    batchResults.forEach(result => {
+      results.errors.push(...result.errors);
+      results.successfulUploads.push(...result.successfulUploads);
+    });
+    
+    const { errors: parsingErrors, successfulUploads } = results;
 
-   
+    // Handle response based on results
     if (parsingErrors.length > 0 && successfulUploads.length === 0) {
       // Complete failure - all files failed to parse
       console.error("All parsing failed:", parsingErrors);
@@ -100,7 +136,7 @@ exports.uploadResumes = async (req, res) => {
     // All files successfully parsed
     res.status(200).json({
       status: "success",
-      message: "Files uploaded and parsed and screened successfully",
+      message: "Files uploaded and parsed successfully",
       data: {
         candidates: successfulUploads,
         files: uploadedFiles,

@@ -98,49 +98,69 @@ exports.parseResumes = async (
           user_id: user_id,
         });
 
-        await candidate.createParsed_resume({
-          resume_obj: parsedData,
-          user_id: user_id,
-          is_deleted: false,
+        // Create an array of promises to execute concurrently
+        const promises = [
+          // Add parsed resume data
+          candidate.createParsed_resume({
+            resume_obj: parsedData,
+            user_id: user_id,
+            is_deleted: false,
+          }),
+
+          // Add skills if available
+          ...(parsedData.skills && Array.isArray(parsedData.skills)
+            ? [candidate.createSkill({ skill_names: parsedData.skills })]
+            : []),
+
+          // Add experience if available
+          ...(parsedData.experience && Array.isArray(parsedData.experience)
+            ? parsedData.experience.map((exp) => {
+                const startDate = exp.start_date
+                  ? new Date(exp.start_date)
+                  : null;
+                const endDate = exp.end_date ? new Date(exp.end_date) : null;
+                const isValidDate = (date) =>
+                  date instanceof Date && !isNaN(date);
+
+                return candidate.createExperience({
+                  company_names: exp.company || "Unknown Company",
+                  job_titles: exp.job_title || "Unknown Job Title",
+                  start_date: isValidDate(startDate) ? startDate : null,
+                  end_date: isValidDate(endDate) ? endDate : null,
+                });
+              })
+            : []),
+
+          // Add education if available
+          ...(parsedData.education && Array.isArray(parsedData.education)
+            ? parsedData.education.map((edu) => {
+                const startDate = edu.start_date
+                  ? new Date(edu.start_date)
+                  : null;
+                const endDate = edu.end_date ? new Date(edu.end_date) : null;
+                const isValidDate = (date) =>
+                  date instanceof Date && !isNaN(date);
+
+                return candidate.createEducation({
+                  institution_name: edu?.College || "Unknown Institution",
+                  degree: edu?.Degree || "Unknown Degree",
+                  start_date: isValidDate(startDate) ? startDate : null,
+                  end_date: isValidDate(endDate) ? endDate : null,
+                });
+              })
+            : []),
+        ];
+
+        // Execute all database operations concurrently
+        await Promise.all(promises);
+
+        // Screen the candidate in the background without waiting
+        screenCandidate(candidate.id).catch((err) => {
+          console.error(
+            `Background screening failed for candidate ${candidate.id}:`,
+            err
+          );
         });
-
-        if (parsedData.skills && Array.isArray(parsedData.skills)) {
-          await candidate.createSkill({
-            skill_names: parsedData.skills,
-          });
-        }
-
-        if (parsedData.experience && Array.isArray(parsedData.experience)) {
-          for (let exp of parsedData.experience) {
-            const startDate = exp.start_date ? new Date(exp.start_date) : null;
-            const endDate = exp.end_date ? new Date(exp.end_date) : null;
-            const isValidDate = (date) => date instanceof Date && !isNaN(date);
-
-            await candidate.createExperience({
-              company_names: exp.company || "Unknown Company",
-              job_titles: exp.job_title || "Unknown Job Title",
-              start_date: isValidDate(startDate) ? startDate : null,
-              end_date: isValidDate(endDate) ? endDate : null,
-            });
-          }
-        }
-
-        if (parsedData.education && Array.isArray(parsedData.education)) {
-          for (let edu of parsedData.education) {
-            const startDate = edu.start_date ? new Date(edu.start_date) : null;
-            const endDate = edu.end_date ? new Date(edu.end_date) : null;
-            const isValidDate = (date) => date instanceof Date && !isNaN(date);
-
-            await candidate.createEducation({
-              institution_name: edu?.College || "Unknown Institution",
-              degree: edu?.Degree || "Unknown Degree",
-              start_date: isValidDate(startDate) ? startDate : null,
-              end_date: isValidDate(endDate) ? endDate : null,
-            });
-          }
-        }
-        
-        await screenCandidate(candidate.id);
 
         // Add the successful upload to our tracking array
         successfulUploads.push({

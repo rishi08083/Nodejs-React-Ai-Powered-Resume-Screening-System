@@ -1,10 +1,5 @@
 "use client";
-import React, {
-  useState,
-  useEffect,
-  useMemo,
-  useRef,
-} from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { motion } from "framer-motion";
 import axios from "axios";
 
@@ -15,7 +10,6 @@ import { withRole } from "../../../../components/withRole";
 
 import { useJobs, useCandidates } from "../../../../hooks";
 import { useData } from "../../../../lib/dataContext";
-
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -250,9 +244,24 @@ const CandidateList = () => {
           Screened Candidates
         </h1>
         <div className="h-1 w-24 bg-[var(--accent)] rounded-full mb-4"></div>
-        <p className="text-[var(--text-secondary)] mt-2">
-          Find and view candidates.
-        </p>
+        <div className="flex items-center justify-between mt-2">
+          <p className="text-[var(--text-secondary)]">
+        Find and manage candidates for your job openings.
+          </p>
+          <button
+        onClick={() => handleRefresh()}
+        className="px-4 py-2 rounded-lg shadow-md transition-all duration-300 bg-[var(--surface)] text-[var(--text-secondary)] border border-[var(--border)] hover:border-[var(--accent)] hover:text-[var(--accent)] flex items-center gap-2"
+        aria-label="Refresh Candidates"
+          >
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M21 2v6h-6"></path>
+          <path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path>
+          <path d="M3 22v-6h6"></path>
+          <path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path>
+        </svg>
+        Refresh
+          </button>
+        </div>
       </motion.div>
 
       {/* Search, Filter, and Recommendation Filter */}
@@ -272,7 +281,7 @@ const CandidateList = () => {
 
       <CandidateTable
         handleShowFeedback={handleShowFeedback}
-        candidates={filteredCandidates} 
+        candidates={filteredCandidates}
         setCandidates={setcandidates}
         setOriginalCandidates={() => refreshCandidates()}
         selectedJob={selectedJob}
