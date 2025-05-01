@@ -4,9 +4,8 @@ import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
 import toastService from "../../utils/toastService";
 import { useToastInit } from "../../hooks/useToastInit";
-
 import { useRouter } from "next/navigation";
-
+import { useEffect, useState } from "react";
 interface GoogleDecodedToken {
   name: string;
   email: string;
@@ -28,7 +27,9 @@ export default function GoogleSignIn({
   useToastInit();
   const router = useRouter();
 
-  const handleGoogleSuccess = async (credentialResponse: any) => {
+  const handleGoogleSuccess = async (credentialResponse: {
+    credential?: string;
+  }) => {
     try {
       if (!credentialResponse?.credential) {
         toastService.error("Google login failed: No credentials returned.");
@@ -93,28 +94,33 @@ export default function GoogleSignIn({
     }
   };
 
+  const [width, setWidth] = useState<number | undefined>(undefined);
+
+  useEffect(() => {
+    // Only access document on the client side
+    const parentElement = document.getElementById("parentElement");
+    if (parentElement) {
+      setWidth(parentElement.offsetWidth);
+    }
+  }, []);
+
   return (
     <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}>
-      <div className="flex items-center justify-center w-full max-w-full overflow-hidden px-2">
-        <div className="w-full max-w-[335px]">
-          <GoogleLogin
-            type="standard"
-            theme="outline"
-            logo_alignment="left"
-            size="large"
-            width="100%"
-            onSuccess={handleGoogleSuccess}
-            onError={() => {
-              toastService.error("Google login failed");
-              onError?.("Google login failed");
-            }}
-            useOneTap
-            shape="rectangular"
-            text={mode === "login" ? "signin_with" : "signup_with"}
-            context={mode === "login" ? "signin" : "signup"}
-          />
-        </div>
-      </div>
+      <GoogleLogin
+        type="standard"
+        theme="outline"
+        size="large"
+        width={width}
+        text={mode === "login" ? "continue_with" : "signup_with"}
+        shape="rectangular"
+        onSuccess={handleGoogleSuccess}
+        onError={() => {
+          toastService.error("Google login failed");
+          onError?.("Google login failed");
+        }}
+        useOneTap
+        context={mode === "login" ? "signin" : "signup"}
+      />
     </GoogleOAuthProvider>
   );
 }

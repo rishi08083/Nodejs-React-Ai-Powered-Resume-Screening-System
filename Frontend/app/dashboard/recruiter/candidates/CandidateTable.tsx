@@ -272,6 +272,8 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
           {" "}
           {/* Set a fixed height and use flex column */}
           <table className="min-w-full table-auto border-collapse">
+           
+
             {/* Make the header sticky */}
             <thead>
               <tr className="bg-[var(--bg)] border-b border-[var(--border)]">

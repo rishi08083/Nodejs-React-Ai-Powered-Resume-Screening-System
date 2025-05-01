@@ -11,17 +11,15 @@ const fileFilter = (req, file, cb) => {
   const allowedMimeTypes = [
     "application/pdf",
     "application/msword",
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",  
     "image/jpeg",
-    "image/png",
-    "image/gif",
   ];
   if (allowedMimeTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
     cb(
       new Error(
-        "Invalid file type. Only PDF, DOC, DOCX, and images are allowed."
+        "Invalid file type. Only PDF, DOC, DOCX, and JPEG images are allowed."
       )
     );
   }
@@ -33,18 +31,22 @@ const upload = multer({
   limits: { files: 15 }, // Restrict to a maximum of 15 files
 });
 
-Router.get('/get-resume/:candidateId', auth.authMiddleware, async (req, res) => {
-  try {
-    await fileUploadController.getResume(req, res);
-  } catch (err) {
-    console.error("Error in getResume:", err);
-    res.status(500).json({
-      status: "error",
-      message: "Internal server error",
-      error: { details: err.message },
-    });
+Router.get(
+  "/get-resume/:candidateId",
+  auth.authMiddleware,
+  async (req, res) => {
+    try {
+      await fileUploadController.getResume(req, res);
+    } catch (err) {
+      console.error("Error in getResume:", err);
+      res.status(500).json({
+        status: "error",
+        message: "Internal server error",
+        error: { details: err.message },
+      });
+    }
   }
-});
+);
 
 // File Upload API
 Router.post(

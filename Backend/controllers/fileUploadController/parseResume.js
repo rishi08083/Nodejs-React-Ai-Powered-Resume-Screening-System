@@ -1,6 +1,7 @@
 const { generateToken } = require("../../utils/tokenGeneration");
 const path = require("path");
 const axios = require("axios");
+const { screenCandidate } = require("../../utils/screenUtils");
 const db = require("../../models");
 
 exports.parseResumes = async (
@@ -60,7 +61,7 @@ exports.parseResumes = async (
 
         // Validate required fields in AI response
         const parsedData = aiResponse.data.data;
-        if ( !parsedData.email && !parsedData.phone) {
+        if (!parsedData.email && !parsedData.phone) {
           errors.push({
             file: fileName,
             error: "Incomplete resume data: Missing email and phone number",
@@ -86,57 +87,80 @@ exports.parseResumes = async (
 
         // Save the parsed data to the database
         const candidate = await db.Candidates.create({
-          name: parsedData.name ? parsedData.name : "Unknown Name",
-          email: parsedData.email ? parsedData.email : "Unknown Email",
-          phone_number: parsedData.phone ? parsedData.phone : "Unknown Phone",
+          name: parsedData.name ? parsedData.name : "Name Not Provided",
+          email: parsedData.email ? parsedData.email : "Email Not Provided",
+          phone_number: parsedData.phone
+            ? parsedData.phone
+            : "Phone Not Provided",
           resume_url: file.fileUrl,
           status: "parsed",
           job_id: job_id,
           user_id: user_id,
         });
 
-        await candidate.createParsed_resume({
-          resume_obj: parsedData,
-          user_id: user_id,
-          is_deleted: false,
+        // Create an array of promises to execute concurrently
+        const promises = [
+          // Add parsed resume data
+          candidate.createParsed_resume({
+            resume_obj: parsedData,
+            user_id: user_id,
+            is_deleted: false,
+          }),
+
+          // Add skills if available
+          ...(parsedData.skills && Array.isArray(parsedData.skills)
+            ? [candidate.createSkill({ skill_names: parsedData.skills })]
+            : []),
+
+          // Add experience if available
+          ...(parsedData.experience && Array.isArray(parsedData.experience)
+            ? parsedData.experience.map((exp) => {
+                const startDate = exp.start_date
+                  ? new Date(exp.start_date)
+                  : null;
+                const endDate = exp.end_date ? new Date(exp.end_date) : null;
+                const isValidDate = (date) =>
+                  date instanceof Date && !isNaN(date);
+
+                return candidate.createExperience({
+                  company_names: exp.company || "Unknown Company",
+                  job_titles: exp.job_title || "Unknown Job Title",
+                  start_date: isValidDate(startDate) ? startDate : null,
+                  end_date: isValidDate(endDate) ? endDate : null,
+                });
+              })
+            : []),
+
+          // Add education if available
+          ...(parsedData.education && Array.isArray(parsedData.education)
+            ? parsedData.education.map((edu) => {
+                const startDate = edu.start_date
+                  ? new Date(edu.start_date)
+                  : null;
+                const endDate = edu.end_date ? new Date(edu.end_date) : null;
+                const isValidDate = (date) =>
+                  date instanceof Date && !isNaN(date);
+
+                return candidate.createEducation({
+                  institution_name: edu?.College || "Unknown Institution",
+                  degree: edu?.Degree || "Unknown Degree",
+                  start_date: isValidDate(startDate) ? startDate : null,
+                  end_date: isValidDate(endDate) ? endDate : null,
+                });
+              })
+            : []),
+        ];
+
+        // Execute all database operations concurrently
+        await Promise.all(promises);
+
+        // Screen the candidate in the background without waiting
+        screenCandidate(candidate.id).catch((err) => {
+          console.error(
+            `Background screening failed for candidate ${candidate.id}:`,
+            err
+          );
         });
-
-        if (parsedData.skills && Array.isArray(parsedData.skills)) {
-          await candidate.createSkill({
-            skill_names: parsedData.skills,
-          });
-        }
-
-        if (parsedData.experience && Array.isArray(parsedData.experience)) {
-          for (let exp of parsedData.experience) {
-            const startDate = exp.start_date ? new Date(exp.start_date) : null;
-            const endDate = exp.end_date ? new Date(exp.end_date) : null;
-            const isValidDate = (date) => date instanceof Date && !isNaN(date);
-
-            await candidate.createExperience({
-              company_names: exp.company || "Unknown Company",
-              job_titles: exp.job_title || "Unknown Job Title",
-              start_date: isValidDate(startDate) ? startDate : null,
-              end_date: isValidDate(endDate) ? endDate : null,
-            });
-          }
-        }
-
-        if (parsedData.education && Array.isArray(parsedData.education)) {
-          for (let edu of parsedData.education) {
-            
-            const startDate = edu.start_date ? new Date(edu.start_date) : null;
-            const endDate = edu.end_date ? new Date(edu.end_date) : null;
-            const isValidDate = (date) => date instanceof Date && !isNaN(date);
-
-            await candidate.createEducation({
-              institution_name: edu?.College || "Unknown Institution",
-              degree: edu?.Degree || "Unknown Degree",
-              start_date: isValidDate(startDate) ? startDate : null,
-              end_date: isValidDate(endDate) ? endDate : null,
-            });
-          }
-        }
 
         // Add the successful upload to our tracking array
         successfulUploads.push({
